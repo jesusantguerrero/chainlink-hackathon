@@ -19,11 +19,15 @@ contract PCNFT is ERC721URIStorage, Ownable {
 
     function mint(address _to, string memory _tokenURI) public onlyOwner {
         require(availableTokens > 0, "No more tokens available");
-        availableTokens.sub(1);
+        availableTokens = availableTokens.sub(1);
         _totalSupply.increment();
         uint tokenId = _totalSupply.current();
         _mint(_to, tokenId);
         _setTokenURI(tokenId, _tokenURI);
+    }
+
+    function getAvailableTokens() public view returns (uint) {
+        return availableTokens;
     }
 
     function totalSupply () public view returns (uint) {
