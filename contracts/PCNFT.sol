@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol"; 
+import "./PCBase.sol";
 
-contract PCNFT is ERC721URIStorage, Ownable {
+contract PCNFT is ERC721URIStorage, PCBase, Ownable {
     using Counters for Counters.Counter;
     using SafeMath for uint;
     Counters.Counter private _totalSupply;
@@ -16,13 +17,14 @@ contract PCNFT is ERC721URIStorage, Ownable {
     uint private claimersTokenLimit = 1;
     
     address private contractOwner;
-    mapping(uint => string) private tokenToImage;
+    mapping(uint => string) internal tokenToImage;
     mapping(uint => bool) private tokenToClaimed;
     mapping(address => uint) private claimers;
     mapping(address => uint) private claimerTokensCount;
 
     constructor(uint _avaiblableTokens) ERC721("IBX", "Insane Box") {
         availableTokens = _avaiblableTokens;
+        contractOwner = msg.sender;
     }
 
     function mint(address _to, string memory _imageURI) public onlyOwner {
@@ -32,6 +34,7 @@ contract PCNFT is ERC721URIStorage, Ownable {
         uint tokenId = _totalSupply.current();
         _mint(_to, tokenId);
         tokenToImage[tokenId] = _imageURI;
+        _generateTokenAttributes(tokenId, string(abi.encodePacked("token ", tokenId)));
         if (_to != contractOwner) {
             _claim(tokenId, _to);
         }
