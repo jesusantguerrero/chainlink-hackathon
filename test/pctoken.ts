@@ -31,4 +31,14 @@ describe("PC Token", function () {
       pcToken.mint(user2.address, "ipfs://newtoken.jpg")
     ).eventually.to.rejectedWith(Error, "No more tokens available");
   });
+
+  it("Should allow users claim tokens", async function () {
+    const pcToken = await getContract("PCNFT", [2]);
+    await pcToken.mint(user2.address, "ipfs://newtoken.jpg");
+    await pcToken.mint(user2.address, "ipfs://newtoken.jpg");
+
+    await expect(
+      pcToken.mint(user2.address, "ipfs://newtoken.jpg")
+    ).eventually.to.rejectedWith(Error, "No more tokens available");
+  });
 });

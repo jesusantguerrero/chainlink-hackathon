@@ -13,7 +13,13 @@ contract PCNFT is ERC721URIStorage, Ownable {
     using SafeMath for uint;
     Counters.Counter private _totalSupply;
     uint private availableTokens = 100;
+    uint private claimersTokenLimit = 1;
+    
+    address private contractOwner;
     mapping(uint => string) private tokenToImage;
+    mapping(uint => bool) private tokenToClaimed;
+    mapping(address => uint) private claimers;
+    mapping(address => uint) private claimerTokensCount;
 
     constructor(uint _avaiblableTokens) ERC721("IBX", "Insane Box") {
         availableTokens = _avaiblableTokens;
@@ -26,6 +32,9 @@ contract PCNFT is ERC721URIStorage, Ownable {
         uint tokenId = _totalSupply.current();
         _mint(_to, tokenId);
         tokenToImage[tokenId] = _imageURI;
+        if (_to != contractOwner) {
+            _claim(tokenId, _to);
+        }
     }
 
     function batchMint(string[] memory _uris) public onlyOwner {
@@ -41,6 +50,31 @@ contract PCNFT is ERC721URIStorage, Ownable {
 
     function totalSupply () public view returns (uint) {
         return _totalSupply.current();
+    }
+
+    // allow users to claim tokens
+    function _claim (uint _tokenId, address _claimer) private {
+        require(claimerTokensCount[_claimer] < claimersTokenLimit, "Claimer has reached the limit");
+        tokenToClaimed[_tokenId] = true;
+        claimers[_claimer] = _tokenId;
+        claimerTokensCount[_claimer] = claimerTokensCount[_claimer].add(1);
+    }
+
+    function claim(uint _tokenId, address _to) public {
+        require(_exists(_tokenId), "This token doent exist");
+        require(tokenToClaimed[_tokenId] != true , "This token is taken");
+        _claim(_tokenId, _to);
+        transferFrom(contractOwner, _to, _tokenId);
+    }
+
+    function pendingToClaim() public view returns (uint) {
+        uint count = 0;
+        for (uint i = 0; i < _totalSupply.current(); i++) {
+            if (tokenToClaimed[i] != true) {
+                count++;
+            }
+        }
+        return  totalSupply() - count;
     }
 
     // Tokens storage to save images to generate tokenURI programmatically
