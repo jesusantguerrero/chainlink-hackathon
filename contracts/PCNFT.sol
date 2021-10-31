@@ -33,7 +33,7 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
         _totalSupply.increment();
         uint tokenId = _totalSupply.current();
         _mint(_to, tokenId);
-        tokenToImage[tokenId] = _imageURI;
+        _setTokenURI(tokenId, _imageURI);
         _generateTokenAttributes(tokenId, string(abi.encodePacked("token ", tokenId)));
         if (_to != contractOwner) {
             _claim(tokenId, _to);
@@ -47,7 +47,7 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
         }
     }
 
-    function getAvailableTokens() public view returns (uint) {
+    function getAvailableNFTs() public view returns (uint) {
         return availableTokens;
     }
 
@@ -115,7 +115,12 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
      * - `tokenId` must exist.
      */
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual override {
-        require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
+        require(_exists(tokenId), "URI set of nonexistent token");
         tokenToImage[tokenId] = _tokenURI;
+    }
+
+    function getImageURI(uint256 tokenId) external view returns (string memory) {
+        require(_exists(tokenId), " URI set of nonexistent token");
+        return tokenToImage[tokenId];
     }
 }
