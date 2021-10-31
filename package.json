@@ -2,6 +2,7 @@
   "name": "hardhat-project",
   "scripts": {
     "contract:test": "npx hardhat test",
+    "contract:coverage": "npx hardhat coverage",
     "contract:compile": "npx hardhat compile",
     "contract:serve": "npx hardhat node",
     "contract:deploy": "npx hardhat run src/scripts/deploy.js --network localhost",

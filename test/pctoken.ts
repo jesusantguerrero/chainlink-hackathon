@@ -53,6 +53,26 @@ describe("PC Token", function () {
       "Claimer has reached the limit"
     );
   });
+
+  it("Should return supply and availability", async () => {
+    const pcToken = await getContract("PCNFT", [100]);
+    await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
+    await pcToken.claim(1, user2.address);
+
+    expect((await pcToken.totalSupply()).toNumber()).to.equal(2); // total minted;
+    expect((await pcToken.pendingToClaim()).toNumber()).to.equal(1); // total available to claim;
+    expect((await pcToken.getAvailableNFTs()).toNumber()).to.equal(98); // total available to mint
+  });
+
+  it("Should return the custom generated URI", async () => {
+    const pcToken = await getContract("PCNFT", [100]);
+    await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
+
+    console.log(await pcToken.tokenURI(1));
+    expect(await pcToken.getImageURI(1)).to.equal("ipfs://token1.jpg");
+    const result = await pcToken.tokenURI(1);
+    expect(result).be.a("string");
+  });
 });
 
 describe("Player Character", () => {
