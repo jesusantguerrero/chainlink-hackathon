@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-contract PCBase {
+contract RoosterBase {
     uint internal _cooldownTime = 1 minutes;
     uint internal dnaDigits = 16;
     uint internal dnaModulus = 10 ** dnaDigits;

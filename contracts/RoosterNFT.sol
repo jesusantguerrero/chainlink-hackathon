@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol"; 
-import "./PCBase.sol";
+import "./RoosterBase.sol";
 import "hardhat/console.sol";
 
-contract PCNFT is ERC721URIStorage, PCBase, Ownable {
+contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _totalSupply;
     uint private availableTokens = 100;
@@ -70,10 +70,12 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
     }
 
     function pendingToClaim() public view returns (uint[] memory) {
-        uint[] memory claimableList = new uint[](claimedTokensCount);
-        for (uint i = 0; i < totalSupply() - claimedTokensCount; i++) {
+        uint[] memory claimableList = new uint[](totalSupply() - claimedTokensCount);
+        uint count = 1;
+        for (uint i = 1; i <= totalSupply() ; i++) {
             if (tokenToClaimer[i] != address(0)) {
-                claimableList[i] = i;
+                claimableList[count] = i;
+                count++;
             }
         }
 

@@ -19,7 +19,7 @@ let user3: SignerWithAddress;
 
 describe("PC Token", function () {
   it("Should mint a new nft token", async function () {
-    const pcToken = await getContract("PCNFT", [100]);
+    const pcToken = await getContract("RoosterFight", [100]);
 
     expect((await pcToken.totalSupply()).toNumber()).to.equal(0);
     await pcToken.mint(user2.address, "ipfs://newtoken.jpg");
@@ -27,7 +27,7 @@ describe("PC Token", function () {
   });
 
   it("Should not allow mint more than the limit nft's", async function () {
-    const pcToken = await getContract("PCNFT", [2]);
+    const pcToken = await getContract("RoosterFight", [2]);
     await pcToken.mint(owner.address, "ipfs://newtoken.jpg");
     await pcToken.mint(user2.address, "ipfs://newtoken.jpg");
 
@@ -37,14 +37,14 @@ describe("PC Token", function () {
   });
 
   it("Should allow users claim tokens", async function () {
-    const pcToken = await getContract("PCNFT", [2]);
+    const pcToken = await getContract("RoosterFight", [2]);
     await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
     await pcToken.claim(1, user2.address);
 
     expect(await pcToken.ownerOf(1)).to.equal(user2.address);
   });
   it("Should prevent users from claiming 2+ tokens", async function () {
-    const pcToken = await getContract("PlayerHelper", [2]);
+    const pcToken = await getContract("RoosterFight", [2]);
     await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
     await pcToken.claim(1, user2.address);
 
@@ -55,17 +55,25 @@ describe("PC Token", function () {
   });
 
   it("Should return supply and availability", async () => {
-    const pcToken = await getContract("PCNFT", [100]);
-    await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
-    await pcToken.claim(1, user2.address);
+    const pcToken = await getContract("RoosterFight", [100]);
+    await pcToken.batchMint([
+      "ipfs://token1.jpg",
+      "ipfs://token2.jpg",
+      "ipfs://token3.jpg",
+    ]);
 
-    expect((await pcToken.totalSupply()).toNumber()).to.equal(2); // total minted;
-    expect((await pcToken.pendingToClaim()).length).to.equal(1); // total available to claim;
-    expect((await pcToken.getAvailableNFTs()).toNumber()).to.equal(98); // total available to mint
+    expect((await pcToken.totalSupply()).toNumber()).to.equal(3); // total minted;
+    expect((await pcToken.pendingToClaim()).length).to.equal(3); // total available to claim;
+    expect(
+      (await pcToken.pendingToClaim()).map((item: ethers.BigNumber) =>
+        item.toNumber()
+      )
+    ).to.equal([1, 2, 3]); // total available to claim;
+    expect((await pcToken.getAvailableNFTs()).toNumber()).to.equal(97); // total available to mint
   });
 
   it("Should return the custom generated URI", async () => {
-    const pcToken = await getContract("PCNFT", [100]);
+    const pcToken = await getContract("RoosterFight", [100]);
     await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
 
     console.log(await pcToken.tokenURI(1));
@@ -78,7 +86,7 @@ describe("PC Token", function () {
 describe("Player Character", () => {
   let pcToken: ethers.Contract;
   beforeEach(async () => {
-    pcToken = await getContract("PlayerHelper", [100]);
+    pcToken = await getContract("RoosterFight", [100]);
   });
 
   it("get player level", async () => {

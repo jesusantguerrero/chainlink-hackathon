@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "./PCNFT.sol";
+import "./RoosterNFT.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "hardhat/console.sol";
 
-contract PlayerHelper is PCNFT {
+contract RoosterFight is RoosterNFT {
     using SafeMath for uint32;
     struct Level {
         uint min;
@@ -13,8 +13,9 @@ contract PlayerHelper is PCNFT {
     }
 
     Level[] public levels;
+    uint public bonusLevel = 5;
 
-    constructor(uint _totalSupply) PCNFT(_totalSupply) {
+    constructor(uint _totalSupply) RoosterNFT(_totalSupply) {
         levels.push(Level(0, 100));
         levels.push(Level(100, 1000));
         levels.push(Level(1000, 10000));
@@ -64,5 +65,22 @@ contract PlayerHelper is PCNFT {
             stats.record.wins,
             stats.record.losses
         );
+    }
+
+    function sendAttack(uint _attacker, uint _target, uint _randomNumber) internal returns(uint) {
+        uint level = getLevel(_attacker);
+        uint maxDamage = tokenIdToStats[_attacker].strength + tokenIdToStats[_attacker].speed + (level * bonusLevel);
+        uint damage = _randomNumber % maxDamage;
+        tokenIdToStats[_target].hp -= SafeMath.sub(tokenIdToStats[_target].hp, damage);
+        return damage;
+    }
+
+    function fight(uint _attackerId, uint _targetId, uint _randomNumber) public returns (uint, uint) {
+        uint myAttack = sendAttack(_attackerId, _targetId, _randomNumber);
+        uint enemyAttack = sendAttack(_targetId, _attackerId, _randomNumber);
+       
+        uint winner = myAttack > enemyAttack ? _attackerId : _targetId;
+        uint losser = winner == _attackerId ? _targetId : _attackerId;
+        return (winner, losser);
     }
 }
