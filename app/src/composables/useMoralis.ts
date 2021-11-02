@@ -1,3 +1,4 @@
+/* eslint-disable node/no-missing-import */
 /* eslint-disable node/no-unpublished-import */
 import Web3 from "web3/dist/web3.min";
 import Moralis from "moralis/dist/moralis";

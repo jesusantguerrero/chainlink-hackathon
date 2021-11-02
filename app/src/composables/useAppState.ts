@@ -1,3 +1,5 @@
+/* eslint-disable node/no-unpublished-import */
+/* eslint-disable node/no-missing-import */
 import Moralis from "moralis";
 import { IAppState, AppState } from "./AppState";
 

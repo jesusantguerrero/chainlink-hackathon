@@ -1,4 +1,11 @@
 export const config = {
-  moralisKey: import.meta.env.VITE_MORALIS_KEY,
-  moralisServerURL: import.meta.env.VITE_MORALIS_SERVER_URL,
+  moralisKey: secureString("VITE_MORALIS_KEY"),
+  moralisServerURL: secureString("VITE_MORALIS_SERVER_URL"),
+  nftAddress: secureString("VITE_NFT_ADDRESS"),
+  rpcURL: secureString("VITE_RPC_URL", "http://localhost:8545"),
 };
+
+function secureString(key: string, defaultValue = ""): string {
+  const value = import.meta.env[key];
+  return typeof value === "string" ? value : defaultValue;
+}
