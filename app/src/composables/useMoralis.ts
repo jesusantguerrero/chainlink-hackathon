@@ -2,8 +2,9 @@
 import Web3 from "web3/dist/web3.min";
 import Moralis from "moralis/dist/moralis";
 import { config } from "../config/";
-import { AppState } from "./AppState";
+import { useAppState } from "./useAppState";
 
+const { setUser } = useAppState();
 window.Web3 = Web3;
 
 Moralis.initialize(config.moralisKey);
@@ -12,7 +13,9 @@ Moralis.serverURL = config.moralisServerURL;
 export const useMoralis = () => {
   const login = async () => {
     const user = await Moralis.Web3.authenticate();
-    AppState.user = user;
+    if (user) {
+      setUser(user);
+    }
   };
 
   const logout = async () => {

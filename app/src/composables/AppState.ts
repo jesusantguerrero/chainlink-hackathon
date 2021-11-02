@@ -1,7 +1,7 @@
 import { Moralis } from "moralis";
 import { reactive } from "vue";
 
-interface IAppState {
+export interface IAppState {
   user: null | Moralis.User;
 }
 
