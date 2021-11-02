@@ -71,9 +71,9 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
 
     function pendingToClaim() public view returns (uint[] memory) {
         uint[] memory claimableList = new uint[](totalSupply() - claimedTokensCount);
-        uint count = 1;
-        for (uint i = 1; i <= totalSupply() ; i++) {
-            if (tokenToClaimer[i] != address(0)) {
+        uint count = 0;
+        for (uint i = 1; i <= totalSupply(); i++) {
+            if (tokenToClaimer[i] == address(0)) {
                 claimableList[count] = i;
                 count++;
             }

@@ -68,7 +68,7 @@ describe("PC Token", function () {
       (await pcToken.pendingToClaim()).map((item: ethers.BigNumber) =>
         item.toNumber()
       )
-    ).to.equal([1, 2, 3]); // total available to claim;
+    ).to.eql([1, 2, 3]); // total available to claim;
     expect((await pcToken.getAvailableNFTs()).toNumber()).to.equal(97); // total available to mint
   });
 
