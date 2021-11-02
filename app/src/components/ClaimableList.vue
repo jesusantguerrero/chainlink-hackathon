@@ -10,8 +10,7 @@ const fetchMarketItems = async () => {
     const { Cockfighter } = getContracts(provider);
 
     let roosters = await Cockfighter?.functions.pendingToClaim();
-    console.log(roosters);
-    roosters = await Promise.all(roosters.map(async(item: ethers.BigNumber) => {
+    roosters = await Promise.all(roosters[0].map(async(item: ethers.BigNumber) => {
         console.log(item);
         const tokenURI = await Cockfighter?.functions.tokenURI(item.toNumber());
         const rooster = await fetch(tokenURI).then(data => data.json()).then( data => data).catch(err => ({}));
