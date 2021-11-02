@@ -2,24 +2,23 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol"; 
 import "./PCBase.sol";
+import "hardhat/console.sol";
 
 contract PCNFT is ERC721URIStorage, PCBase, Ownable {
     using Counters for Counters.Counter;
-    using SafeMath for uint;
     Counters.Counter private _totalSupply;
     uint private availableTokens = 100;
     uint private claimersTokenLimit = 1;
-    
+    uint private claimedTokensCount = 0;
+
     address private contractOwner;
     mapping(uint => string) internal tokenToImage;
-    mapping(uint => bool) private tokenToClaimed;
-    mapping(address => uint) private claimers;
+    mapping(uint => address) private tokenToClaimer;
     mapping(address => uint) private claimerTokensCount;
 
     constructor(uint _avaiblableTokens) ERC721("IBX", "Insane Box") {
@@ -27,9 +26,9 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
         contractOwner = msg.sender;
     }
 
-    function mint(address _to, string memory _imageURI) public onlyOwner {
+    function mint(address _to, string memory _imageURI) public {
         require(availableTokens > 0, "No more tokens available");
-        availableTokens = availableTokens.sub(1);
+        availableTokens = SafeMath.sub(availableTokens, 1);
         _totalSupply.increment();
         uint tokenId = _totalSupply.current();
         _mint(_to, tokenId);
@@ -58,40 +57,37 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
     // allow users to claim tokens
     function _claim (uint _tokenId, address _claimer) private {
         require(claimerTokensCount[_claimer] < claimersTokenLimit, "Claimer has reached the limit");
-        tokenToClaimed[_tokenId] = true;
-        claimers[_claimer] = _tokenId;
-        claimerTokensCount[_claimer] = claimerTokensCount[_claimer].add(1);
+        tokenToClaimer[_tokenId] = _claimer;
+        claimerTokensCount[_claimer] = SafeMath.add(claimerTokensCount[_claimer], 1);
+        claimedTokensCount = SafeMath.add(claimedTokensCount, 1);
     }
 
     function claim(uint _tokenId, address _to) public {
         require(_exists(_tokenId), "This token doent exist");
-        require(tokenToClaimed[_tokenId] != true , "This token is taken");
+        require(tokenToClaimer[_tokenId] == address(0) , "This token is taken");
         _claim(_tokenId, _to);
         transferFrom(contractOwner, _to, _tokenId);
     }
 
-    function pendingToClaim() public view returns (uint) {
-        uint count = 0;
-        for (uint i = 0; i < _totalSupply.current(); i++) {
-            if (tokenToClaimed[i] != true) {
-                count++;
+    function pendingToClaim() public view returns (uint[] memory) {
+        uint[] memory claimableList = new uint[](claimedTokensCount);
+        for (uint i = 0; i < totalSupply() - claimedTokensCount; i++) {
+            if (tokenToClaimer[i] != address(0)) {
+                claimableList[i] = i;
             }
         }
-        return  totalSupply() - count;
+
+        return claimableList;
     }
 
     // Tokens storage to save images to generate tokenURI programmatically
-  
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
-
-        string memory imageURI = tokenToImage[tokenId];
-
-        return formatTokenURI(imageURI);
-        
+    function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
+        require(_exists(_tokenId), "URI query for nonexistent token");
+        return formatTokenURI(tokenToImage[_tokenId], _tokenId);
     }
 
-    function formatTokenURI(string memory _imageURI) public view virtual returns (string memory) {
+    function formatTokenURI(string memory _imageURI, uint _tokenId) public view virtual returns (string memory) {
+        Attributes memory attributes = tokenIdToAttributes[_tokenId];
         return string(
             abi.encodePacked(
                 "data:application/json;base64,",
@@ -100,8 +96,11 @@ contract PCNFT is ERC721URIStorage, PCBase, Ownable {
                         '{"name": "CryptoRooster 1",',
                         '"description": "This is a description",',
                         '"image":', 
-                        _imageURI, 
-                        '"}'
+                        _imageURI, '"',
+                        '"attributes":[',
+                        '{"breed":"', attributes.breed , '"', 
+                        ']',
+                        '}'
                     )
                 )))
         );

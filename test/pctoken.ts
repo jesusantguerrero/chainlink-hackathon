@@ -60,7 +60,7 @@ describe("PC Token", function () {
     await pcToken.claim(1, user2.address);
 
     expect((await pcToken.totalSupply()).toNumber()).to.equal(2); // total minted;
-    expect((await pcToken.pendingToClaim()).toNumber()).to.equal(1); // total available to claim;
+    expect((await pcToken.pendingToClaim()).length).to.equal(1); // total available to claim;
     expect((await pcToken.getAvailableNFTs()).toNumber()).to.equal(98); // total available to mint
   });
 
