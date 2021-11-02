@@ -7,8 +7,11 @@ const { login, logout } = useMoralis();
 </script>
 
 <template>
-  <Pages />
-  <button @click="login()" v-if="!AppState.user"> Login with moralis </button>
-  <button @click="logout()" v-else="!AppState.user"> Logout </button>
-  {{ AppState.user }}
+  <Pages @connect="login()" />
 </template>
+
+<style>
+html {
+  @apply bg-gray-900;
+}
+</style>
