@@ -14,23 +14,24 @@ const fetchMarketItems = async () => {
         const tokenURI = await Cockfighter?.tokenURI(item.toNumber());
         const rooster = await fetch(tokenURI)
         .then(data => {
-            console.log(data);
             return data.json()
         })
         .then( data => data)
         .catch(err => {
-            console.log(err);
             return {};
         });
         
-        return {...rooster};
+        return {
+            tokenId: item.toNumber(), 
+            ...rooster
+        };
     }))
 
     return roosters;
 }
 
 interface NFTAsset {
-    id: string;
+    tokenId: number;
     name: string;
     description: string;
     image: string;
@@ -39,6 +40,15 @@ interface NFTAsset {
     claimable: boolean;
 };
 
+const claim = async (tokenId: Number) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const signer = provider.getSigner();
+    const { Claimer, Cockfighter } = getContracts(signer);
+    const signerAddress = await signer.getAddress()
+    await Claimer?.functions.claim(Cockfighter?.address, tokenId, signerAddress);
+    await fetchMarketItems();
+} 
+
 const items = ref<NFTAsset[]>([]);
 onMounted(async () => {
     items.value = await fetchMarketItems();
@@ -46,14 +56,24 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="claimable-list">
+    <div class="px-5 claimable-list">
         <div class="claimable-list__header">
             <h2 class="text-2xl">Claimable Roosters</h2>
         </div>
         <div class="flex flex-wrap gap-2 mt-5 claimable-list__items">
             <div v-for="item in items" class="claimable-list__item">
-                <div class="overflow-hidden rounded-md claimable-list__item__image">
+                <div class="overflow-hidden rounded-t-md claimable-list__item__image">
                     <img :src="item.image" class="w-64"/>
+                    <div class="px-4 pb-3 bg-gray-700">
+                        <h3 class="text-xl">{{item.name}}</h3>
+                        <p class="text-sm text-gray-300">{{item.description}}</p>
+                    </div>
+                    <div class="flex items-center justify-between overflow-hidden bg-purple-500 rounded-b-md">
+                        <div class="block w-full h-full px-4 py-2 bg-gray-700">Price: Free</div>
+                        <Button @click="claim(item.tokenId)" class="block w-full px-4 py-2 text-white bg-purple-500 hover:bg-purple-900 rounded-br-md"> 
+                            Claim Token
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -17,13 +17,19 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
     uint private claimedTokensCount = 0;
 
     address private contractOwner;
+    address private claimerAddress;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
     mapping(address => uint) private claimerTokensCount;
 
-    constructor(uint _avaiblableTokens) ERC721("IBX", "Insane Box") {
+    constructor(uint _avaiblableTokens) ERC721("CRF", "Crypto RoosterFight") {
         availableTokens = _avaiblableTokens;
         contractOwner = msg.sender;
+    }
+
+    function setClaimerAddress(address _claimer) public onlyOwner {
+        claimerAddress = _claimer;
+        setApprovalForAll(claimerAddress, true);
     }
 
     function mint(address _to, string memory _imageURI) public {

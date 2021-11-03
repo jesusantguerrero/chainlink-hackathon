@@ -44,9 +44,11 @@ describe("PC Token", function () {
     expect(await pcToken.ownerOf(1)).to.equal(user2.address);
   });
   it("Should prevent users from claiming 2+ tokens", async function () {
+    const pcClaimer = await getContract("RoosterClaimer");
     const pcToken = await getContract("RoosterFight", [2]);
+    await pcToken.setClaimerAddress(pcClaimer.address);
     await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
-    await pcToken.claim(1, user2.address);
+    await pcClaimer.claim(pcToken.address, 1, user2.address);
 
     await expect(pcToken.claim(2, user2.address)).eventually.to.rejectedWith(
       Error,
