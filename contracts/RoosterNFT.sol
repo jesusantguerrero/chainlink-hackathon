@@ -97,10 +97,10 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
                     abi.encodePacked(
                         '{"name": "CryptoRooster 1",',
                         '"description": "This is a description",',
-                        '"image":', 
-                        _imageURI, '"',
+                        '"image":"', 
+                        _imageURI, '",',
                         '"attributes":[',
-                        '{"breed":"', attributes.breed , '"', 
+                        '{"breed":"', breedNames[uint(attributes.breed)], '"}', 
                         ']',
                         '}'
                     )

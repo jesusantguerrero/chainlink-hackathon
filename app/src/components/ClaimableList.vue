@@ -11,9 +11,17 @@ const fetchMarketItems = async () => {
 
     let roosters = await Cockfighter?.functions.pendingToClaim();
     roosters = await Promise.all(roosters[0].map(async(item: ethers.BigNumber) => {
-        console.log(item);
-        const tokenURI = await Cockfighter?.functions.tokenURI(item.toNumber());
-        const rooster = await fetch(tokenURI).then(data => data.json()).then( data => data).catch(err => ({}));
+        const tokenURI = await Cockfighter?.tokenURI(item.toNumber());
+        const rooster = await fetch(tokenURI)
+        .then(data => {
+            console.log(data);
+            return data.json()
+        })
+        .then( data => data)
+        .catch(err => {
+            console.log(err);
+            return {};
+        });
         
         return {...rooster};
     }))
@@ -40,12 +48,12 @@ onMounted(async () => {
 <template>
     <div class="claimable-list">
         <div class="claimable-list__header">
-            <h2>Claimable Roosters</h2>
+            <h2 class="text-2xl">Claimable Roosters</h2>
         </div>
-        <div class="claimable-list__items">
+        <div class="flex flex-wrap gap-2 mt-5 claimable-list__items">
             <div v-for="item in items" class="claimable-list__item">
-                <div class="claimable-list__item__image">
-                    <img :src="item.image" />
+                <div class="overflow-hidden rounded-md claimable-list__item__image">
+                    <img :src="item.image" class="w-64"/>
                 </div>
             </div>
         </div>
