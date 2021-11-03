@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { useMoralis } from "./composables/useMoralis";
-import { AppState } from './composables/AppState';
-import Pages from './pages/index.vue';
 
-const { login, logout } = useMoralis();
+const { login } = useMoralis();
 </script>
 
 <template>
-  <Pages @connect="login()" />
+  <router-view @connect="login()" />
 </template>
 
 <style>

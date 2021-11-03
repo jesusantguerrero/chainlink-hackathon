@@ -15,8 +15,9 @@ const links = [{
     name: 'Marketplace',
     url: '/marketplace'
 }, {
-
-}]
+    name: 'Dashboard',
+    url: '/dashboard'
+}];
 
 const actions = [{
     name: 'Learn more',
