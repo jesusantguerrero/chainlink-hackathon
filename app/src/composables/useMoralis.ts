@@ -13,7 +13,7 @@ Moralis.serverURL = config.moralisServerURL;
 
 export const useMoralis = () => {
   const login = async () => {
-    const user = await Moralis.Web3.authenticate();
+    const user = await Moralis.Web3.authenticate({ provider: window.ethereum });
     if (user) {
       setUser(user);
     }
