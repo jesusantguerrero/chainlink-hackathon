@@ -8,7 +8,6 @@ import hre from "hardhat";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
-// eslint-disable-next-line no-unused-vars
 let owner: SignerWithAddress;
 let user2: SignerWithAddress;
 let user3: SignerWithAddress;
@@ -78,7 +77,6 @@ describe("PC Token", function () {
     const pcToken = await getContract("RoosterFight", [100]);
     await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
 
-    console.log(await pcToken.tokenURI(1));
     expect(await pcToken.getImageURI(1)).to.equal("ipfs://token1.jpg");
     const result = await pcToken.tokenURI(1);
     expect(result).be.a("string");
