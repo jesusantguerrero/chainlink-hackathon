@@ -1,10 +1,11 @@
 /* eslint-disable node/no-missing-import */
-import { getContract } from "../utils/getContract";
+import { getContract } from "./getContract";
 import fs from "fs";
 import path from "path";
 
-const saveEnvVar = (envName: string, value: string) => {
+export const saveEnvVar = async (envName: string, value: string) => {
   const envFilePath = path.resolve(__dirname, "..", "app", ".env.local");
+  console.log(envFilePath, "Este es el archivero");
   const file = fs.readFileSync(envFilePath, "utf8");
   const lines = file.split("\n");
   const index = lines.findIndex((line: string) => line.includes(envName));
@@ -13,12 +14,7 @@ const saveEnvVar = (envName: string, value: string) => {
   } else {
     lines.splice(index, 1, `${envName}=${value}`);
   }
-
-  fs.writeFile(envFilePath, lines.join("\n"), (err) => {
-    if (err) {
-      console.error(err);
-    }
-  });
+  return fs.writeFileSync(envFilePath, lines.join("\n"));
 };
 
 export const deployContract = async (

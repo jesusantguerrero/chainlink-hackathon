@@ -119,7 +119,7 @@ describe("Tournament unit tests", async () => {
     expect(requestId).to.not.be.null;
 
     // wait 60 secs for oracle to callback
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    await new Promise((resolve) => setTimeout(resolve, 30000));
 
     const result = await tournament.startFight(requestId, 0);
     const trx2 = await result.wait(1);

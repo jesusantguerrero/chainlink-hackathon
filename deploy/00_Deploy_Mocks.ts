@@ -5,9 +5,9 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 const DeployChainlinkMocks: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy, log } = hre.deployments;
   const { deployer } = await hre.getNamedAccounts();
-  const chainId = 31337;
+  const chainId = await hre.getChainId();
   // If we are on a local development network, we need to deploy mocks!
-  if (chainId === 31337) {
+  if (chainId === "1337") {
     log("Local network detected! Deploying mocks...");
     const linkToken = await deploy("LinkToken", { from: deployer, log: true });
     await deploy("VRFCoordinatorMock", {
@@ -27,4 +27,4 @@ const DeployChainlinkMocks: DeployFunction = async (hre: HardhatRuntimeEnvironme
   }
 };
 export default DeployChainlinkMocks;
-DeployChainlinkMocks.tags = ["all", "mocks", "main"];
+DeployChainlinkMocks.tags = ["all", "mocks", "local"];
