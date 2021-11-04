@@ -13,6 +13,8 @@ contract Tournament is Ownable, VRFConsumerBase {
     using Counters for Counters.Counter;
     event FightStarted(bytes32 requestId, uint _attacker, uint _defence, uint _eventId, uint combatId);
     event FightFinished(bytes32 requestId, uint _attacker, uint _defence, uint _eventId, uint combatId);
+    event FightWinner(bytes32 requestId, uint winner, address owner);
+    event TournamentWinner(address winner, uint prize);
 
     struct Record {
         uint8 wins;
@@ -21,6 +23,7 @@ contract Tournament is Ownable, VRFConsumerBase {
     }
 
     struct TournamentPlayer {
+        uint playerId;
         uint tokenId;
         uint points;
         Record record;
@@ -50,6 +53,7 @@ contract Tournament is Ownable, VRFConsumerBase {
 
     struct MatchUp {
         uint token;
+        bytes32 requestId;
         uint eventID;
         string name;
         uint attacker;
@@ -72,23 +76,20 @@ contract Tournament is Ownable, VRFConsumerBase {
     MatchUp[] public combats;
 
     mapping (uint => uint) private eventToOwnerFee; 
-    mapping(uint => uint) public playerToEvent;
-    mapping(bytes32 => uint) public requestIdToCombat;
+    mapping(uint => mapping(uint => uint)) public playerToEvent;
+    mapping(bytes32 => uint) public requestIdToRamdomNumber;
     mapping(uint => MatchUp) public eventToCombat;
 
     constructor(address _vrfCoodinator, address _linkToken, bytes32 _keyhash  ) VRFConsumerBase(
         _vrfCoodinator,
         _linkToken
     ) {
-        // 0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9, // VRF Coordinator
-        // 0xa36085F69e2889c224210F603D836748e7dC0088  // LINK Token
-        // keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
         contractOwner = payable(msg.sender);
         keyHash = _keyhash;
         fee = 0.1 * 10 ** 18; // 0.1 LINK (Varies by network)
     }
 
-    function setNFTaddress(address _roosterFightAddress) public {
+    function setNFTAddress(address _roosterFightAddress) public {
         roosterFightAdress = _roosterFightAddress;
     }
 
@@ -120,9 +121,9 @@ contract Tournament is Ownable, VRFConsumerBase {
         TournamentEvent storage tEvents = events[_eventId];
         require(msg.value == prixes[tEvents.tokenId].seatFee, "Should pay the tournament fee");
         tEvents.seatsTaken++;
-        players.push(TournamentPlayer(_tokenId, 0, Record(0, 0, 0), payable(msg.sender)));
-        uint tokenId = players.length - 1; 
-        playerToEvent[tokenId] = _eventId; 
+        uint playerId = players.length; 
+        players.push(TournamentPlayer(playerId, _tokenId, 0, Record(0, 0, 0), payable(msg.sender)));
+        playerToEvent[_eventId][playerId] = _tokenId; 
         uint percentage = (msg.value/housePercentage);
         prixes[tEvents.tokenId].prize += msg.value - percentage;
         eventToOwnerFee[_eventId] += percentage;
@@ -136,48 +137,62 @@ contract Tournament is Ownable, VRFConsumerBase {
         TournamentPlayer memory winner = TournamentPlayer(
             0,
             0,
+            0,
             Record(0, 0, 0),
             payable(address(0))
         );
         for (uint256 index = 0; index < players.length; index++) {
-            if (playerToEvent[index] == _eventId && players[index].points > winner.points) {
+            if (playerToEvent[_eventId][index] != 0 && players[index].points > winner.points) {
                 winner = players[index];
             }
         }
-        return winner.tokenId;
+        return winner.playerId;
     }
 
     function getEventParticipants(uint _eventId) public view returns (TournamentPlayer[] memory) {
         uint playerLen = events[_eventId].seatsTaken;
         TournamentPlayer[] memory ePlayers = new TournamentPlayer[](playerLen);
         for (uint256 index = 0; index < players.length; index++) {
-            if (playerToEvent[index] == _eventId) {
+            if (playerToEvent[_eventId][index] != 0) {
                 ePlayers[index] = players[index];
             }
         }
         return ePlayers;
     }
 
-    function prepareFight(uint _attacker, uint _defence, uint _eventId) public returns (bytes32) {
+    function prepareFight(uint _attackerPlayerId, uint _defencePlayerId, uint _eventId) public returns (bytes32, uint) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK");
         bytes32 requestId = requestRandomness(keyHash, fee);
         uint combatId = combats.length +1;
-        combats.push(MatchUp(combatId, _eventId, "", _attacker, _defence, true, 0));
-        requestIdToCombat[requestId] = combatId;
-        emit FightStarted(requestId, _attacker, _defence, _eventId, combatId); 
-        return requestId;       
+        combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defencePlayerId, true, 0));
+        emit FightStarted(requestId, playerToEvent[_eventId][_attackerPlayerId], playerToEvent[_eventId][_defencePlayerId], _eventId, combatId); 
+        return (requestId, combatId);       
     }
 
     function fulfillRandomness(bytes32 _requestId, uint _randomNumber) internal override {
-        MatchUp storage combat = combats[requestIdToCombat[_requestId]];
+        requestIdToRamdomNumber[_requestId] = _randomNumber;
+    }
+
+    function startFight(bytes32 _requestId, uint _combatId) public {
+        MatchUp storage combat = combats[_combatId];
         uint winner;
         uint loser;
-        (winner, loser) = IRoosterFight(roosterFightAdress).fight(combat.attacker, combat.defence, _randomNumber);
+        
+        // token Ids 
+        (winner, loser) = IRoosterFight(roosterFightAdress).fight(playerToEvent[combat.eventID][combat.attacker], playerToEvent[combat.eventID][combat.defence], requestIdToRamdomNumber[combat.requestId]);
         combat.active = false;
         combat.winner = winner;
-        players[winner].record.wins++;
-        players[winner].points += 3;
-        players[loser].record.losses++;
+
+        // here I need players id
+        uint winnerPlayerId = playerToEvent[combat.eventID][combat.attacker] == winner ? combat.attacker : combat.defence;
+        uint loserPlayerId = playerToEvent[combat.eventID][combat.attacker] != winner ? combat.attacker : combat.defence;
+
+        // give the prizes to the winners
+        players[winnerPlayerId].record.wins++;
+        players[winnerPlayerId].points += 3;
+        players[loserPlayerId].record.losses++;
+
+        emit FightWinner(_requestId, winner, players[winnerPlayerId].owner);
         emit FightFinished(_requestId, combat.attacker, combat.defence, combat.eventID, combat.token);
     }
 
@@ -188,5 +203,6 @@ contract Tournament is Ownable, VRFConsumerBase {
         eventToOwnerFee[_eventId] = 0;
         payable(contractOwner).transfer(amount);
         players[winnerId].owner.transfer(prize);
+        emit TournamentWinner(players[winnerId].owner, prize);
     }
 }
