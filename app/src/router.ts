@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Index from "./pages/index.vue";
 import Dashboard from "./pages/Dashboard.vue";
+import Admin from "./pages/Admin.vue";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -15,6 +16,10 @@ export const router = createRouter({
     {
       path: "/dashboard",
       component: Dashboard,
+    },
+    {
+      path: "/admin",
+      component: Admin,
     },
     {
       path: "/signup",
