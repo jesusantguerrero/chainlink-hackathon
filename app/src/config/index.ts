@@ -3,6 +3,7 @@ export const config = {
   moralisServerURL: secureString("VITE_MORALIS_SERVER_URL"),
   nftAddress: secureString("VITE_NFT_ADDRESS"),
   claimerAddress: secureString("VITE_CLAIMER_ADDRESS"),
+  tournamentAddress: secureString("VITE_TOURNAMENT_ADDRESS"),
   rpcURL: secureString("VITE_RPC_URL", "http://localhost:8545"),
 };
 

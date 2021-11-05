@@ -6,6 +6,7 @@ import { config } from "../config";
 
 import NFT from "../../../artifacts/contracts/RoosterFight.sol/RoosterFight.json";
 import CLAIMER from "../../../artifacts/contracts/RoosterClaimer.sol/RoosterClaimer.json";
+import TOURNAMENT from "../../../artifacts/contracts/Tournament.sol/Tournament.json";
 
 export const getContracts = (
   provider: ethers.providers.Provider | ethers.Signer
@@ -18,8 +19,15 @@ export const getContracts = (
     provider
   );
 
+  const Tournament = new ethers.Contract(
+    config.tournamentAddress,
+    TOURNAMENT.abi,
+    provider
+  );
+
   return {
     Cockfighter,
     Claimer,
+    Tournament,
   };
 };
