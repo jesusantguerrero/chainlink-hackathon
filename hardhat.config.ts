@@ -65,7 +65,9 @@ const config: HardhatUserConfig = {
 };
 
 function safeAccounts() {
-  return process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [];
+  return process.env.PRIVATE_KEY !== undefined
+    ? [process.env.PRIVATE_KEY]
+    : ["https://polygon-mainnet.infura.io/"];
 }
 
 export default config;
