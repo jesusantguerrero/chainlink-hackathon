@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NFTList from '../components/NFTList.vue';
 
 const dashboardMenu = [
     "General",
@@ -6,6 +7,9 @@ const dashboardMenu = [
     "Sponsors",
     "Notifications"
 ]
+
+
+
 </script>
 
 <template>
@@ -33,6 +37,7 @@ const dashboardMenu = [
         </div>
         <div class="px-5 py-3 mt-2 bg-gray-700 current-training">
             <h1>My Roosters</h1>
+            <NFTList />
         </div>
         <div class="px-5 py-3 mt-2 bg-gray-700 current-training">
             <h1> Title of the section</h1>
