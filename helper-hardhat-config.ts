@@ -107,7 +107,7 @@ export const getNetworkIdFromName = async (networkIdName: string) => {
       return id;
     }
   }
-  return null;
+  return Object.keys(networkConfig.default)[0];
 };
 
 export const autoFundCheck = async (
@@ -117,7 +117,8 @@ export const autoFundCheck = async (
   additionalMessage: string
 ) => {
   console.log("Checking to see if contract can be auto-funded with LINK:");
-  const amount = networkConfig[31337].fundAmount;
+  const chainId = (await getNetworkIdFromName(networkName)) || 1337;
+  const amount = networkConfig[chainId].fundAmount;
   // check to see if user has enough LINK
   const accounts = await hre.ethers.getSigners();
   const signer = accounts[0];
