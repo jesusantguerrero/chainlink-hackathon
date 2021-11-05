@@ -12,7 +12,7 @@ import "hardhat/console.sol";
 contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _totalSupply;
-    uint private availableTokens = 100;
+    uint public availableTokens = 100;
     uint private claimersTokenLimit = 1;
     uint private claimedTokensCount = 0;
 
@@ -20,6 +20,7 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
     address private claimerAddress;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
+    mapping(uint => address) private tokenToOwner;
     mapping(address => uint) private claimerTokensCount;
 
     constructor(uint _avaiblableTokens) ERC721("CRF", "Crypto RoosterFight") {
@@ -32,7 +33,7 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
         setApprovalForAll(claimerAddress, true);
     }
 
-    function mint(address _to, string memory _imageURI) public {
+    function mint(address _to, string memory _imageURI) public onlyOwner {
         require(availableTokens > 0, "No more tokens available");
         availableTokens = SafeMath.sub(availableTokens, 1);
         _totalSupply.increment();
@@ -43,6 +44,7 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
         if (_to != contractOwner) {
             _claim(tokenId, _to);
         }
+        tokenToOwner[tokenId] = _to;
     }
 
     function batchMint(string[] memory _uris) public onlyOwner {
@@ -50,10 +52,6 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
         for (uint256 index = 0; index < _uris.length; index++) {
             mint(msg.sender, _uris[index]);
         }
-    }
-
-    function getAvailableNFTs() public view returns (uint) {
-        return availableTokens;
     }
 
     function totalSupply () public view returns (uint) {
@@ -129,5 +127,36 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
     function getImageURI(uint256 tokenId) external view returns (string memory) {
         require(_exists(tokenId), " URI set of nonexistent token");
         return tokenToImage[tokenId];
+    }
+
+    // NFT Balances
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override {
+        super.transferFrom(from, to, tokenId);
+        tokenToOwner[tokenId] = to;
+    }
+
+    function _getRoostersOf(address _owner) internal view returns (uint[] memory) {
+        uint[] memory nfts = new uint[](balanceOf(_owner));
+        uint counter = 0;
+        for (uint i = 1; i <= _totalSupply.current(); i++) {
+            if (tokenToOwner[i] == _owner) {
+                console.log(i, _owner);
+                nfts[counter] = i;
+                counter++;
+            }
+        }
+        return nfts;
+    }
+
+    function getRoostersByOwner(address _owner) external view returns (uint[] memory) {
+        return _getRoostersOf(_owner);
+    }
+
+    function getMyRoosters() public view returns (uint[] memory) {
+        return _getRoostersOf(msg.sender);
     }
 }

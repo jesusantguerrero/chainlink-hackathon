@@ -12,6 +12,10 @@ let owner: SignerWithAddress;
 let user2: SignerWithAddress;
 let user3: SignerWithAddress;
 
+const toNumberArray = (arr: ethers.BigNumber[]) => {
+  return arr.map((item) => item.toNumber());
+};
+
 (async () => {
   [owner, user2, user3] = await hre.ethers.getSigners();
 })();
@@ -53,6 +57,15 @@ describe("PC Token", function () {
       Error,
       "Claimer has reached the limit"
     );
+
+    await pcToken.claim(2, user3.address);
+    expect(toNumberArray(await pcToken.connect(user2).getMyRoosters())).to.eql([
+      1,
+    ]);
+    expect(toNumberArray(await pcToken.getMyRoosters())).to.eql([]);
+    expect(
+      toNumberArray(await pcToken.getRoostersByOwner(user3.address))
+    ).to.eql([2]);
   });
 
   it("Should return supply and availability", async () => {
@@ -65,12 +78,8 @@ describe("PC Token", function () {
 
     expect((await pcToken.totalSupply()).toNumber()).to.equal(3); // total minted;
     expect((await pcToken.pendingToClaim()).length).to.equal(3); // total available to claim;
-    expect(
-      (await pcToken.pendingToClaim()).map((item: ethers.BigNumber) =>
-        item.toNumber()
-      )
-    ).to.eql([1, 2, 3]); // total available to claim;
-    expect((await pcToken.getAvailableNFTs()).toNumber()).to.equal(97); // total available to mint
+    expect(toNumberArray(await pcToken.pendingToClaim())).to.eql([1, 2, 3]); // total available to claim;
+    expect((await pcToken.availableTokens()).toNumber()).to.equal(97); // total available to mint
   });
 
   it("Should return the custom generated URI", async () => {
