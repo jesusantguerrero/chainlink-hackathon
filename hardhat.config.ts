@@ -31,15 +31,17 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     mumbai: {
-      url: process.env.MUMBAI_URL,
+      url: process.env.MUMBAI_URL || "https://rpc-mumbai.matic.today",
       accounts: safeAccounts(),
     },
     ropsten: {
-      url: process.env.ROPSTEN_URL || "",
+      url:
+        process.env.ROPSTEN_URL ||
+        "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
       accounts: safeAccounts(),
     },
     mainnet: {
-      url: process.env.MAINNET_URL,
+      url: process.env.MAINNET_URL || "https://polygon-rpc.com/",
       accounts: safeAccounts(),
     },
   },
@@ -65,9 +67,7 @@ const config: HardhatUserConfig = {
 };
 
 function safeAccounts() {
-  return process.env.PRIVATE_KEY !== undefined
-    ? [process.env.PRIVATE_KEY]
-    : ["https://polygon-mainnet.infura.io/"];
+  return process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [];
 }
 
 export default config;
