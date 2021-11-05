@@ -1,37 +1,10 @@
 <script setup lang="ts">
+import Game from '../layouts/Game.vue';
 import NFTList from '../components/NFTList.vue';
-
-const dashboardMenu = [
-    "General",
-    "Ring",
-    "Sponsors",
-    "Notifications"
-]
-
-
-
 </script>
 
 <template>
-    <div class="flex justify-between px-5 py-3 text-white bg-gray-700">
-        <div>
-            <h1 class="text-2xl font-bold text-purple-400">Home</h1>
-        </div>
-        <div class="flex space-x-2">
-            <div>Tokens</div>
-            <div>Money</div>
-            <div>Energy</div>
-            <div>Hospital Points</div>
-        </div>
-    </div>
-
-    <div class="mx-auto mt-10 text-white max-w-7xl">
-        <ul class="flex justify-around text-white bg-gray-700">
-            <li v-for="item in dashboardMenu" class="w-full py-3 text-center cursor-pointer hover:bg-gray-800">{{
-                item
-            }}</li>
-        </ul>
-
+    <Game>
         <div class="px-5 py-3 mt-2 bg-gray-700 current-training">
             <h1>My Trainings</h1>
         </div>
@@ -60,5 +33,6 @@ const dashboardMenu = [
                 </div>
             </div>
         </div>
-    </div>
+    </Game>
+
 </template>
