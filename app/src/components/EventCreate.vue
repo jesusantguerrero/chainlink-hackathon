@@ -2,35 +2,29 @@
 import { reactive, ref } from "@vue/reactivity";
 import { ethers } from "ethers";
 import { getContracts } from "../composables/getContracts"
-import { AtButton } from "atmosphere-ui";
+import { AtButton, AtDateSelect } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
-import EventCreate from "./EventCreate.vue";
 
-interface ITournament {
-    name: string;
-    description: string;
-    seats: number;
-    fee: number;
+interface ITournamentEvent {
+    tournamentId: ethers.BigNumber;
+    startDate: Date;
+    endDate: Date;
 }
 
-const form = reactive<ITournament>({
-    name: "",
-    description: "",
-    seats: 0,
-    fee: 0
+const form = reactive<ITournamentEvent>({
+    tournamentId: ethers.BigNumber.from(0),
+    startDate: new Date(),
+    endDate: new Date(),
 });
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
 const { Tournament } = getContracts(signer);
 
-const createTournament = async (formData: ITournament) => {
-    const trx = await Tournament?.functions.addPrix(formData.name, formData.description, formData.seats, 
-    ethers.utils.parseEther(formData.fee.toString()));
-    const receipt = await trx?.wait();
-    const name = receipt?.events?.NewPrix?.returnValues?.name;
-    alert(`Tournament ${name} has been created`);
-    await fetchTournaments();
+const createEvent = async (formData: ITournamentEvent) => {
+    
+    const trx = await Tournament?.functions.addEvent( formData.tournamentId.toNumber(), formData.startDate.getTime(), formData.endDate.getTime());
+    alert(`Tournament event has been created`);
 }
 
 const tournaments = ref([]);
@@ -58,22 +52,22 @@ onMounted(async () => {
 </script>
 
 <template>
-    <form className="form" @submit.prevent="createTournament(form)">
+    <form className="form" @submit.prevent="createEvent(form)">
+        <div className="form-group">
+            <label htmlFor="name">Tournament</label>
+            <select v-model="form.tournament" class="form-control">
+                <option  v-for="tournament in tournaments">
+                    {{ tournament.name }}
+                </option>
+            </select>
+        </div>
         <div className="form-group">
             <label htmlFor="name">Name</label>
-            <input type="text" className="form-control" id="name" v-model="form.name">
+            <AtDateSelect v-model="form.startDate" />
         </div>
         <div className="form-group">
             <label htmlFor="description">Description</label>
-            <input type="text" className="form-control" id="description" v-model="form.description">
-        </div>
-        <div className="form-group">
-            <label htmlFor="seats">Seats</label>
-            <input type="number" className="form-control" id="seats" v-model="form.seats">
-        </div>
-        <div className="form-group">
-            <label htmlFor="fee">Fee</label>
-            <input type="number" className="form-control" id="fee" v-model="form.fee">
+            <AtDateSelect v-model="form.endDate" />
         </div>
 
         <div class="text-right">
@@ -96,8 +90,6 @@ onMounted(async () => {
             </li>
         </ul>
     </div>
-
-    <EventCreate />
 </template>
 
 <style lang="scss">
