@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "@vue/runtime-core";
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts";
-import { getProvider } from "../composables/getProvider";
+import { getContracts } from "../composables/getContracts"
 import { ref } from "vue";
 
 const fetchMyItems = async () => {
