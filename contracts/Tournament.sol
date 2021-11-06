@@ -38,6 +38,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint endDate;
         uint8 seatsTaken;
         string champion;
+        uint houseFee;
     }
 
     struct TournamentPrix {
@@ -75,10 +76,10 @@ contract Tournament is Ownable, VRFConsumerBase {
     TournamentPlayer[] public players;
     MatchUp[] public combats;
 
-    mapping (uint => uint) private eventToOwnerFee; 
+    mapping(uint => uint) public prixToCurrentEvent;
+    mapping (uint => mapping(uint => bool)) public tokenToEvent; 
     mapping(uint => mapping(uint => uint)) public playerToEvent;
     mapping(bytes32 => uint) public requestIdToRamdomNumber;
-    mapping(uint => uint) public prixToCurrentEvent;
 
     constructor(address _vrfCoodinator, address _linkToken, bytes32 _keyhash  ) VRFConsumerBase(
         _vrfCoodinator,
@@ -122,20 +123,22 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint eventId = _getTokenFor(_eventsIds, false);
         TournamentPrix storage prix = prixes[_prixId];
         prix.editions.increment();
-        events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, ""));
+        events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, "", 0));
         prixToCurrentEvent[_prixId] = eventId;
     }
 
     function addParticipant(uint _tokenId, uint _eventId) public payable {
         TournamentEvent storage tEvents = events[_eventId];
         require(msg.value == prixes[tEvents.tokenId].seatFee, "Should pay the tournament fee");
+        require(tokenToEvent[_tokenId][_eventId] != false, "Is already in this event");
         tEvents.seatsTaken++;
         uint playerId = players.length; 
         players.push(TournamentPlayer(playerId, _tokenId, 0, Record(0, 0, 0), payable(msg.sender)));
         playerToEvent[_eventId][playerId] = _tokenId; 
+        tokenToEvent[_tokenId][_eventId] = true;
         uint percentage = (msg.value/housePercentage);
         prixes[tEvents.tokenId].prize += msg.value - percentage;
-        eventToOwnerFee[_eventId] += percentage;
+        events[_eventId].houseFee += percentage;
     }
 
     function getEventFee(uint _eventId) public view returns (uint) {
@@ -208,8 +211,8 @@ contract Tournament is Ownable, VRFConsumerBase {
     function payout(uint _eventId) public onlyOwner {
         uint winnerId = getEventWinner(_eventId);
         uint prize = prixes[events[_eventId].prixId].prize;
-        uint amount = eventToOwnerFee[_eventId];
-        eventToOwnerFee[_eventId] = 0;
+        uint amount = events[_eventId].houseFee;
+        events[_eventId].houseFee = 0;
         payable(contractOwner).transfer(amount);
         players[winnerId].owner.transfer(prize);
         emit TournamentWinner(players[winnerId].owner, prize);
