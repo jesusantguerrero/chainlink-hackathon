@@ -97,7 +97,7 @@ onMounted(async () => {
         </ul>
     </div>
 
-    <EventCreate />
+    <EventCreate :tournaments="tournaments" />
 </template>
 
 <style lang="scss">

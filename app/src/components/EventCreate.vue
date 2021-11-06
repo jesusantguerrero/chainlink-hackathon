@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { reactive, ref } from "@vue/reactivity";
+import { reactive } from "@vue/reactivity";
 import { ethers } from "ethers";
 import { getContracts } from "../composables/getContracts"
 import { AtButton, AtDateSelect } from "atmosphere-ui";
-import { onMounted } from "@vue/runtime-core";
+
+defineProps({
+    tournaments: {
+        type: Array,
+        default: () => []
+    },
+});
 
 interface ITournamentEvent {
     tournamentId: ethers.BigNumber;
@@ -21,42 +27,19 @@ const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
 const { Tournament } = getContracts(signer);
 
-const createEvent = async (formData: ITournamentEvent) => {
-    
+const createEvent = async (formData: ITournamentEvent) => {   
     const trx = await Tournament?.functions.addEvent( formData.tournamentId.toNumber(), formData.startDate.getTime(), formData.endDate.getTime());
     alert(`Tournament event has been created`);
 }
-
-const tournaments = ref([]);
-const fetchTournaments = async () => {
-    let prixes = await Tournament?.functions.getPrixes();
-    prixes = prixes[0]?.map((t:any) => {
-        return {
-            id: t.tokenId,
-            name: t.name,
-            description: t.description,
-            seats: t.seats,
-            fee: ethers.utils.formatEther(t.seatFee),
-            realFee: t.seatFee
-        }
-    });
-
-    tournaments.value = prixes;
-}
-
-onMounted(async () => {
-    await fetchTournaments();
-});
-
-
 </script>
 
 <template>
     <form className="form" @submit.prevent="createEvent(form)">
-        <div className="form-group">
+        <h2 class="mt-5 text-xl font-bold text-purple-400">Create Event for this tournament</h2>
+        <div className="form-group mt-5">
             <label htmlFor="name">Tournament</label>
-            <select v-model="form.tournament" class="form-control">
-                <option  v-for="tournament in tournaments">
+            <select v-model="form.tournamentId" class="form-control">
+                <option  v-for="tournament in tournaments" :value="tournament.id">
                     {{ tournament.name }}
                 </option>
             </select>
@@ -75,21 +58,7 @@ onMounted(async () => {
             Create
         </AtButton>
         </div>
-    </form>
-
-    <div>
-        <h2 class="mb-5"> Tournaments </h2>
-        <ul class="space-y-5 list-group">
-            <li class="list-group-item" v-for="tournament in tournaments">
-                <div>
-                    <h3>{{ tournament.name }}</h3>
-                    <p>{{ tournament.description }}</p>
-                    <p>Seats: {{ tournament.seats }}</p>
-                    <p>Fee: {{ tournament.fee }}</p>
-                </div>
-            </li>
-        </ul>
-    </div>
+    </form>s
 </template>
 
 <style lang="scss">
