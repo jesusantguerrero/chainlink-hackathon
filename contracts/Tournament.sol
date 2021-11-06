@@ -78,7 +78,7 @@ contract Tournament is Ownable, VRFConsumerBase {
     mapping (uint => uint) private eventToOwnerFee; 
     mapping(uint => mapping(uint => uint)) public playerToEvent;
     mapping(bytes32 => uint) public requestIdToRamdomNumber;
-    mapping(uint => MatchUp) public eventToCombat;
+    mapping(uint => uint) public prixToCurrentEvent;
 
     constructor(address _vrfCoodinator, address _linkToken, bytes32 _keyhash  ) VRFConsumerBase(
         _vrfCoodinator,
@@ -110,11 +110,20 @@ contract Tournament is Ownable, VRFConsumerBase {
         prixes.push(TournamentPrix(tokenId, 0, _seatsFee, _name,"", _description, _seatsLimit, edition));
     }
 
+    function getPrixes() public view returns (TournamentPrix[] memory) {
+        TournamentPrix[] memory result = new TournamentPrix[](prixes.length);
+        for (uint i = 0; i < prixes.length; i++) {
+            result[i] = prixes[i];
+        }
+        return result;
+    }
+
     function addEvent(uint _prixId, uint _startDate, uint _endDate) public onlyOwner {
-        uint tokenId = _getTokenFor(_eventsIds, false);
+        uint eventId = _getTokenFor(_eventsIds, false);
         TournamentPrix storage prix = prixes[_prixId];
         prix.editions.increment();
-        events.push(TournamentEvent(tokenId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, ""));
+        events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, ""));
+        prixToCurrentEvent[_prixId] = eventId;
     }
 
     function addParticipant(uint _tokenId, uint _eventId) public payable {
@@ -178,16 +187,16 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint winner;
         uint loser;
         
-        // token Ids 
+        // Token Ids 
         (winner, loser) = IRoosterFight(roosterFightAdress).fight(playerToEvent[combat.eventID][combat.attacker], playerToEvent[combat.eventID][combat.defence], requestIdToRamdomNumber[combat.requestId]);
         combat.active = false;
         combat.winner = winner;
 
-        // here I need players id
+        // Here I need players id
         uint winnerPlayerId = playerToEvent[combat.eventID][combat.attacker] == winner ? combat.attacker : combat.defence;
         uint loserPlayerId = playerToEvent[combat.eventID][combat.attacker] != winner ? combat.attacker : combat.defence;
 
-        // give the prizes to the winners
+        // Give the prizes to the winners
         players[winnerPlayerId].record.wins++;
         players[winnerPlayerId].points += 3;
         players[loserPlayerId].record.losses++;
