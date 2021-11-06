@@ -53,7 +53,7 @@ const SetupContract: DeployFunction = async (
   );
   await roosterFight.functions.setClaimerAddress(RoosterClaimer.address);
 
-  await deploy("Tournament", {
+  const Tournament = await deploy("Tournament", {
     from: deployer,
     log: true,
     args: [
@@ -72,6 +72,7 @@ const SetupContract: DeployFunction = async (
 
   await saveEnvVar("VITE_NFT_ADDRESS", RoosterFight.address);
   await saveEnvVar("VITE_CLAIMER_ADDRESS", RoosterClaimer.address);
+  await saveEnvVar("VITE_TOURNAMENT_ADDRESS", Tournament.address);
   console.log(chainId, "Como estamos?");
 };
 
