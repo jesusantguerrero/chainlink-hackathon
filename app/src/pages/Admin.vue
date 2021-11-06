@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Game from '../layouts/Game.vue';
-import NFTList from '../components/NFTList.vue';
 import TournamentCreate from '../components/TournamentCreate.vue';
 </script>
 

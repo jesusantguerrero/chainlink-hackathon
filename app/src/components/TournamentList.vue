@@ -64,8 +64,8 @@ onMounted(async () => {
     <div>
         <ul class="mt-5 space-y-5 list-group">
             <li class="list-group-item" v-for="tournament in tournaments">
-                <div>
-                    <h3>{{ tournament.name }} {{ tournament.eventId }}</h3>
+                <router-link :to="`/tournaments/${tournament.id}`">
+                    <h3>{{ tournament.name }} - {{ tournament.id }}{{ tournament.eventId }}</h3>
                     <p>{{ tournament.description }}</p>
                     <p>Seats: {{ tournament.seats }}</p>
                     <p>Participants: {{ tournament.seatsTaken }}</p>
@@ -73,7 +73,7 @@ onMounted(async () => {
                     <AtButton class="bg-purple-500" @click="joinTournament(tournament.id)">
                         Join
                     </AtButton>
-                </div>
+                </router-link>
             </li>
         </ul>
     </div>

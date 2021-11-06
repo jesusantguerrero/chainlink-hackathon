@@ -27,6 +27,10 @@ export const router = createRouter({
       component: Tournaments,
     },
     {
+      path: "/tournaments/:id",
+      component: Tournaments,
+    },
+    {
       path: "/signup",
       component: Dashboard,
     },
