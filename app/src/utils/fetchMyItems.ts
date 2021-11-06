@@ -30,6 +30,11 @@ export const fetchMyItems = async () => {
   return roosters;
 };
 
+export interface IAsset {
+  name: string;
+  description: string;
+  attributes: Record<string, string>;
+}
 export interface NFTAsset {
   tokenId: number;
   name: string;

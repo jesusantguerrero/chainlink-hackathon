@@ -130,7 +130,7 @@ contract Tournament is Ownable, VRFConsumerBase {
     function addParticipant(uint _tokenId, uint _eventId) public payable {
         TournamentEvent storage tEvents = events[_eventId];
         require(msg.value == prixes[tEvents.tokenId].seatFee, "Should pay the tournament fee");
-        require(tokenToEvent[_tokenId][_eventId] != false, "Is already in this event");
+        require(tokenToEvent[_tokenId][_eventId] == false, "Is already in this event");
         tEvents.seatsTaken++;
         uint playerId = players.length; 
         players.push(TournamentPlayer(playerId, _tokenId, 0, Record(0, 0, 0), payable(msg.sender)));
