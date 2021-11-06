@@ -3,7 +3,7 @@
 import { deployments } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { networkConfig } from "../helper-hardhat-config";
+import { autoFundCheck, networkConfig } from "../helper-hardhat-config";
 import { saveEnvVar } from "../utils/deploy-contract";
 
 const SetupContract: DeployFunction = async (
@@ -73,7 +73,21 @@ const SetupContract: DeployFunction = async (
   await saveEnvVar("VITE_NFT_ADDRESS", RoosterFight.address);
   await saveEnvVar("VITE_CLAIMER_ADDRESS", RoosterClaimer.address);
   await saveEnvVar("VITE_TOURNAMENT_ADDRESS", Tournament.address);
-  console.log(chainId, "Como estamos?");
+
+  if (
+    chainLink.linkTokenAddress &&
+    (await autoFundCheck(
+      Tournament.address,
+      "localhost",
+      chainLink.linkTokenAddress,
+      "Nothing more"
+    ))
+  ) {
+    await hre.run("fund-link", {
+      contract: Tournament.address,
+      linkaddress: chainLink.linkTokenAddress,
+    });
+  }
 };
 
 export default SetupContract;
