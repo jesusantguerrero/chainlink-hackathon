@@ -1,46 +1,106 @@
-# Advanced Sample Hardhat Project
+# Chainlink Hackathon Project
+[![codecov](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon/branch/master/graph/badge.svg?token=Y153S4JEZL)](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon)
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+## User Stories
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+- User Story: I can connect my wallet using metamask.
 
-Try running some of the following tasks:
+- User Story: I can claim NFTRoosters.
+
+- User Story: I can participate in tournaments.
+
+- User Story: I can fight with others roosters to win points.
+
+- User Story: I can win if at the end of the tourmament I have more points.
+
+## Technical Details
+In the following application tried to cover all main aspects of solidity and smart contract topics
+
+- Use external contracts and libraries
+- Protect external configuration functions with Ownable
+- Use VRFCoordinator to generate radom number decide the damage
+- Implement ERC721 Interface
+- Testing the contracts
+
+In addition to the following Dapp topics
+
+- Connecting a wallet (Metamask)
+- Connect a frontend with a smart contract (ethers.js)
+- Listen events from the contracts
+
+## The contracts
+
+| Contract                 | Description                                      |
+|--------------------------|-----------------------------------------         |
+| **RoosterBase.sol**      | Stores Attributes and States of tokens           |
+| **RoosterNFT.sol**       | Stores Mint and Claim and NFT logic              | 
+| **RoosterFight.sol**     | Stores helpers and inherit from NFT and Base     | 
+| **RoosterClaimer.sol**   | Stores the logic to let users claim NFT          | 
+| **Tournament.sol**       | Stores Tournament and fight logic                |
+
+## Built with
+Frontend:
+- [Vue.js 3](https://v3.vuejs.org/) - The Progressive JavaScript Framework
+- [ethers.js](https://docs.ethers.io/v5/) - JS library for interacting with the Ethereum Blockchain and its ecosystem
+
+Blockchain Environment:
+- [Hardhat](https://hardhat.org/) - Flexible, extensible and fast Ethereum development environment for professionals.
+- [hardhat-deploy]
+
+## Installation
+
+### Prerequisites
+
+| Prerequisite                                          | Version |
+| ------------------------------------------------------| ------- |
+| [MetaMask](https://metamask.io/)                                          |         |
+| npm (comes with Node) or yarn (used)                  | `~ ^12.20.0`|
+| npm (comes with Node) or yarn (used)                  | `~ ^6.14.8`  |
 
 ```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+node -v
+mongo --version
 ```
+#### Cloning the repo
 
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+1. Open a Terminal in your projects directory 
+2. Clone this repo
 
 ```shell
-hardhat run --network ropsten scripts/sample-script.ts
+$ git clone https://github.com/jesusantguerrero/chainlink-hackathon.git
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
+### setup
+```bash
+# Install NPM dependencies
+npm install
+# or If you like yarn
+yarn install
 
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
 
-# Performance optimizations
+copy .env.example to .env and change the API KEY:
 
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+```bash
+cp .env.example .env
+```
+
+### running
+
+```bash
+# Start the local blockchain in a separate terminal
+npm run contract:serve
+
+# Deploy the contracts to the local blockchain
+npm run contract:deploy
+
+# run the frontend SPA
+npm run dev
+```
+
+### testing
+```
+npm run contract:test
+npm run contract:coverage
+```
+
