@@ -34,7 +34,7 @@ contract RoosterFight is RoosterNFT {
         return level;
     }
 
-    function getPCDetails(uint _tokenId) external view returns (
+    function getDetails(uint _tokenId) external view returns (
         string memory name,
         string memory image,
         string memory breed,

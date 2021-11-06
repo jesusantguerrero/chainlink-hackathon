@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable node/no-missing-import */
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -98,7 +99,10 @@ describe("Player Character", () => {
     pcToken = await getContract("RoosterFight", [100]);
   });
 
-  it("get player level", async () => {
+  it("Should get player level", async () => {
     expect(await pcToken.getLevel(1)).to.equal(1);
+  });
+  it("Should get player details", async () => {
+    expect(await pcToken.getDetails(1)).to.not.be.null;
   });
 });
