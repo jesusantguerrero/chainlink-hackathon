@@ -33,6 +33,27 @@ const joinTournament = async (prixId: number) => {
     alert(`You has joined to the ${name} tournament`);
     await fetchTournament();
 }
+
+const fight = async (eventId: number, defenderId: number) => {
+    const myRoosters = await Cockfighter?.functions.getMyRoosters()
+    const tokenId: ethers.BigNumber = myRoosters[0][0];
+    const attackerId = players.value.find(p => p.tokenId === tokenId.toNumber())?.playerId;
+    if (attackerId === defenderId) {
+        alert("You need to have at least one rooster to join a tournament");
+        return;
+    }
+    const trx = await Tournament?.functions.prepareFight(eventId, attackerId, defenderId);
+    const receipt = await trx?.wait();
+    const name = receipt?.events?.NewPrix?.returnValues?.name;
+    alert(`The fight is going to take place in a minute`);
+    await fetchTournament();
+}
+interface IPlayer {
+    playerId: number;
+    tokenId: number;
+    name: string;
+}
+
 interface ITournamentWithEvent {
     id: number,
     name: string,
@@ -61,7 +82,7 @@ const tournament = ref<ITournamentWithEvent>({
     realFee: 0
 });
 
-const players = ref([]);
+const players = ref<IPlayer[]>([]);
 
 const fetchPlayers = async (eventId: number) => {
     const playersData = await Tournament?.getEventParticipants(eventId);
@@ -76,9 +97,16 @@ const fetchPlayers = async (eventId: number) => {
         
         return {
             ...player,
+            playerId: player.playerId.toNumber(),
+            tokenId: player.tokenId.toNumber(),
             ...rooster
         }
     }));
+}
+
+const combats = ref<any[]>([]);
+const fetchMatches = async (eventId: number) => {
+    combats.value = await Tournament?.getEventCombats(eventId);
 }
 
 const fetchTournament = async () => {
@@ -106,7 +134,8 @@ const fetchTournament = async () => {
 
 onMounted(async () => {
     await fetchTournament();
-    fetchPlayers(tournament?.value?.eventId);
+    await fetchPlayers(tournament?.value?.eventId);
+    fetchMatches(tournament?.value?.eventId);
 });
 
 
@@ -136,22 +165,38 @@ onMounted(async () => {
                         <th class="px-4 py-2">Loses</th>
                         <th class="px-4 py-2">Draws</th>
                         <th class="px-4 py-2">Points</th>
+                        <th class="px-4 py-2">Owner</th>
+                    
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(player, index) in players">
                         <td class="px-4 py-2 border">{{ index + 1 }}</td>
-                        <td class="px-4 py-2 border">
+                        <td class="flex flex-col px-4 py-2 border">
                             <img :src="player.image" alt="" class="rounded-md w-28 h-28">
                             <span>{{ player.name }}</span>
+                            <AtButton 
+                                class="font-bold bg-purple-400" 
+                                @click="fight(tournament.eventId, player.playerId)"> 
+                                Fight 
+                            </AtButton>
                         </td>
                         <td class="px-4 py-2 border">{{ player.record.wins }}</td>
                         <td class="px-4 py-2 border">{{ player.record.losses }}</td>
                         <td class="px-4 py-2 border">{{ player.record.draws }}</td>
                         <td class="px-4 py-2 border">{{ player.points }}</td>
+                        <td class="px-4 py-2 border">{{ player.owner }}</td>
+                        
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <h4 class="mt-5">Combats</h4>
+        <div>
+            <div v-for="(combat, index) in combats">
+                {{index + 1}} - {{combat.attacker}} vs {{ combat.defence }}
+            </div>
         </div>
     </div>
 </template>

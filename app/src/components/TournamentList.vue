@@ -70,7 +70,7 @@ onMounted(async () => {
                     <p>Seats: {{ tournament.seats }}</p>
                     <p>Participants: {{ tournament.seatsTaken }}</p>
                     <p>Fee: {{ tournament.fee }}</p>
-                    <AtButton class="bg-purple-500" @click="joinTournament(tournament.id)">
+                    <AtButton class="bg-purple-500" @click.stop="joinTournament(tournament.id)">
                         Join
                     </AtButton>
                 </router-link>
