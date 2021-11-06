@@ -39,6 +39,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint8 seatsTaken;
         string champion;
         uint houseFee;
+        uint32 combatsCount;
     }
 
     struct TournamentPrix {
@@ -123,7 +124,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint eventId = _getTokenFor(_eventsIds, false);
         TournamentPrix storage prix = prixes[_prixId];
         prix.editions.increment();
-        events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, "", 0));
+        events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, "", 0, 0));
         prixToCurrentEvent[_prixId] = eventId;
     }
 
@@ -172,10 +173,22 @@ contract Tournament is Ownable, VRFConsumerBase {
         return ePlayers;
     }
 
+    function getEventCombats(uint _eventId) public view returns (MatchUp[] memory) {
+        uint combatsCount = events[_eventId].combatsCount;
+        MatchUp[] memory eCombats = new MatchUp[](combatsCount);
+        for (uint256 index = 0; index < combats.length; index++) {
+            if (playerToEvent[_eventId][index] != 0) {
+                eCombats[index] = combats[index];
+            }
+        }
+        return eCombats;
+    }
+
     function prepareFight(uint _attackerPlayerId, uint _defencePlayerId, uint _eventId) public returns (bytes32, uint) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK");
         bytes32 requestId = requestRandomness(keyHash, fee);
         uint combatId = combats.length +1;
+        events[_eventId].combatsCount++;
         combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defencePlayerId, true, 0));
         emit FightStarted(requestId, playerToEvent[_eventId][_attackerPlayerId], playerToEvent[_eventId][_defencePlayerId], _eventId, combatId); 
         return (requestId, combatId);       
