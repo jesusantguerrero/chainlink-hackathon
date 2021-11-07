@@ -38,6 +38,8 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint endDate;
         uint8 seatsTaken;
         string champion;
+        uint houseFee;
+        uint32 combatsCount;
     }
 
     struct TournamentPrix {
@@ -75,10 +77,10 @@ contract Tournament is Ownable, VRFConsumerBase {
     TournamentPlayer[] public players;
     MatchUp[] public combats;
 
-    mapping (uint => uint) private eventToOwnerFee; 
+    mapping(uint => uint) public prixToCurrentEvent;
+    mapping (uint => mapping(uint => bool)) public tokenToEvent; 
     mapping(uint => mapping(uint => uint)) public playerToEvent;
     mapping(bytes32 => uint) public requestIdToRamdomNumber;
-    mapping(uint => MatchUp) public eventToCombat;
 
     constructor(address _vrfCoodinator, address _linkToken, bytes32 _keyhash  ) VRFConsumerBase(
         _vrfCoodinator,
@@ -110,23 +112,34 @@ contract Tournament is Ownable, VRFConsumerBase {
         prixes.push(TournamentPrix(tokenId, 0, _seatsFee, _name,"", _description, _seatsLimit, edition));
     }
 
+    function getPrixes() public view returns (TournamentPrix[] memory) {
+        TournamentPrix[] memory result = new TournamentPrix[](prixes.length);
+        for (uint i = 0; i < prixes.length; i++) {
+            result[i] = prixes[i];
+        }
+        return result;
+    }
+
     function addEvent(uint _prixId, uint _startDate, uint _endDate) public onlyOwner {
-        uint tokenId = _getTokenFor(_eventsIds, false);
+        uint eventId = _getTokenFor(_eventsIds, false);
         TournamentPrix storage prix = prixes[_prixId];
         prix.editions.increment();
-        events.push(TournamentEvent(tokenId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, ""));
+        events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, "", 0, 0));
+        prixToCurrentEvent[_prixId] = eventId;
     }
 
     function addParticipant(uint _tokenId, uint _eventId) public payable {
         TournamentEvent storage tEvents = events[_eventId];
         require(msg.value == prixes[tEvents.tokenId].seatFee, "Should pay the tournament fee");
+        require(tokenToEvent[_tokenId][_eventId] == false, "Is already in this event");
         tEvents.seatsTaken++;
         uint playerId = players.length; 
         players.push(TournamentPlayer(playerId, _tokenId, 0, Record(0, 0, 0), payable(msg.sender)));
         playerToEvent[_eventId][playerId] = _tokenId; 
+        tokenToEvent[_tokenId][_eventId] = true;
         uint percentage = (msg.value/housePercentage);
         prixes[tEvents.tokenId].prize += msg.value - percentage;
-        eventToOwnerFee[_eventId] += percentage;
+        events[_eventId].houseFee += percentage;
     }
 
     function getEventFee(uint _eventId) public view returns (uint) {
@@ -160,10 +173,22 @@ contract Tournament is Ownable, VRFConsumerBase {
         return ePlayers;
     }
 
+    function getEventCombats(uint _eventId) public view returns (MatchUp[] memory) {
+        uint combatsCount = events[_eventId].combatsCount;
+        MatchUp[] memory eCombats = new MatchUp[](combatsCount);
+        for (uint256 index = 0; index < combats.length; index++) {
+            if (playerToEvent[_eventId][index] != 0) {
+                eCombats[index] = combats[index];
+            }
+        }
+        return eCombats;
+    }
+
     function prepareFight(uint _attackerPlayerId, uint _defencePlayerId, uint _eventId) public returns (bytes32, uint) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK");
         bytes32 requestId = requestRandomness(keyHash, fee);
         uint combatId = combats.length +1;
+        events[_eventId].combatsCount++;
         combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defencePlayerId, true, 0));
         emit FightStarted(requestId, playerToEvent[_eventId][_attackerPlayerId], playerToEvent[_eventId][_defencePlayerId], _eventId, combatId); 
         return (requestId, combatId);       
@@ -178,16 +203,16 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint winner;
         uint loser;
         
-        // token Ids 
+        // Token Ids 
         (winner, loser) = IRoosterFight(roosterFightAdress).fight(playerToEvent[combat.eventID][combat.attacker], playerToEvent[combat.eventID][combat.defence], requestIdToRamdomNumber[combat.requestId]);
         combat.active = false;
         combat.winner = winner;
 
-        // here I need players id
+        // Here I need players id
         uint winnerPlayerId = playerToEvent[combat.eventID][combat.attacker] == winner ? combat.attacker : combat.defence;
         uint loserPlayerId = playerToEvent[combat.eventID][combat.attacker] != winner ? combat.attacker : combat.defence;
 
-        // give the prizes to the winners
+        // Give the prizes to the winners
         players[winnerPlayerId].record.wins++;
         players[winnerPlayerId].points += 3;
         players[loserPlayerId].record.losses++;
@@ -199,8 +224,8 @@ contract Tournament is Ownable, VRFConsumerBase {
     function payout(uint _eventId) public onlyOwner {
         uint winnerId = getEventWinner(_eventId);
         uint prize = prixes[events[_eventId].prixId].prize;
-        uint amount = eventToOwnerFee[_eventId];
-        eventToOwnerFee[_eventId] = 0;
+        uint amount = events[_eventId].houseFee;
+        events[_eventId].houseFee = 0;
         payable(contractOwner).transfer(amount);
         players[winnerId].owner.transfer(prize);
         emit TournamentWinner(players[winnerId].owner, prize);

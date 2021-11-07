@@ -1,45 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "@vue/runtime-core";
-import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts";
-import { getProvider } from "../composables/getProvider";
 import { ref } from "vue";
-
-const fetchMyItems = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    const signer = provider.getSigner();
-    const { Cockfighter } = getContracts(signer);
-
-    let roosters = await Cockfighter?.functions.getMyRoosters();
-    roosters = await Promise.all(roosters[0].map(async(item: ethers.BigNumber) => {
-        const tokenURI = await Cockfighter?.tokenURI(item.toNumber());
-        const rooster = await fetch(tokenURI)
-        .then(data => {
-            return data.json()
-        })
-        .then( data => data)
-        .catch(err => {
-            return {};
-        });
-        
-        return {
-            tokenId: item.toNumber(), 
-            ...rooster
-        };
-    }))
-
-    return roosters;
-}
-
-interface NFTAsset {
-    tokenId: number;
-    name: string;
-    description: string;
-    image: string;
-    price: string;
-    owner: string;
-    claimable: boolean;
-};
+import { fetchMyItems, NFTAsset } from "../utils/fetchMyItems";
 
 
 const items = ref<NFTAsset[]>([]);

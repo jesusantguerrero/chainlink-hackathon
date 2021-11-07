@@ -18,14 +18,35 @@ onMounted(async () => {
 })
 
 const dashboardMenu = computed(() => {    
-    const menu = [
-        "General",
-        "Tournaments",
-        "Sponsors",
-        "Notifications"
-    ];
+    const menu = [ {
+        text: 'Dashboard',
+        to: '/dashboard',
+        icon: 'mdi-view-dashboard',
+        active: false
+    } , {
+        text: 'Tournaments',
+        to: '/tournaments',
+        icon: 'mdi-trophy-award',
+        active: false
+    } , {
+        text: 'Players',
+        to: '/players',
+        icon: 'mdi-account-multiple',
+        active: false
+    } , {
+        text: 'Settings',
+        to: '/settings',
+        icon: 'mdi-settings',
+        active: false
+    } ];
+
     if (isOwner.value) {
-        menu.push("Admin");
+        menu.push({
+            text: 'Admin',
+            to: '/admin',
+            icon: 'mdi-account-key',
+            active: false
+        });
     }
     return menu;
 });
@@ -47,9 +68,9 @@ const dashboardMenu = computed(() => {
 
     <div class="mx-auto mt-10 text-white max-w-7xl">
         <ul class="flex justify-around text-white bg-gray-700">
-            <li v-for="item in dashboardMenu" class="w-full py-3 text-center cursor-pointer hover:bg-gray-800">{{
-                item
-            }}</li>
+            <router-link :to="item.to" v-for="item in dashboardMenu" class="w-full py-3 text-center cursor-pointer hover:bg-gray-800">
+               {{ item.icon }} {{ item.text }}
+            </router-link>
         </ul>
        <slot />
     </div>

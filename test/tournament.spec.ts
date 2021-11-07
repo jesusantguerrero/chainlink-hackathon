@@ -113,7 +113,7 @@ describe("Tournament unit tests", async () => {
     const trx = await tournament.prepareFight(0, 1, 0);
     const receipt = await trx.wait(1);
     const requestId = receipt.events[2].topics[1];
-
+    expect((await tournament.getEventCombats(0)).length).to.equal(1);
     console.log("events: ", receipt.events);
     console.log("requestId: ", requestId);
     expect(requestId).to.not.be.null;
