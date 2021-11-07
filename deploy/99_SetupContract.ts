@@ -63,6 +63,13 @@ const SetupContract: DeployFunction = async (
     ],
   });
 
+  const tournament = await hre.ethers.getContractAt(
+    "Tournament",
+    Tournament.address
+  );
+
+  tournament.setNFTAddress(RoosterFight.address);
+
   //   Mint the initial tokens
   await roosterFight.functions.batchMint([
     "https://lh3.googleusercontent.com/pnay7Gr6QdYT5V23hYlv8Dyvm1R6VfyvQgPHSrMmQJuLMHVwn8B2pth6DFHnWQZvrGPpiPP-DTPgdUFd-fa0pa7rbBwoboRP0Csu6MI=w600",
