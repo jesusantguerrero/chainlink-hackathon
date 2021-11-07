@@ -39,7 +39,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint8 seatsTaken;
         string champion;
         uint houseFee;
-        uint32 combatsCount;
+        uint64 combatsCount;
     }
 
     struct TournamentPrix {
@@ -79,7 +79,7 @@ contract Tournament is Ownable, VRFConsumerBase {
 
     mapping(uint => uint) public prixToCurrentEvent;
     mapping (uint => mapping(uint => bool)) public tokenToEvent; 
-    mapping(uint => mapping(uint => uint)) public playerToEvent;
+    mapping(uint => mapping(uint => uint)) public eventToPlayer;
     mapping(bytes32 => uint) public requestIdToRamdomNumber;
 
     constructor(address _vrfCoodinator, address _linkToken, bytes32 _keyhash  ) VRFConsumerBase(
@@ -135,7 +135,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         tEvents.seatsTaken++;
         uint playerId = players.length; 
         players.push(TournamentPlayer(playerId, _tokenId, 0, Record(0, 0, 0), payable(msg.sender)));
-        playerToEvent[_eventId][playerId] = _tokenId; 
+        eventToPlayer[_eventId][playerId] = _tokenId; 
         tokenToEvent[_tokenId][_eventId] = true;
         uint percentage = (msg.value/housePercentage);
         prixes[tEvents.tokenId].prize += msg.value - percentage;
@@ -155,7 +155,7 @@ contract Tournament is Ownable, VRFConsumerBase {
             payable(address(0))
         );
         for (uint256 index = 0; index < players.length; index++) {
-            if (playerToEvent[_eventId][index] != 0 && players[index].points > winner.points) {
+            if (eventToPlayer[_eventId][index] != 0 && players[index].points > winner.points) {
                 winner = players[index];
             }
         }
@@ -166,7 +166,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint playerLen = events[_eventId].seatsTaken;
         TournamentPlayer[] memory ePlayers = new TournamentPlayer[](playerLen);
         for (uint256 index = 0; index < players.length; index++) {
-            if (playerToEvent[_eventId][index] != 0) {
+            if (eventToPlayer[_eventId][index] != 0) {
                 ePlayers[index] = players[index];
             }
         }
@@ -177,7 +177,7 @@ contract Tournament is Ownable, VRFConsumerBase {
         uint combatsCount = events[_eventId].combatsCount;
         MatchUp[] memory eCombats = new MatchUp[](combatsCount);
         for (uint256 index = 0; index < combats.length; index++) {
-            if (playerToEvent[_eventId][index] != 0) {
+            if (eventToPlayer[_eventId][index] != 0) {
                 eCombats[index] = combats[index];
             }
         }
@@ -187,10 +187,10 @@ contract Tournament is Ownable, VRFConsumerBase {
     function prepareFight(uint _attackerPlayerId, uint _defencePlayerId, uint _eventId) public returns (bytes32, uint) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK");
         bytes32 requestId = requestRandomness(keyHash, fee);
-        uint combatId = combats.length +1;
+        uint combatId = combats.length;
         events[_eventId].combatsCount++;
         combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defencePlayerId, true, 0));
-        emit FightStarted(requestId, playerToEvent[_eventId][_attackerPlayerId], playerToEvent[_eventId][_defencePlayerId], _eventId, combatId); 
+        emit FightStarted(requestId, eventToPlayer[_eventId][_attackerPlayerId], eventToPlayer[_eventId][_defencePlayerId], _eventId, combatId); 
         return (requestId, combatId);       
     }
 
@@ -200,17 +200,18 @@ contract Tournament is Ownable, VRFConsumerBase {
 
     function startFight(bytes32 _requestId, uint _combatId) public {
         MatchUp storage combat = combats[_combatId];
+        require(combat.active == true, "Combat already finished");
         uint winner;
         uint loser;
         
         // Token Ids 
-        (winner, loser) = IRoosterFight(roosterFightAdress).fight(playerToEvent[combat.eventID][combat.attacker], playerToEvent[combat.eventID][combat.defence], requestIdToRamdomNumber[combat.requestId]);
+        (winner, loser) = IRoosterFight(roosterFightAdress).fight(eventToPlayer[combat.eventID][combat.attacker], eventToPlayer[combat.eventID][combat.defence], requestIdToRamdomNumber[combat.requestId]);
         combat.active = false;
         combat.winner = winner;
 
         // Here I need players id
-        uint winnerPlayerId = playerToEvent[combat.eventID][combat.attacker] == winner ? combat.attacker : combat.defence;
-        uint loserPlayerId = playerToEvent[combat.eventID][combat.attacker] != winner ? combat.attacker : combat.defence;
+        uint winnerPlayerId = eventToPlayer[combat.eventID][combat.attacker] == winner ? combat.attacker : combat.defence;
+        uint loserPlayerId = eventToPlayer[combat.eventID][combat.attacker] != winner ? combat.attacker : combat.defence;
 
         // Give the prizes to the winners
         players[winnerPlayerId].record.wins++;
