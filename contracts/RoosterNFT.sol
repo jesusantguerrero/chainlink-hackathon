@@ -144,7 +144,6 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
         uint counter = 0;
         for (uint i = 1; i <= _totalSupply.current(); i++) {
             if (tokenToOwner[i] == _owner) {
-                console.log(i, _owner);
                 nfts[counter] = i;
                 counter++;
             }

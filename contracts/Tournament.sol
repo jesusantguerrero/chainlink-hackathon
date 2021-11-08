@@ -5,12 +5,13 @@ import "./TournamentBase.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 interface IRoosterFight {
-    function fight (uint _attacker, uint _defender,uint _randomNumber) external returns (uint, uint);
+    function simulateRound(uint _attacker, uint _defender,uint _randomNumber) external returns (uint, uint, uint, uint);
 }
 
 contract Tournament is TournamentBase, VRFConsumerBase {
     event FightStarted(bytes32 requestId, uint _attacker, uint _defense, uint _eventId, uint combatId);
     event FightFinished(bytes32 requestId, uint _attacker, uint _defense, uint _eventId, uint combatId);
+    event FightRound(uint eventId, uint attacker, uint damage);
     event FightWinner(bytes32 requestId, uint winner, address owner);
 
     struct MatchUp {
@@ -72,9 +73,19 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         require(combat.active == true, "Combat already finished");
         uint winner;
         uint loser;
+        uint player1Attack;
+        uint player2Attack;
         
         // Token Ids 
-        (winner, loser) = IRoosterFight(roosterFightAdress).fight(eventToPlayer[combat.eventId][combat.attacker], eventToPlayer[combat.eventId][combat.defense], requestIdToRandomNumber[combat.requestId]);
+        (winner, loser, player1Attack, player2Attack) = IRoosterFight(roosterFightAdress).simulateRound(
+            eventToPlayer[combat.eventId][combat.attacker], 
+            eventToPlayer[combat.eventId][combat.defense], 
+            requestIdToRandomNumber[combat.requestId]
+        );
+        
+        emit FightRound(combat.eventId, combat.attacker, player1Attack);
+        emit FightRound(combat.eventId, combat.defense, player2Attack);
+        
         combat.active = false;
         combat.winner = winner;
 
