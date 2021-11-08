@@ -198,7 +198,7 @@ onMounted(async () => {
         <h4 class="mt-5 text-xl font-bold">Combats</h4>
         <div class="mb-10 space-y-2">
             <router-link class="block font-bold text-purple-400 underline" :to="`/match/${combat.token}`" v-for="(combat, index) in combats">
-                Fight {{index + 1}} - {{combat.attacker}} vs {{ combat.defence }}
+                Fight {{index + 1}} - {{combat.attacker}} vs {{ combat.defense }}
             </router-link>
         </div>
     </div>

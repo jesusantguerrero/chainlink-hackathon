@@ -29,8 +29,8 @@ const fetchRooster = async (tokenId: ethers.BigNumber) => {
 
 const fetchMatch = async (matchId: string) => {
     const combat = await Tournament?.combats(matchId);;
-    const player1TokenId = await Tournament?.functions?.eventToPlayer(combat.eventID, combat.attacker.toNumber());
-    const player2TokenId = await Tournament?.functions?.eventToPlayer(combat.eventID, combat.defence.toNumber());
+    const player1TokenId = await Tournament?.functions?.eventToPlayer(combat.eventId, combat.attacker.toNumber());
+    const player2TokenId = await Tournament?.functions?.eventToPlayer(combat.eventId, combat.defense.toNumber());
 
     const [rooster1, rooster2] = await Promise.all([
         fetchRooster(player1TokenId[0]),
