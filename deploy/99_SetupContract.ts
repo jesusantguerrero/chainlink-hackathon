@@ -1,5 +1,6 @@
 /* eslint-disable node/no-missing-import */
 /* eslint-disable node/no-unpublished-import */
+import { ethers } from "ethers";
 import { deployments } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -76,6 +77,17 @@ const SetupContract: DeployFunction = async (
     "https://lh3.googleusercontent.com/bs5rirjgoAV5VQNFwp2EiVurf15o2bbNOIu_sac-nXnP3UTDVh6n2xVCIBLHCwG1odiJ656iP7fzmVPkSEqBYWs1HX73sSsU9FGo=w600",
     "https://lh3.googleusercontent.com/ioC2jjM0CTXuTCKWHJCsenkO0rmmcWczzlBt25_hbMP_mfaRh5iYAkckwoY1I6tzWM3vNR6RRotyFuOeVk9dUSCWW5GLyK6InmTUNQ=w600",
   ]);
+
+  // Create the initial tournament
+  await tournament.functions.addPrix(
+    "Rooster fight I",
+    "First tournament of rooster fight",
+    10,
+    ethers.utils.parseEther("0.1")
+  );
+  const startDate = new Date();
+  const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
+  await tournament.functions.addEvent(0, new Date().getTime(), endDate);
 
   await saveEnvVar("VITE_NFT_ADDRESS", RoosterFight.address);
   await saveEnvVar("VITE_CLAIMER_ADDRESS", RoosterClaimer.address);

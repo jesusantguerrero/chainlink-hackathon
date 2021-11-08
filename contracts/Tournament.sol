@@ -27,7 +27,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
 
     bytes32 internal keyHash;
     uint256 internal fee;    
-    MatchUp[] internal combats;
+    MatchUp[] public combats;
     
     mapping (uint => mapping(uint => mapping(uint => bool))) public eventToPlayerVsPlayer;
     mapping (bytes32 => uint) public requestIdToRandomNumber;
