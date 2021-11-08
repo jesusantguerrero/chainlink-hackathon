@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {  ref } from "@vue/reactivity";
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts"
+import { useContract, uuseContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
 import { IAsset } from "../utils/fetchMyItems";
@@ -16,7 +16,8 @@ const props = defineProps({
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
-const { Tournament, Cockfighter } = getContracts(signer);
+const Cockfighter = useContract("RoosterFight", signer);
+const Tournament = useContract("Tournament", signer);
 
 const tournament = ref<ITournamentWithEvent>({
     id: 0,
@@ -41,15 +42,16 @@ const joinTournament = async (prixId: number) => {
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
     const tournamentFee = await Tournament?.getEventFee(eventId);
-    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }); 
+    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
+        console.log(err);
+    }); 
     const receipt = await trx?.wait();
     const name = receipt?.events?.NewPrix?.returnValues?.name;
     alert(`You has joined to the ${tournament.value.name} tournament`);
-    await fetchTournament();
+    await fetchPageData();
 }
 
 const fight = async (eventId: number, defenderId: number) => {
-    debugger;
     const myRoosters = await Cockfighter?.functions.getMyRoosters()
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const attackerId = players.value.find(p => p.tokenId === tokenId.toNumber())?.playerId;
@@ -57,7 +59,6 @@ const fight = async (eventId: number, defenderId: number) => {
         alert("You cant fight yourself bro");
         return;
     }
-    debugger;
     const trx = await Tournament?.functions.prepareFight(eventId, attackerId, defenderId);
     const receipt = await trx?.wait();
     const name = receipt?.events?.NewPrix?.returnValues?.name;
@@ -94,7 +95,6 @@ const fetchPlayers = async (eventId: number) => {
         const rooster = await axios(tokenURI[0])
         .then(({ data } : { data: IAsset}): IAsset => data)
         .catch(err => {
-            console.log(err)
           return {};
         });
         
@@ -109,7 +109,7 @@ const fetchPlayers = async (eventId: number) => {
 
 const combats = ref<any[]>([]);
 const fetchMatches = async (eventId: number) => {
-    combats.value = await Tournament?.getEventCombats(eventId);
+    combats.value = await Tournament?.getMatchesForEvent(eventId);
 }
 
 const fetchTournament = async () => {
@@ -134,11 +134,13 @@ const fetchTournament = async () => {
     tournament.value = prix;
 }
 
-
-onMounted(async () => {
+const fetchPageData = async () => {
     await fetchTournament();
-    await fetchPlayers(tournament?.value?.eventId);
-    fetchMatches(tournament?.value?.eventId);
+    await fetchPlayers(tournament.value.eventId);
+    await fetchMatches(tournament.value.eventId);
+}
+onMounted(async () => {
+    await fetchPageData();
 });
 
 

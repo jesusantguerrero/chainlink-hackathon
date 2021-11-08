@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onMounted } from "@vue/runtime-core";
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts";
+import { useContract } from "../composables/useContract";
 import { getProvider } from "../composables/getProvider";
 import { ref } from "vue";
 
 const fetchMarketItems = async () => {
     const provider = getProvider()
-    const { Cockfighter } = getContracts(provider);
+    const Cockfighter = useContract("RoosterFight", provider);
 
     let roosters = await Cockfighter?.functions.pendingToClaim();
     roosters = await Promise.all(roosters[0].map(async(item: ethers.BigNumber) => {

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ethers } from 'ethers';
 import { computed, onMounted, ref } from 'vue';
-import { getContracts } from '../composables/getContracts';
+import { useContract } from '../composables/useContract';
+import GameHeader from '../components/GameHeader.vue';
 
 const isOwner = ref(false);
 
 const getIsOwner = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     const signer = provider.getSigner();
-    const { Tournament } = getContracts(signer);
+    const Tournament = useContract("Tournament", signer);
     const contractOwner = await Tournament?.functions.contractOwner();
     return contractOwner[0] === await signer.getAddress();
 }
@@ -21,22 +22,29 @@ const dashboardMenu = computed(() => {
     const menu = [ {
         text: 'Dashboard',
         to: '/dashboard',
-        icon: 'mdi-view-dashboard',
+        icon: 'fa fa-home',
         active: false
     } , {
         text: 'Tournaments',
         to: '/tournaments',
-        icon: 'mdi-trophy-award',
+        icon: 'fas fa-medal',
         active: false
-    } , {
+    } ,
+    {
+        text: 'Marketplace',
+        to: '/marketplace',
+        icon: 'fas fa-store',
+        active: false
+    },
+    {
         text: 'Players',
         to: '/players',
-        icon: 'mdi-account-multiple',
+        icon: 'fa fa-users',
         active: false
     } , {
         text: 'Settings',
         to: '/settings',
-        icon: 'mdi-settings',
+        icon: 'fa fa-cogs',
         active: false
     } ];
 
@@ -44,7 +52,7 @@ const dashboardMenu = computed(() => {
         menu.push({
             text: 'Admin',
             to: '/admin',
-            icon: 'mdi-account-key',
+            icon: 'fa fa-shield',
             active: false
         });
     }
@@ -54,22 +62,13 @@ const dashboardMenu = computed(() => {
 </script>
 
 <template>
-    <div class="flex justify-between px-5 py-3 text-white bg-gray-700">
-        <div>
-            <h1 class="text-2xl font-bold text-purple-400">Home</h1>
-        </div>
-        <div class="flex space-x-2">
-            <div>Tokens</div>
-            <div>Money</div>
-            <div>Energy</div>
-            <div>Hospital Points</div>
-        </div>
-    </div>
+   <GameHeader />
 
     <div class="mx-auto mt-10 text-white max-w-7xl">
         <ul class="flex justify-around text-white bg-gray-700">
             <router-link :to="item.to" v-for="item in dashboardMenu" class="w-full py-3 text-center cursor-pointer hover:bg-gray-800">
-               {{ item.icon }} {{ item.text }}
+               <i :class="item.icon" />
+               {{ item.text }}
             </router-link>
         </ul>
        <slot />

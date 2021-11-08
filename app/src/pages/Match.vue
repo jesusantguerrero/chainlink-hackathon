@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import { watch, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { getContracts } from '../composables/getContracts';
+import { useContract, uuseContract } from '../composables/useContract';
 import { IAsset } from '../utils/fetchMyItems';
 import { AtButton } from "atmosphere-ui";
 
@@ -12,7 +12,8 @@ const matchId = ref<string>();
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
-const { Tournament, Cockfighter } = getContracts(signer);
+const Cockfighter = useContract("RoosterFight", signer);
+const Tournament = useContract("Tournament", signer);
 
 const matchEvent = ref<any>({});
 const isFetching = ref(true);
@@ -55,7 +56,6 @@ const fetchMatch = async (matchId: string) => {
 const processMatch = async () => {
    const trx = await Tournament?.functions?.startFight(matchEvent.value.requestId, matchId.value)
    const receipt = await trx?.wait();
-   console.log(receipt.events);
    if (matchId.value) {
        await fetchMatch(matchId.value);
    }

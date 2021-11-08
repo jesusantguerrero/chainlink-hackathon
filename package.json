@@ -5,7 +5,7 @@
     "contract:coverage": "npx hardhat coverage",
     "contract:compile": "npx hardhat compile",
     "contract:serve": "npx hardhat node",
-    "contract:deploy": "npx hardhat deploy --network localhost --tags local",
+    "contract:deploy": "npx hardhat deploy --network localhost --tags local --export app/src/contracts.json",
     "contract:update": "npx hardhat run scripts/update.ts --network mainnet",
     "contract:deploy-mumbai": "npx hardhat run scripts/deploy.ts --network mumbai",
     "contract:deploy-prod": "npx hardhat run scripts/deploy.ts --network mainnet",

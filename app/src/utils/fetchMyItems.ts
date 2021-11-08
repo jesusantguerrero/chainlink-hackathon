@@ -2,13 +2,13 @@
 /* eslint-disable node/no-missing-import */
 /* eslint-disable node/no-extraneous-import */
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts";
+import { useContract } from "../composables/useContract";
 import axios from "axios";
 
 export const fetchMyItems = async () => {
   const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
   const signer = provider.getSigner();
-  const { Cockfighter } = getContracts(signer);
+  const Cockfighter = useContract("RoosterFight", signer);
 
   let roosters = await Cockfighter?.functions.getMyRoosters();
   roosters = await Promise.all(
