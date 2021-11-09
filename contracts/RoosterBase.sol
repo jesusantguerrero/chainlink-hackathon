@@ -44,11 +44,6 @@ contract RoosterBase {
     BreedAttributes internal pintoBreed = BreedAttributes(10, 7, 5);
     BreedAttributes internal blackBreed = BreedAttributes(15, 7, 7);
 
-    function _generateRandomDna(string memory _str) internal view returns (uint) {
-        uint rand = uint(keccak256(abi.encodePacked(_str)));
-        return rand % dnaModulus;
-    }
-
     function getBreed(Breed _breed, BreedAttributes memory _attributes) view public returns(BreedAttributes memory) {
         BreedAttributes memory breeding;
         if (_breed == Breed.BLACK) {
@@ -67,9 +62,8 @@ contract RoosterBase {
         return breeding;
     }
 
-    function _generateTokenAttributes(uint _tokenId, string memory _name) internal {
-        uint dna = _generateRandomDna(_name);
-        Breed breed = Breed(dna % 4);
+    function _generateTokenAttributes(uint _tokenId, uint _breedCode ,string memory _name) internal {
+        Breed breed = Breed(_breedCode);
         BreedAttributes memory breedAttributes = getBreed(breed, BreedAttributes(0, 0, 0));
         tokenIdToAttributes[_tokenId] = Attributes(_name, breed);
         tokenIdToStats[_tokenId] = Stats(

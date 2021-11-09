@@ -75,9 +75,9 @@ contract RoosterFight is RoosterNFT {
         return damage;
     }
 
-    function simulateRound(uint _attackerId, uint _targetId, uint _randomNumber) public returns (uint, uint, uint, uint) {
-        uint myAttack = sendAttack(_attackerId, _targetId, _randomNumber);
-        uint enemyAttack = sendAttack(_targetId, _attackerId, _randomNumber);
+    function simulateRound(uint _attackerId, uint _targetId, uint[] memory _randomNumber) public returns (uint, uint, uint, uint) {
+        uint myAttack = sendAttack(_attackerId, _targetId, _randomNumber[0]);
+        uint enemyAttack = sendAttack(_targetId, _attackerId, _randomNumber[1]);
        
         uint winner = myAttack > enemyAttack ? _attackerId : _targetId;
         uint losser = winner == _attackerId ? _targetId : _attackerId;

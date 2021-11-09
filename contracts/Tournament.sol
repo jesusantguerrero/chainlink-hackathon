@@ -5,7 +5,7 @@ import "./TournamentBase.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 interface IRoosterFight {
-    function simulateRound(uint _attacker, uint _defender,uint _randomNumber) external returns (uint, uint, uint, uint);
+    function simulateRound(uint _attacker, uint _defender,uint[] memory _randomNumbers ) external returns (uint, uint, uint, uint);
 }
 
 contract Tournament is TournamentBase, VRFConsumerBase {
@@ -68,6 +68,14 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         requestIdToRandomNumber[_requestId] = _randomNumber;
     }
 
+    function expand(uint _randomValue, uint times) public pure returns (uint[] memory) {
+        uint[] memory result = new uint[](times);
+        for (uint i = 0; i < times; i++) {
+            result[i] = uint(keccak256(abi.encode(_randomValue, i)));
+        }
+        return result;
+    }
+
     function startFight(bytes32 _requestId, uint _combatId) public {
         MatchUp storage combat = combats[_combatId];
         require(combat.active == true, "Combat already finished");
@@ -80,7 +88,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         (winner, loser, player1Attack, player2Attack) = IRoosterFight(roosterFightAdress).simulateRound(
             eventToPlayer[combat.eventId][combat.attacker], 
             eventToPlayer[combat.eventId][combat.defense], 
-            requestIdToRandomNumber[combat.requestId]
+            expand(requestIdToRandomNumber[combat.requestId], 2)
         );
         
         emit FightRound(combat.eventId, combat.attacker, player1Attack);
