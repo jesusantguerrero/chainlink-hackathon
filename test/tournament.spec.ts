@@ -26,16 +26,22 @@ let user3: SignerWithAddress;
 describe("Tournament unit tests", async () => {
   let tournament: ethers.Contract,
     linkToken: ethers.Contract,
-    vrfCoordinator: ethers.Contract;
+    vrfCoordinator: ethers.Contract,
+    pcToken: ethers.Contract;
 
   beforeEach(async () => {
-    await hre.deployments.fixture(["mocks"]);
+    await hre.deployments.fixture(["mocks", "local"]);
     const LinkToken = await hre.deployments.get("LinkToken");
     const VRFCoordinatorMock = await hre.deployments.get("VRFCoordinatorMock");
+    const RoosterFight = await hre.deployments.get("RoosterFight");
     linkToken = await hre.ethers.getContractAt("LinkToken", LinkToken.address);
     vrfCoordinator = await hre.ethers.getContractAt(
       "VRFCoordinatorMock",
       VRFCoordinatorMock.address
+    );
+    pcToken = await hre.ethers.getContractAt(
+      "RoosterFight",
+      RoosterFight.address
     );
     const networkId = await getNetworkIdFromName("localhost");
     const keyHash = networkConfig[networkId || 1].keyHash || "";
@@ -93,12 +99,8 @@ describe("Tournament unit tests", async () => {
     await tournament.addEvent(0, startDate, endDate);
 
     // integration with fights
-    const pcClaimer = await getContract("RoosterClaimer");
-    const pcToken = await getContract("RoosterFight", [100]);
-    await pcToken.setClaimerAddress(pcClaimer.address);
-    await pcToken.batchMint(["ipfs://token1.jpg", "ipfs://token2.jpg"]);
-    await pcClaimer.claim(pcToken.address, 1, user2.address);
-    await pcClaimer.claim(pcToken.address, 2, user3.address);
+    await pcToken.connect(user2).mint(1);
+    await pcToken.connect(user3).mint(2);
 
     // Token registration
     await tournament.setNFTAddress(pcToken.address);

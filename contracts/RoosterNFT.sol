@@ -13,33 +13,44 @@ import "hardhat/console.sol";
 contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _totalSupply;
-    uint public availableTokens = 100;
+    Counters.Counter public availableTokens;
+
+    struct PreToken {
+        uint id;
+        uint breed;
+        string uri;
+        bool claimed;
+    }
 
     address private contractOwner;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
     mapping(uint => address) private tokenToOwner;
+    mapping(uint => PreToken) private minteableTokens;
 
-    constructor(uint _avaiblableTokens) ERC721("CRF", "Crypto RoosterFight") {
-        availableTokens = _avaiblableTokens;
+
+    constructor(PreToken[] memory _uris) ERC721("CRF", "Crypto RoosterFight") {
         contractOwner = msg.sender;
+        batchPreMint(_uris);
     }
 
-    function mint(string memory _imageURI) public nonReentrant {
-        require(availableTokens > 0, "No more tokens available");
-        availableTokens = SafeMath.sub(availableTokens, 1);
+    function mint(uint _preTokenId) public nonReentrant {
+        require(totalSupply() < availableTokens.current(), "No more tokens available");
+        require(minteableTokens[_preTokenId].claimed == false, "The token is already minted");
         _totalSupply.increment();
         uint tokenId = _totalSupply.current();
         _mint(msg.sender, tokenId);
-        _setTokenURI(tokenId, _imageURI);
-        _generateTokenAttributes(tokenId, string(abi.encodePacked("token ", tokenId)));
+        _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
+        _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", tokenId)));
         tokenToOwner[tokenId] = msg.sender;
+        minteableTokens[_preTokenId].claimed = true;
     }
 
-    function batchMint(string[] memory _uris) public onlyOwner {
+    function batchPreMint(PreToken[] memory _uris) public onlyOwner {
         require(_uris.length > 0, "Should be at least one");
         for (uint256 index = 0; index < _uris.length; index++) {
-            mint(_uris[index]);
+            availableTokens.increment();
+            minteableTokens[availableTokens.current()] = PreToken(availableTokens.current(), _uris[index].breed, _uris[index].uri, false);
         }
     }
 
@@ -47,8 +58,17 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         return _totalSupply.current();
     }
 
-    function pendingToMint() public view returns (uint) {
-        return availableTokens - totalSupply();
+    function pendingToMint() public view returns (PreToken[] memory) {
+        PreToken[] memory pending = new PreToken[](availableTokens.current() - totalSupply());
+        uint count = 0;
+        for (uint i = 1; i <= totalSupply(); i++) {
+            if (minteableTokens[i].claimed == false) {
+                pending[count] = minteableTokens[i];
+                count++;
+            }
+        }
+
+        return pending;
     }
 
     // Tokens storage to save images to generate tokenURI programmatically

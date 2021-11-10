@@ -15,7 +15,7 @@ contract RoosterFight is RoosterNFT {
     Level[] public levels;
     uint public bonusLevel = 5;
 
-    constructor(uint _totalSupply) RoosterNFT(_totalSupply) {
+    constructor(PreToken[] memory _uris) RoosterNFT(_uris) {
         levels.push(Level(0, 100));
         levels.push(Level(100, 1000));
         levels.push(Level(1000, 10000));
