@@ -23,49 +23,48 @@ let user3: SignerWithAddress;
   [owner, user2, user3] = await hre.ethers.getSigners();
 })();
 
-describe("Tournament unit tests", async () => {
-  let tournament: ethers.Contract,
-    linkToken: ethers.Contract,
-    vrfCoordinator: ethers.Contract,
-    pcToken: ethers.Contract;
+let tournament: ethers.Contract,
+  linkToken: ethers.Contract,
+  vrfCoordinator: ethers.Contract,
+  pcToken: ethers.Contract;
 
-  beforeEach(async () => {
-    await hre.deployments.fixture(["mocks", "local"]);
-    const LinkToken = await hre.deployments.get("LinkToken");
-    const VRFCoordinatorMock = await hre.deployments.get("VRFCoordinatorMock");
-    const RoosterFight = await hre.deployments.get("RoosterFight");
-    linkToken = await hre.ethers.getContractAt("LinkToken", LinkToken.address);
-    vrfCoordinator = await hre.ethers.getContractAt(
-      "VRFCoordinatorMock",
-      VRFCoordinatorMock.address
-    );
-    pcToken = await hre.ethers.getContractAt(
-      "RoosterFight",
-      RoosterFight.address
-    );
-    const networkId = await getNetworkIdFromName("localhost");
-    const keyHash = networkConfig[networkId || 1].keyHash || "";
-    tournament = await getContract("Tournament", [
-      vrfCoordinator.address,
+beforeEach(async () => {
+  await hre.deployments.fixture(["mocks", "local"]);
+  const LinkToken = await hre.deployments.get("LinkToken");
+  const VRFCoordinatorMock = await hre.deployments.get("VRFCoordinatorMock");
+  const RoosterFight = await hre.deployments.get("RoosterFight");
+  linkToken = await hre.ethers.getContractAt("LinkToken", LinkToken.address);
+  vrfCoordinator = await hre.ethers.getContractAt(
+    "VRFCoordinatorMock",
+    VRFCoordinatorMock.address
+  );
+  pcToken = await hre.ethers.getContractAt(
+    "RoosterFight",
+    RoosterFight.address
+  );
+  const networkId = await getNetworkIdFromName("localhost");
+  const keyHash = networkConfig[networkId || 1].keyHash || "";
+  tournament = await getContract("Tournament", [
+    vrfCoordinator.address,
+    linkToken.address,
+    keyHash,
+  ]);
+
+  if (
+    await autoFundCheck(
+      tournament.address,
+      "localhost",
       linkToken.address,
-      keyHash,
-    ]);
-
-    if (
-      await autoFundCheck(
-        tournament.address,
-        "localhost",
-        linkToken.address,
-        "Nothing more"
-      )
-    ) {
-      await hre.run("fund-link", {
-        contract: tournament.address,
-        linkaddress: linkToken.address,
-      });
-    }
-  });
-
+      "Nothing more"
+    )
+  ) {
+    await hre.run("fund-link", {
+      contract: tournament.address,
+      linkaddress: linkToken.address,
+    });
+  }
+});
+describe("Tournament unit tests", async () => {
   it("Should add participants", async () => {
     await tournament.addPrix(
       "Amateur League",

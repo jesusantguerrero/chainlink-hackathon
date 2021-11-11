@@ -5,7 +5,6 @@ import { deployments } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { autoFundCheck, networkConfig } from "../helper-hardhat-config";
-import { saveEnvVar } from "../utils/deploy-contract";
 
 //   Mint the initial tokens
 const premintedTokens = [
@@ -98,9 +97,6 @@ const SetupContract: DeployFunction = async (
   const startDate = new Date();
   const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
   await tournament.functions.addEvent(0, new Date().getTime(), endDate);
-
-  await saveEnvVar("VITE_NFT_ADDRESS", RoosterFight.address);
-  await saveEnvVar("VITE_TOURNAMENT_ADDRESS", Tournament.address);
 
   if (
     chainLink.linkTokenAddress &&
