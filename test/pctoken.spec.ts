@@ -36,7 +36,7 @@ describe("PC Token", function () {
   it("Should mint a new nft token", async function () {
     expect((await pcToken.totalSupply()).toNumber()).to.equal(0);
     await pcToken.mint(1);
-    expect((await pcToken.totalSupply()).toNumber()).to.equal(1);
+    expect((await pcToken.getMyRoosters()).length).to.equal(1);
   });
 
   it("Should not allow mint more than the limit nft's", async function () {
@@ -53,7 +53,9 @@ describe("PC Token", function () {
   it("Should allow users claim tokens", async function () {
     await pcToken.connect(user2).mint(1);
 
-    expect(await pcToken.ownerOf(1)).to.equal(user2.address);
+    expect((await pcToken.getRoostersByOwner(user2.address)).length).to.equal(
+      1
+    );
   });
 
   it("Should return supply and availability", async () => {
@@ -75,6 +77,12 @@ describe("PC Token", function () {
     );
     const result = await pcToken.tokenURI(1);
     expect(result).be.a("string");
+  });
+  it("Should allow transfer token", async () => {
+    pcToken.mint(1);
+    expect(await pcToken.ownerOf(1)).to.equal(owner.address);
+    await pcToken.functions.transferFrom(owner.address, user2.address, 1);
+    expect(await pcToken.ownerOf(1)).to.equal(user2.address);
   });
 });
 

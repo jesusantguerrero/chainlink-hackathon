@@ -25,7 +25,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     address private contractOwner;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
-    mapping(uint => address) private tokenToOwner;
+    mapping(uint => address) internal tokenToOwner;
     mapping(uint => PreToken) private minteableTokens;
 
 

@@ -7,6 +7,7 @@ import "hardhat/console.sol";
 
 contract RoosterFight is RoosterNFT {
     using SafeMath for uint32;
+    using SafeMath for uint;
     struct Level {
         uint min;
         uint max;
@@ -20,6 +21,11 @@ contract RoosterFight is RoosterNFT {
         levels.push(Level(100, 1000));
         levels.push(Level(1000, 10000));
         levels.push(Level(10000, 100000));
+    }
+
+    modifier onlyOwnerOf(uint _id) {
+        require(tokenToOwner[_id] == msg.sender, "Only tokenowner call");
+        _;
     }
 
     function getLevel(uint256 _tokenId) public view returns (uint32) {
@@ -82,5 +88,22 @@ contract RoosterFight is RoosterNFT {
         uint winner = myAttack > enemyAttack ? _attackerId : _targetId;
         uint losser = winner == _attackerId ? _targetId : _attackerId;
         return (winner, losser, myAttack, enemyAttack);
+    }
+
+    function setName (uint _tokenId, string memory _name) public onlyOwnerOf(_tokenId) {
+        tokenIdToAttributes[_tokenId].name = _name;
+    }
+
+    function getAvailablePoints(uint _tokenId) public view returns (uint) {
+        return tokenIdToStats[_tokenId].points;
+    }
+
+    function distributePoints(uint _tokenId, uint _strength, uint _speed, uint _agility) public onlyOwnerOf(_tokenId) {
+        uint points = _strength + _speed + _agility;
+        require(points <= tokenIdToStats[_tokenId].points, "Not enough points");
+        tokenIdToStats[_tokenId].points = tokenIdToStats[_tokenId].points.sub(uint(points));
+        tokenIdToStats[_tokenId].strength = tokenIdToStats[_tokenId].strength.add(_strength);
+        tokenIdToStats[_tokenId].speed = tokenIdToStats[_tokenId].speed.add(_speed);
+        tokenIdToStats[_tokenId].agility = tokenIdToStats[_tokenId].agility.add(_agility);
     }
 }

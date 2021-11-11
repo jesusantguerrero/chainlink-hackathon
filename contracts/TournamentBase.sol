@@ -70,19 +70,14 @@ contract TournamentBase is Ownable {
         roosterFightAdress = _roosterFightAddress;
     }
 
-    function _getTokenFor(Counters.Counter storage counter, bool before) internal returns (uint) {
-        if (before) {
-            counter.increment();
-            return uint(counter.current());
-        } else {
-            uint tokenID = uint(counter.current());
-            counter.increment();
-            return tokenID;
-        }
+    function _getTokenFor(Counters.Counter storage counter) internal returns (uint) {
+        uint tokenID = uint(counter.current());
+        counter.increment();
+        return tokenID;
     }
 
     function addPrix(string memory _name, string memory _description, uint8 _seatsLimit, uint _seatsFee) public onlyOwner {
-        uint tokenId = _getTokenFor(_prixesIds, false);
+        uint tokenId = _getTokenFor(_prixesIds);
         Counters.Counter memory edition;
         prixes.push(TournamentPrix(tokenId, 0, _seatsFee, _name,"", _description, _seatsLimit, edition));
     }
@@ -96,7 +91,7 @@ contract TournamentBase is Ownable {
     }
 
     function addEvent(uint _prixId, uint _startDate, uint _endDate) public onlyOwner {
-        uint eventId = _getTokenFor(_eventsIds, false);
+        uint eventId = _getTokenFor(_eventsIds);
         TournamentPrix storage prix = prixes[_prixId];
         prix.editions.increment();
         events.push(TournamentEvent(eventId, _prixId, uint(prix.editions.current()), _startDate, _endDate, 0, "", 0, 0));
