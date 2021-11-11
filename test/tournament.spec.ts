@@ -4,11 +4,7 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { getContract } from "../utils/getContract";
 import hre from "hardhat";
-import {
-  autoFundCheck,
-  networkConfig,
-  getNetworkIdFromName,
-} from "../helper-hardhat-config";
+import { networkConfig, getNetworkIdFromName } from "../helper-hardhat-config";
 import { ethers } from "ethers";
 
 chai.use(chaiAsPromised);
@@ -36,20 +32,6 @@ describe("Tournament unit tests", async () => {
       linkToken.address,
       keyHash,
     ]);
-
-    if (
-      await autoFundCheck(
-        tournament.address,
-        "localhost",
-        linkToken.address,
-        "Nothing more"
-      )
-    ) {
-      await hre.run("fund-link", {
-        contract: tournament.address,
-        linkaddress: linkToken.address,
-      });
-    }
   });
 
   it("Should create a prix", async () => {
@@ -59,6 +41,7 @@ describe("Tournament unit tests", async () => {
       8,
       ethers.utils.parseEther("0.05")
     );
+    expect((await tournament.getPrixes()).length).to.be.equal(1);
   });
 
   it("Should create a tournament event", async () => {
