@@ -24,7 +24,7 @@ contract RoosterFight is RoosterNFT {
     }
 
     modifier onlyOwnerOf(uint _id) {
-        require(tokenToOwner[_id] == msg.sender, "Only tokenowner call");
+        require(ownerOf(_id) == msg.sender, "Only tokenowner call");
         _;
     }
 

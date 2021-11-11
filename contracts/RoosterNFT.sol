@@ -25,7 +25,6 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     address private contractOwner;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
-    mapping(uint => address) internal tokenToOwner;
     mapping(uint => PreToken) private minteableTokens;
 
 
@@ -42,7 +41,6 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         _mint(msg.sender, tokenId);
         _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
         _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", tokenId)));
-        tokenToOwner[tokenId] = msg.sender;
         minteableTokens[_preTokenId].claimed = true;
     }
 
@@ -119,21 +117,11 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         return tokenToImage[tokenId];
     }
 
-    // NFT Balances
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        super.transferFrom(from, to, tokenId);
-        tokenToOwner[tokenId] = to;
-    }
-
     function _getRoostersOf(address _owner) internal view returns (uint[] memory) {
         uint[] memory nfts = new uint[](balanceOf(_owner));
         uint counter = 0;
         for (uint i = 1; i <= _totalSupply.current(); i++) {
-            if (tokenToOwner[i] == _owner) {
+            if (ownerOf(i) == _owner) {
                 nfts[counter] = i;
                 counter++;
             }
