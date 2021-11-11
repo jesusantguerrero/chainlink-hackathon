@@ -35,7 +35,6 @@ In addition to the following Dapp topics
 | **RoosterBase.sol**      | Stores Attributes and States of tokens           |
 | **RoosterNFT.sol**       | Stores Mint and Claim and NFT logic              | 
 | **RoosterFight.sol**     | Stores helpers and inherit from NFT and Base     | 
-| **RoosterClaimer.sol**   | Stores the logic to let users claim NFT          | 
 | **Tournament.sol**       | Stores Tournament and fight logic                |
 
 ## Built with
