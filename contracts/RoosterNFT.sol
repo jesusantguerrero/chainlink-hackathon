@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -9,48 +10,52 @@ import "base64-sol/base64.sol";
 import "./RoosterBase.sol";
 import "hardhat/console.sol";
 
-contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
+contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _totalSupply;
-    uint public availableTokens = 100;
-    uint private claimersTokenLimit = 1;
-    uint private claimedTokensCount = 0;
+    Counters.Counter public availableTokens;
+
+    struct PreToken {
+        uint id;
+        uint breed;
+        string uri;
+        bool claimed;
+    }
 
     address private contractOwner;
-    address private claimerAddress;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
     mapping(uint => address) private tokenToOwner;
-    mapping(address => uint) private claimerTokensCount;
+    mapping(uint => PreToken) private minteableTokens;
 
-    constructor(uint _avaiblableTokens) ERC721("CRF", "Crypto RoosterFight") {
-        availableTokens = _avaiblableTokens;
+
+    constructor(PreToken[] memory _uris) ERC721("CRF", "Crypto RoosterFight") {
         contractOwner = msg.sender;
+        batchPreMint(_uris);
     }
 
-    function setClaimerAddress(address _claimer) public onlyOwner {
-        claimerAddress = _claimer;
-        setApprovalForAll(claimerAddress, true);
-    }
-
-    function mint(address _to, string memory _imageURI) public onlyOwner {
-        require(availableTokens > 0, "No more tokens available");
-        availableTokens = SafeMath.sub(availableTokens, 1);
+    function mint(uint _preTokenId) public nonReentrant {
+        require(totalSupply() < availableTokens.current(), "No more tokens available");
+        require(minteableTokens[_preTokenId].claimed == false, "The token is already minted");
         _totalSupply.increment();
         uint tokenId = _totalSupply.current();
-        _mint(_to, tokenId);
-        _setTokenURI(tokenId, _imageURI);
-        _generateTokenAttributes(tokenId, string(abi.encodePacked("token ", tokenId)));
-        if (_to != contractOwner) {
-            _claim(tokenId, _to);
-        }
-        tokenToOwner[tokenId] = _to;
+        _mint(msg.sender, tokenId);
+        _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
+        _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", tokenId)));
+        tokenToOwner[tokenId] = msg.sender;
+        minteableTokens[_preTokenId].claimed = true;
     }
 
-    function batchMint(string[] memory _uris) public onlyOwner {
+    function batchPreMint(PreToken[] memory _uris) public onlyOwner {
         require(_uris.length > 0, "Should be at least one");
         for (uint256 index = 0; index < _uris.length; index++) {
-            mint(msg.sender, _uris[index]);
+            availableTokens.increment();
+            minteableTokens[availableTokens.current()] = PreToken(
+                availableTokens.current(), 
+                _uris[index].breed, 
+                _uris[index].uri, 
+                false
+            );
         }
     }
 
@@ -58,32 +63,17 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
         return _totalSupply.current();
     }
 
-    // allow users to claim tokens
-    function _claim (uint _tokenId, address _claimer) private {
-        require(claimerTokensCount[_claimer] < claimersTokenLimit, "Claimer has reached the limit");
-        tokenToClaimer[_tokenId] = _claimer;
-        claimerTokensCount[_claimer] = SafeMath.add(claimerTokensCount[_claimer], 1);
-        claimedTokensCount = SafeMath.add(claimedTokensCount, 1);
-    }
-
-    function claim(uint _tokenId, address _to) public {
-        require(_exists(_tokenId), "This token doent exist");
-        require(tokenToClaimer[_tokenId] == address(0) , "This token is taken");
-        _claim(_tokenId, _to);
-        transferFrom(contractOwner, _to, _tokenId);
-    }
-
-    function pendingToClaim() public view returns (uint[] memory) {
-        uint[] memory claimableList = new uint[](totalSupply() - claimedTokensCount);
+    function pendingToMint() public view returns (PreToken[] memory) {
+        PreToken[] memory pending = new PreToken[](availableTokens.current() - totalSupply());
         uint count = 0;
-        for (uint i = 1; i <= totalSupply(); i++) {
-            if (tokenToClaimer[i] == address(0)) {
-                claimableList[count] = i;
+        for (uint i = 1; i <= availableTokens.current(); i++) {
+            if (minteableTokens[i].claimed == false) {
+                pending[count] = minteableTokens[i];
                 count++;
             }
         }
 
-        return claimableList;
+        return pending;
     }
 
     // Tokens storage to save images to generate tokenURI programmatically
@@ -99,7 +89,7 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
                 "data:application/json;base64,",
                 Base64.encode(bytes(
                     abi.encodePacked(
-                        '{"name": "CryptoRooster 1",',
+                        '{"name": "',attributes.name, '",',
                         '"description": "This is a description",',
                         '"image":"', 
                         _imageURI, '",',
@@ -125,7 +115,7 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
     }
 
     function getImageURI(uint256 tokenId) external view returns (string memory) {
-        require(_exists(tokenId), " URI set of nonexistent token");
+        require(_exists(tokenId), "URI set of nonexistent token");
         return tokenToImage[tokenId];
     }
 
@@ -144,7 +134,6 @@ contract RoosterNFT is ERC721URIStorage, RoosterBase, Ownable {
         uint counter = 0;
         for (uint i = 1; i <= _totalSupply.current(); i++) {
             if (tokenToOwner[i] == _owner) {
-                console.log(i, _owner);
                 nfts[counter] = i;
                 counter++;
             }

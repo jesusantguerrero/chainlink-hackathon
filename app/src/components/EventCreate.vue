@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "@vue/reactivity";
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts"
+import { useContract } from "../composables/useContract"
 import { AtButton, AtDateSelect } from "atmosphere-ui";
 
 defineProps({
@@ -25,7 +25,7 @@ const form = reactive<ITournamentEvent>({
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
-const { Tournament } = getContracts(signer);
+const Tournament = useContract("Tournament", signer);
 
 const createEvent = async (formData: ITournamentEvent) => {   
     const trx = await Tournament?.functions.addEvent( formData.tournamentId.toNumber(), formData.startDate.getTime(), formData.endDate.getTime());

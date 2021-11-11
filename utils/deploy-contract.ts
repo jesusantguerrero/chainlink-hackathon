@@ -5,7 +5,6 @@ import path from "path";
 
 export const saveEnvVar = async (envName: string, value: string) => {
   const envFilePath = path.resolve(__dirname, "..", "app", ".env.local");
-  console.log(envFilePath, "Este es el archivero");
   const file = fs.readFileSync(envFilePath, "utf8");
   const lines = file.split("\n");
   const index = lines.findIndex((line: string) => line.includes(envName));

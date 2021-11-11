@@ -3,6 +3,7 @@ import Index from "./pages/index.vue";
 import Dashboard from "./pages/Dashboard.vue";
 import Admin from "./pages/Admin.vue";
 import Tournaments from "./pages/Tournaments.vue";
+import Match from "./pages/Match.vue";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -29,6 +30,10 @@ export const router = createRouter({
     {
       path: "/tournaments/:id",
       component: Tournaments,
+    },
+    {
+      path: "/match/:id",
+      component: Match,
     },
     {
       path: "/signup",

@@ -1,10 +1,39 @@
 /* eslint-disable node/no-missing-import */
 /* eslint-disable node/no-unpublished-import */
+import { ethers } from "ethers";
 import { deployments } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { autoFundCheck, networkConfig } from "../helper-hardhat-config";
 import { saveEnvVar } from "../utils/deploy-contract";
+
+//   Mint the initial tokens
+const premintedTokens = [
+  {
+    id: 0,
+    breed: 0,
+    uri: "https://lh3.googleusercontent.com/pnay7Gr6QdYT5V23hYlv8Dyvm1R6VfyvQgPHSrMmQJuLMHVwn8B2pth6DFHnWQZvrGPpiPP-DTPgdUFd-fa0pa7rbBwoboRP0Csu6MI=w600",
+    claimed: false,
+  },
+  {
+    id: 0,
+    breed: 1,
+    uri: "https://lh3.googleusercontent.com/bs5rirjgoAV5VQNFwp2EiVurf15o2bbNOIu_sac-nXnP3UTDVh6n2xVCIBLHCwG1odiJ656iP7fzmVPkSEqBYWs1HX73sSsU9FGo=w600",
+    claimed: false,
+  },
+  {
+    id: 0,
+    breed: 2,
+    uri: "https://lh3.googleusercontent.com/ioC2jjM0CTXuTCKWHJCsenkO0rmmcWczzlBt25_hbMP_mfaRh5iYAkckwoY1I6tzWM3vNR6RRotyFuOeVk9dUSCWW5GLyK6InmTUNQ=w600",
+    claimed: false,
+  },
+  {
+    id: 0,
+    breed: 3,
+    uri: "https://lh3.googleusercontent.com/ioC2jjM0CTXuTCKWHJCsenkO0rmmcWczzlBt25_hbMP_mfaRh5iYAkckwoY1I6tzWM3vNR6RRotyFuOeVk9dUSCWW5GLyK6InmTUNQ=w600",
+    claimed: false,
+  },
+];
 
 const SetupContract: DeployFunction = async (
   hre: HardhatRuntimeEnvironment
@@ -39,19 +68,8 @@ const SetupContract: DeployFunction = async (
   const RoosterFight = await deploy("RoosterFight", {
     from: deployer,
     log: true,
-    args: [100],
+    args: [premintedTokens],
   });
-
-  const RoosterClaimer = await deploy("RoosterClaimer", {
-    from: deployer,
-    log: true,
-  });
-
-  const roosterFight = await hre.ethers.getContractAt(
-    "RoosterFight",
-    RoosterFight.address
-  );
-  await roosterFight.functions.setClaimerAddress(RoosterClaimer.address);
 
   const Tournament = await deploy("Tournament", {
     from: deployer,
@@ -63,15 +81,25 @@ const SetupContract: DeployFunction = async (
     ],
   });
 
-  //   Mint the initial tokens
-  await roosterFight.functions.batchMint([
-    "https://lh3.googleusercontent.com/pnay7Gr6QdYT5V23hYlv8Dyvm1R6VfyvQgPHSrMmQJuLMHVwn8B2pth6DFHnWQZvrGPpiPP-DTPgdUFd-fa0pa7rbBwoboRP0Csu6MI=w600",
-    "https://lh3.googleusercontent.com/bs5rirjgoAV5VQNFwp2EiVurf15o2bbNOIu_sac-nXnP3UTDVh6n2xVCIBLHCwG1odiJ656iP7fzmVPkSEqBYWs1HX73sSsU9FGo=w600",
-    "https://lh3.googleusercontent.com/ioC2jjM0CTXuTCKWHJCsenkO0rmmcWczzlBt25_hbMP_mfaRh5iYAkckwoY1I6tzWM3vNR6RRotyFuOeVk9dUSCWW5GLyK6InmTUNQ=w600",
-  ]);
+  const tournament = await hre.ethers.getContractAt(
+    "Tournament",
+    Tournament.address
+  );
+
+  tournament.setNFTAddress(RoosterFight.address);
+
+  // Create the initial tournament
+  await tournament.functions.addPrix(
+    "Rooster fight I",
+    "First tournament of rooster fight",
+    10,
+    ethers.utils.parseEther("0.1")
+  );
+  const startDate = new Date();
+  const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
+  await tournament.functions.addEvent(0, new Date().getTime(), endDate);
 
   await saveEnvVar("VITE_NFT_ADDRESS", RoosterFight.address);
-  await saveEnvVar("VITE_CLAIMER_ADDRESS", RoosterClaimer.address);
   await saveEnvVar("VITE_TOURNAMENT_ADDRESS", Tournament.address);
 
   if (

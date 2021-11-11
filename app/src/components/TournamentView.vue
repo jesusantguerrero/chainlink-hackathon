@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {  ref } from "@vue/reactivity";
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts"
+import { useContract, uuseContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
 import { IAsset } from "../utils/fetchMyItems";
@@ -16,7 +16,22 @@ const props = defineProps({
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
-const { Tournament, Cockfighter } = getContracts(signer);
+const Cockfighter = useContract("RoosterFight", signer);
+const Tournament = useContract("Tournament", signer);
+
+const tournament = ref<ITournamentWithEvent>({
+    id: 0,
+    name: "",
+    description: "",
+    seats: 0,
+    eventId: 0,
+    edition: 0,
+    startDate: 0,
+    endDate: 0,
+    seatsTaken: 0,
+    fee: 0,
+    realFee: 0
+});
 
 const joinTournament = async (prixId: number) => {
     const myRoosters = await Cockfighter?.functions.getMyRoosters();
@@ -27,11 +42,13 @@ const joinTournament = async (prixId: number) => {
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
     const tournamentFee = await Tournament?.getEventFee(eventId);
-    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }); 
+    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
+        console.log(err);
+    }); 
     const receipt = await trx?.wait();
     const name = receipt?.events?.NewPrix?.returnValues?.name;
-    alert(`You has joined to the ${name} tournament`);
-    await fetchTournament();
+    alert(`You has joined to the ${tournament.value.name} tournament`);
+    await fetchPageData();
 }
 
 const fight = async (eventId: number, defenderId: number) => {
@@ -39,15 +56,16 @@ const fight = async (eventId: number, defenderId: number) => {
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const attackerId = players.value.find(p => p.tokenId === tokenId.toNumber())?.playerId;
     if (attackerId === defenderId) {
-        alert("You need to have at least one rooster to join a tournament");
+        alert("You cant fight yourself bro");
         return;
     }
     const trx = await Tournament?.functions.prepareFight(eventId, attackerId, defenderId);
     const receipt = await trx?.wait();
     const name = receipt?.events?.NewPrix?.returnValues?.name;
     alert(`The fight is going to take place in a minute`);
-    await fetchTournament();
+    await fetchMatches(eventId);
 }
+
 interface IPlayer {
     playerId: number;
     tokenId: number;
@@ -68,20 +86,6 @@ interface ITournamentWithEvent {
     realFee: number
 }
 
-const tournament = ref<ITournamentWithEvent>({
-    id: 0,
-    name: "",
-    description: "",
-    seats: 0,
-    eventId: 0,
-    edition: 0,
-    startDate: 0,
-    endDate: 0,
-    seatsTaken: 0,
-    fee: 0,
-    realFee: 0
-});
-
 const players = ref<IPlayer[]>([]);
 
 const fetchPlayers = async (eventId: number) => {
@@ -91,7 +95,6 @@ const fetchPlayers = async (eventId: number) => {
         const rooster = await axios(tokenURI[0])
         .then(({ data } : { data: IAsset}): IAsset => data)
         .catch(err => {
-            console.log(err)
           return {};
         });
         
@@ -106,7 +109,7 @@ const fetchPlayers = async (eventId: number) => {
 
 const combats = ref<any[]>([]);
 const fetchMatches = async (eventId: number) => {
-    combats.value = await Tournament?.getEventCombats(eventId);
+    combats.value = await Tournament?.getMatchesForEvent(eventId);
 }
 
 const fetchTournament = async () => {
@@ -119,7 +122,7 @@ const fetchTournament = async () => {
         name: prix.name,
         description: prix.description,
         seats: prix.seatsLimit,
-        eventId: currentEvent.tokenId,
+        eventId: currentEvent.tokenId.toNumber(),
         edition: currentEvent.tournamentEdition,
         startDate: currentEvent.startDate,
         endDate:  currentEvent.endDate,
@@ -131,11 +134,13 @@ const fetchTournament = async () => {
     tournament.value = prix;
 }
 
-
-onMounted(async () => {
+const fetchPageData = async () => {
     await fetchTournament();
-    await fetchPlayers(tournament?.value?.eventId);
-    fetchMatches(tournament?.value?.eventId);
+    await fetchPlayers(tournament.value.eventId);
+    await fetchMatches(tournament.value.eventId);
+}
+onMounted(async () => {
+    await fetchPageData();
 });
 
 
@@ -174,7 +179,7 @@ onMounted(async () => {
                         <td class="px-4 py-2 border">{{ index + 1 }}</td>
                         <td class="flex flex-col px-4 py-2 border">
                             <img :src="player.image" alt="" class="rounded-md w-28 h-28">
-                            <span>{{ player.name }}</span>
+                            <span>{{ player.name }} {{ player.playerId }}</span>
                             <AtButton 
                                 class="font-bold bg-purple-400" 
                                 @click="fight(tournament.eventId, player.playerId)"> 
@@ -192,11 +197,11 @@ onMounted(async () => {
             </table>
         </div>
 
-        <h4 class="mt-5">Combats</h4>
-        <div>
-            <div v-for="(combat, index) in combats">
-                {{index + 1}} - {{combat.attacker}} vs {{ combat.defence }}
-            </div>
+        <h4 class="mt-5 text-xl font-bold">Combats</h4>
+        <div class="mb-10 space-y-2">
+            <router-link class="block font-bold text-purple-400 underline" :to="`/match/${combat.token}`" v-for="(combat, index) in combats">
+                Fight {{index + 1}} - {{combat.attacker}} vs {{ combat.defense }}
+            </router-link>
         </div>
     </div>
 </template>

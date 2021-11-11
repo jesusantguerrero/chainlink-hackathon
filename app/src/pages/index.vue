@@ -3,20 +3,24 @@ import { AtSiteHeader, AtButton } from "atmosphere-ui";
 import { useAppState } from "../composables/useAppState";
 import ClaimableList from "../components/ClaimableList.vue";
 import MintForm from "../components/MintForm.vue";
+import { RouterLink } from "vue-router";
 const { state } = useAppState();
 
 const links = [{
     name: 'Home',
-    url: '/'
+    to: '/',
+    component: RouterLink
 }, {
     name: 'Claim',
     url: '/#claim'
 }, {
     name: 'Marketplace',
-    url: '/marketplace'
+    to: '/marketplace',
+    component: RouterLink
 }, {
     name: 'Dashboard',
-    url: '/dashboard'
+    to: '/dashboard',
+    component: RouterLink
 }];
 
 const actions = [{

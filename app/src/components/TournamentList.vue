@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import {  ref } from "@vue/reactivity";
 import { ethers } from "ethers";
-import { getContracts } from "../composables/getContracts"
+import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
-const { Tournament, Cockfighter } = getContracts(signer);
+const Cockfighter = useContract("RoosterFight", signer);
+const Tournament = useContract("Tournament", signer);
 
 const joinTournament = async (prixId: number) => {
     const myRoosters = await Cockfighter?.functions.getMyRoosters();
@@ -32,8 +33,6 @@ const fetchTournaments = async () => {
 
         const currentEventId = await Tournament?.prixToCurrentEvent(t.tokenId);
         const currentEvent = await Tournament?.events(currentEventId);
-
-        console.log(currentEvent);
 
         return {
             id: t.tokenId,
@@ -70,7 +69,7 @@ onMounted(async () => {
                     <p>Seats: {{ tournament.seats }}</p>
                     <p>Participants: {{ tournament.seatsTaken }}</p>
                     <p>Fee: {{ tournament.fee }}</p>
-                    <AtButton class="bg-purple-500" @click.stop="joinTournament(tournament.id)">
+                    <AtButton class="bg-purple-500" @click.p.prevent.stop="joinTournament(tournament.id)">
                         Join
                     </AtButton>
                 </router-link>

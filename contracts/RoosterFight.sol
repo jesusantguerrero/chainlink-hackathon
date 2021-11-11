@@ -15,7 +15,7 @@ contract RoosterFight is RoosterNFT {
     Level[] public levels;
     uint public bonusLevel = 5;
 
-    constructor(uint _totalSupply) RoosterNFT(_totalSupply) {
+    constructor(PreToken[] memory _uris) RoosterNFT(_uris) {
         levels.push(Level(0, 100));
         levels.push(Level(100, 1000));
         levels.push(Level(1000, 10000));
@@ -70,17 +70,17 @@ contract RoosterFight is RoosterNFT {
     function sendAttack(uint _attacker, uint _target, uint _randomNumber) internal returns(uint) {
         uint level = getLevel(_attacker);
         uint maxDamage = tokenIdToStats[_attacker].strength + tokenIdToStats[_attacker].speed + (level * bonusLevel);
-        uint damage = _randomNumber % maxDamage;
+        uint damage = _randomNumber % maxDamage + tokenIdToStats[_attacker].strength;
         tokenIdToStats[_target].hp -= SafeMath.sub(tokenIdToStats[_target].hp, damage);
         return damage;
     }
 
-    function fight(uint _attackerId, uint _targetId, uint _randomNumber) public returns (uint, uint) {
-        uint myAttack = sendAttack(_attackerId, _targetId, _randomNumber);
-        uint enemyAttack = sendAttack(_targetId, _attackerId, _randomNumber);
+    function simulateRound(uint _attackerId, uint _targetId, uint[] memory _randomNumber) public returns (uint, uint, uint, uint) {
+        uint myAttack = sendAttack(_attackerId, _targetId, _randomNumber[0]);
+        uint enemyAttack = sendAttack(_targetId, _attackerId, _randomNumber[1]);
        
         uint winner = myAttack > enemyAttack ? _attackerId : _targetId;
         uint losser = winner == _attackerId ? _targetId : _attackerId;
-        return (winner, losser);
+        return (winner, losser, myAttack, enemyAttack);
     }
 }
