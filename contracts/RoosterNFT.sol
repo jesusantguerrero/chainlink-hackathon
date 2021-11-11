@@ -50,7 +50,12 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         require(_uris.length > 0, "Should be at least one");
         for (uint256 index = 0; index < _uris.length; index++) {
             availableTokens.increment();
-            minteableTokens[availableTokens.current()] = PreToken(availableTokens.current(), _uris[index].breed, _uris[index].uri, false);
+            minteableTokens[availableTokens.current()] = PreToken(
+                availableTokens.current(), 
+                _uris[index].breed, 
+                _uris[index].uri, 
+                false
+            );
         }
     }
 
@@ -61,7 +66,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     function pendingToMint() public view returns (PreToken[] memory) {
         PreToken[] memory pending = new PreToken[](availableTokens.current() - totalSupply());
         uint count = 0;
-        for (uint i = 1; i <= totalSupply(); i++) {
+        for (uint i = 1; i <= availableTokens.current(); i++) {
             if (minteableTokens[i].claimed == false) {
                 pending[count] = minteableTokens[i];
                 count++;
@@ -110,7 +115,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     }
 
     function getImageURI(uint256 tokenId) external view returns (string memory) {
-        require(_exists(tokenId), " URI set of nonexistent token");
+        require(_exists(tokenId), "URI set of nonexistent token");
         return tokenToImage[tokenId];
     }
 

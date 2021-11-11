@@ -5,15 +5,17 @@ import chaiAsPromised from "chai-as-promised";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ethers } from "ethers";
 import hre from "hardhat";
+import { IPreToken } from "../types/index";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+// eslint-disable-next-line no-unused-vars
 let owner: SignerWithAddress;
 let user2: SignerWithAddress;
 let user3: SignerWithAddress;
 
-const toNumberArray = (arr: ethers.BigNumber[]) => {
-  return arr.map((item) => item.toNumber());
+const toNumberArray = (tokens: IPreToken[]) => {
+  return tokens.map((item) => item.id.toNumber());
 };
 
 (async () => {
@@ -55,13 +57,19 @@ describe("PC Token", function () {
   });
 
   it("Should return supply and availability", async () => {
-    expect((await pcToken.totalSupply()).toNumber()).to.equal(3); // total minted;
+    expect((await pcToken.totalSupply()).toNumber()).to.equal(0); // total minted;
     expect((await pcToken.pendingToMint()).length).to.equal(3); // total available to claim;
     expect(toNumberArray(await pcToken.pendingToMint())).to.eql([1, 2, 3]); // total available to claim;
-    expect((await pcToken.availableTokens()).toNumber()).to.equal(97); // total available to mint
   });
 
+  it("Should fail to get token URI", async () => {
+    await expect(pcToken.getImageURI(1)).eventually.to.rejectedWith(
+      Error,
+      "URI set of nonexistent token"
+    );
+  });
   it("Should return the custom generated URI", async () => {
+    pcToken.mint(1);
     expect(await pcToken.getImageURI(1)).to.equal(
       "https://lh3.googleusercontent.com/pnay7Gr6QdYT5V23hYlv8Dyvm1R6VfyvQgPHSrMmQJuLMHVwn8B2pth6DFHnWQZvrGPpiPP-DTPgdUFd-fa0pa7rbBwoboRP0Csu6MI=w600"
     );
