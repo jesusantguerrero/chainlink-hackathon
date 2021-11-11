@@ -43,8 +43,8 @@ describe("PC Token", function () {
     await pcToken.mint(1);
     await pcToken.connect(user2).mint(2);
     await pcToken.connect(user3).mint(3);
-
-    await expect(pcToken.connect(user3).mint(4)).eventually.to.rejectedWith(
+    await pcToken.connect(user3).mint(4);
+    await expect(pcToken.connect(user3).mint(5)).eventually.to.rejectedWith(
       Error,
       "No more tokens available"
     );
@@ -58,8 +58,8 @@ describe("PC Token", function () {
 
   it("Should return supply and availability", async () => {
     expect((await pcToken.totalSupply()).toNumber()).to.equal(0); // total minted;
-    expect((await pcToken.pendingToMint()).length).to.equal(3); // total available to claim;
-    expect(toNumberArray(await pcToken.pendingToMint())).to.eql([1, 2, 3]); // total available to claim;
+    expect((await pcToken.pendingToMint()).length).to.equal(4); // total available to claim;
+    expect(toNumberArray(await pcToken.pendingToMint())).to.eql([1, 2, 3, 4]); // total available to claim;
   });
 
   it("Should fail to get token URI", async () => {
