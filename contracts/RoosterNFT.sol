@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol"; 
 import "./RoosterBase.sol";
@@ -40,7 +41,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         uint tokenId = _totalSupply.current();
         _mint(msg.sender, tokenId);
         _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
-        _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", tokenId)));
+        _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", Strings.toString(tokenId))));
         minteableTokens[_preTokenId].claimed = true;
     }
 
