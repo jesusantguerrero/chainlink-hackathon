@@ -4,52 +4,25 @@ import { ethers } from "ethers";
 import { useContract } from "../composables/useContract";
 import { getProvider } from "../composables/getProvider";
 import { ref } from "vue";
+import { IPreToken } from "../types";
+
+const provider = getProvider()
+const Cockfighter = useContract("RoosterFight", provider);
 
 const fetchMarketItems = async () => {
-    const provider = getProvider()
-    const Cockfighter = useContract("RoosterFight", provider);
-
-    let roosters = await Cockfighter?.functions.pendingToClaim();
-    roosters = await Promise.all(roosters[0].map(async(item: ethers.BigNumber) => {
-        const tokenURI = await Cockfighter?.tokenURI(item.toNumber());
-        const rooster = await fetch(tokenURI)
-        .then(data => {
-            return data.json()
-        })
-        .then( data => data)
-        .catch(err => {
-            return {};
-        });
-        
-        return {
-            tokenId: item.toNumber(), 
-            ...rooster
-        };
-    }))
-
-    return roosters;
+    let roosters = await Cockfighter?.functions.pendingToMint();
+    return roosters[0];
 }
 
-interface NFTAsset {
-    tokenId: number;
-    name: string;
-    description: string;
-    image: string;
-    price: string;
-    owner: string;
-    claimable: boolean;
-};
-
-const claim = async (tokenId: Number) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+const claim = async (token: IPreToken) => {
+    const provider = new ethers.providers.Web3Provider(window?.ethereum, "any");
     const signer = provider.getSigner();
-    const { Claimer, Cockfighter } = getContracts(signer);
-    const signerAddress = await signer.getAddress()
-    await Claimer?.functions.claim(Cockfighter?.address, tokenId, signerAddress);
+    const RoosterFight = useContract("RoosterFight", signer);
+    await RoosterFight?.functions.mint(token.id);
     await fetchMarketItems();
 } 
 
-const items = ref<NFTAsset[]>([]);
+const items = ref<IPreToken[]>([]);
 onMounted(async () => {
     items.value = await fetchMarketItems();
 })
@@ -63,14 +36,13 @@ onMounted(async () => {
         <div class="flex flex-wrap gap-2 mt-5 claimable-list__items">
             <div v-for="item in items" class="claimable-list__item">
                 <div class="overflow-hidden rounded-t-md claimable-list__item__image">
-                    <img :src="item.image" class="w-64"/>
+                    <img :src="item.uri" class="w-64"/>
                     <div class="px-4 pb-3 bg-gray-700">
-                        <h3 class="text-xl">{{item.name}}</h3>
-                        <p class="text-sm text-gray-300">{{item.description}}</p>
+                        <h3 class="text-xl">Rooster #{{item.id}}</h3>
                     </div>
                     <div class="flex items-center justify-between overflow-hidden bg-purple-500 rounded-b-md">
                         <div class="block w-full h-full px-4 py-2 bg-gray-700">Price: Free</div>
-                        <Button @click="claim(item.tokenId)" class="block w-full px-4 py-2 text-white bg-purple-500 hover:bg-purple-900 rounded-br-md"> 
+                        <Button @click="claim(item)" class="block w-full px-4 py-2 text-white bg-purple-500 hover:bg-purple-900 rounded-br-md"> 
                             Claim Token
                         </Button>
                     </div>

@@ -24,7 +24,7 @@ contract RoosterFight is RoosterNFT {
     }
 
     modifier onlyOwnerOf(uint _id) {
-        require(tokenToOwner[_id] == msg.sender, "Only tokenowner call");
+        require(ownerOf(_id) == msg.sender, "Only tokenowner call");
         _;
     }
 
@@ -77,7 +77,6 @@ contract RoosterFight is RoosterNFT {
         uint level = getLevel(_attacker);
         uint maxDamage = tokenIdToStats[_attacker].strength + tokenIdToStats[_attacker].speed + (level * bonusLevel);
         uint damage = _randomNumber % maxDamage + tokenIdToStats[_attacker].strength;
-        tokenIdToStats[_target].hp -= SafeMath.sub(tokenIdToStats[_target].hp, damage);
         return damage;
     }
 

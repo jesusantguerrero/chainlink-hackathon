@@ -3,7 +3,7 @@
   "chainId": "1337",
   "contracts": {
     "LinkToken": {
-      "address": "0xaB2787995106E2fd488f5D9B149d0a4232553357",
+      "address": "0xcB3DB4226cF474D1e08cFa9De1245151b4E520f7",
       "abi": [
         {
           "constant": true,
@@ -328,115 +328,37 @@
         }
       ]
     },
-    "VRFCoordinatorMock": {
-      "address": "0xb2572c83406a0824B8557AAFb9FC037070d82041",
-      "abi": [
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "linkAddress",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "constructor"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "keyHash",
-              "type": "bytes32"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "seed",
-              "type": "uint256"
-            }
-          ],
-          "name": "RandomnessRequest",
-          "type": "event"
-        },
-        {
-          "inputs": [],
-          "name": "LINK",
-          "outputs": [
-            {
-              "internalType": "contract LinkTokenInterface",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "bytes32",
-              "name": "requestId",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint256",
-              "name": "randomness",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "consumerContract",
-              "type": "address"
-            }
-          ],
-          "name": "callBackWithRandomness",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "fee",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes",
-              "name": "_data",
-              "type": "bytes"
-            }
-          ],
-          "name": "onTokenTransfer",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        }
-      ]
-    },
     "RoosterFight": {
-      "address": "0xCA232C9AE5033f5FaAb2430841C10dBA22Ac8fF3",
+      "address": "0xb10c5f52415C38E3C5C722656CeeFF40317aa5af",
       "abi": [
         {
           "inputs": [
             {
-              "internalType": "uint256",
-              "name": "_totalSupply",
-              "type": "uint256"
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "id",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "breed",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "uri",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "claimed",
+                  "type": "bool"
+                }
+              ],
+              "internalType": "struct RoosterNFT.PreToken[]",
+              "name": "_uris",
+              "type": "tuple[]"
             }
           ],
           "stateMutability": "nonpayable",
@@ -560,7 +482,7 @@
           "outputs": [
             {
               "internalType": "uint256",
-              "name": "",
+              "name": "_value",
               "type": "uint256"
             }
           ],
@@ -589,12 +511,34 @@
         {
           "inputs": [
             {
-              "internalType": "string[]",
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "id",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "breed",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "uri",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "claimed",
+                  "type": "bool"
+                }
+              ],
+              "internalType": "struct RoosterNFT.PreToken[]",
               "name": "_uris",
-              "type": "string[]"
+              "type": "tuple[]"
             }
           ],
-          "name": "batchMint",
+          "name": "batchPreMint",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -639,12 +583,22 @@
               "type": "uint256"
             },
             {
-              "internalType": "address",
-              "name": "_to",
-              "type": "address"
+              "internalType": "uint256",
+              "name": "_strength",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_speed",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_agility",
+              "type": "uint256"
             }
           ],
-          "name": "claim",
+          "name": "distributePoints",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -687,6 +641,25 @@
               "internalType": "address",
               "name": "",
               "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getAvailablePoints",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -940,14 +913,9 @@
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "_to",
-              "type": "address"
-            },
-            {
-              "internalType": "string",
-              "name": "_imageURI",
-              "type": "string"
+              "internalType": "uint256",
+              "name": "_preTokenId",
+              "type": "uint256"
             }
           ],
           "name": "mint",
@@ -1002,12 +970,34 @@
         },
         {
           "inputs": [],
-          "name": "pendingToClaim",
+          "name": "pendingToMint",
           "outputs": [
             {
-              "internalType": "uint256[]",
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "id",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "breed",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "uri",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "claimed",
+                  "type": "bool"
+                }
+              ],
+              "internalType": "struct RoosterNFT.PreToken[]",
               "name": "",
-              "type": "uint256[]"
+              "type": "tuple[]"
             }
           ],
           "stateMutability": "view",
@@ -1092,12 +1082,17 @@
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "_claimer",
-              "type": "address"
+              "internalType": "uint256",
+              "name": "_tokenId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
             }
           ],
-          "name": "setClaimerAddress",
+          "name": "setName",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -1115,9 +1110,9 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
+              "internalType": "uint256[]",
               "name": "_randomNumber",
-              "type": "uint256"
+              "type": "uint256[]"
             }
           ],
           "name": "simulateRound",
@@ -1248,36 +1243,8 @@
         }
       ]
     },
-    "RoosterClaimer": {
-      "address": "0xC230763588C93F664d43a8d3f583A3A0e5e9aE68",
-      "abi": [
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "_nftContract",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_tokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "_to",
-              "type": "address"
-            }
-          ],
-          "name": "claim",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        }
-      ]
-    },
     "Tournament": {
-      "address": "0x3f1b31cdc3d81F0e3a147da2681D51e13A2488C0",
+      "address": "0xEbC044b36782bA7eA8fc7Aa00DDF2919411B96D2",
       "abi": [
         {
           "inputs": [
@@ -1708,6 +1675,30 @@
             }
           ],
           "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_randomValue",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "times",
+              "type": "uint256"
+            }
+          ],
+          "name": "expand",
+          "outputs": [
+            {
+              "internalType": "uint256[]",
+              "name": "",
+              "type": "uint256[]"
+            }
+          ],
+          "stateMutability": "pure",
           "type": "function"
         },
         {
@@ -2219,6 +2210,106 @@
             }
           ],
           "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ]
+    },
+    "VRFCoordinatorMock": {
+      "address": "0xEB83Cb4a7cb408b3a932fE33C93A511ab04DFa14",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "linkAddress",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "keyHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "seed",
+              "type": "uint256"
+            }
+          ],
+          "name": "RandomnessRequest",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "LINK",
+          "outputs": [
+            {
+              "internalType": "contract LinkTokenInterface",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "requestId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "randomness",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "consumerContract",
+              "type": "address"
+            }
+          ],
+          "name": "callBackWithRandomness",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fee",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "_data",
+              "type": "bytes"
+            }
+          ],
+          "name": "onTokenTransfer",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"

@@ -66,7 +66,7 @@ const dashboardMenu = computed(() => {
 
     <div class="mx-auto mt-10 text-white max-w-7xl">
         <ul class="flex justify-around text-white bg-gray-700">
-            <router-link :to="item.to" v-for="item in dashboardMenu" class="w-full py-3 text-center cursor-pointer hover:bg-gray-800">
+            <router-link :to="item.to" v-for="item in dashboardMenu" class="w-full py-3 text-center cursor-pointer game-link hover:bg-gray-800">
                <i :class="item.icon" />
                {{ item.text }}
             </router-link>
@@ -74,3 +74,9 @@ const dashboardMenu = computed(() => {
        <slot />
     </div>
 </template>
+
+<style lang="scss">
+.game-link.router-link-active, .game-link:hover {
+    @apply bg-purple-50 border-b-4 border-purple-400 bg-opacity-5 text-purple-400;
+}
+</style>
