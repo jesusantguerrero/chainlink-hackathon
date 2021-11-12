@@ -1,5 +1,5 @@
 <template>
-   <div class="flex justify-between px-5 py-3 text-white bg-gray-700">
+   <div class="relative flex justify-between px-5 py-3 text-white bg-gray-700">
         <div class="flex items-center space-x-2">
             <router-link to="/" class="px-3 text-2xl border border-transparent rounded-md hover:bord hover:bg-gray-800 er-gray-600">
                 <i class="fa fa-chevron-left"></i>
@@ -8,11 +8,12 @@
                 Home
             </h1>
         </div>
-        <div class="flex space-x-2">
+        <div class="relative flex mr-24 space-x-2">
             <div>Tokens</div>
             <div>Money</div>
-            <div>Energy</div>
-            <div>Hospital Points</div>
+        </div>
+        <div class="absolute top-0 w-20 h-20 bg-gray-700 border rounded-md right-5">
+        
         </div>
     </div>
 </template>

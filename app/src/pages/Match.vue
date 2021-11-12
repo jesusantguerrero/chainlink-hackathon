@@ -3,9 +3,10 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import { watch, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useContract, uuseContract } from '../composables/useContract';
+import { useContract } from '../composables/useContract';
 import { IAsset } from '../utils/fetchMyItems';
 import { AtButton } from "atmosphere-ui";
+import { useMessage } from '../utils/useMessage';
 
 const route = useRoute();
 const matchId = ref<string>();
@@ -53,19 +54,37 @@ const fetchMatch = async (matchId: string) => {
    
 }
 
+const { setMessage, timeout } = useMessage()
 const processMatch = async () => {
    const trx = await Tournament?.functions?.startFight(matchEvent.value.requestId, matchId.value)
    const receipt = await trx?.wait();
-   if (matchId.value) {
-       await fetchMatch(matchId.value);
+   if (receipt) {
+        const eventDelay = 3000; 
+        receipt.events.forEach(async (event: ethers.Event, index: number) => {
+            setTimeout(async () => {
+                if (event.event == 'FightFinished' && event.args) {
+                    const { damage, damageReceived, winner } = event.args;
+                    setMessage(`${winner} won the fight. You has received ${damageReceived} and attack caused ${damage}`, eventDelay);
+                    if (matchId.value) {
+                        await fetchMatch(matchId.value);
+                    }
+                } else if (event.event == 'FightWinner' && event.args) {
+                    const { damage, damageReceived, winnerName } = event.args;
+                    setMessage(`${winnerName} won the fight. You has received ${damageReceived} and attack caused ${damage}`, eventDelay);
+                } else if (event.args) {
+                    const { tokenName, damage, message } = event.args;
+                    setMessage(`${tokenName} ${message} ${damage}`, eventDelay);
+                }
+            }, eventDelay * (index + 1));
+        });
    }
 }
 
 const winnerToken = computed(() => {
-    if (matchEvent.value.winner === matchEvent.value.attackerToken.tokenId) {
+    if (matchEvent.value.winner.toNumber() === matchEvent.value.attackerToken.tokenId) {
         return matchEvent.value.attackerToken;
     }
-    return matchEvent.value.winner ? matchEvent.value.defenseToken : { };
+    return matchEvent.value.winner.toNumber() !== 0 ? matchEvent.value.defenseToken : null;
 });
 
 watch(() => route.path, () => {
@@ -74,17 +93,6 @@ watch(() => route.path, () => {
     fetchMatch(matchId.value);
   }
 }, {immediate: true });
-//  public/private rooster view
-/**
- * 
- * gameplay start animations
- * - Show the cards with the data
- * - Show the details of the match preview
- * - Show the match: 
- * 
- */
-
-
 </script>
 
 <template>
@@ -101,14 +109,14 @@ watch(() => route.path, () => {
             </div>
             <AtButton  
                 @click="processMatch()"
-                :disabled="matchEvent.active" 
+                :disabled="!matchEvent.active" 
                 class="mt-10 text-white bg-purple-500"
                 v-if="matchEvent.active"
             > 
                 Fight  
             </AtButton>
 
-            <div v-if="matchEvent.winner" class="mt-5 text-white">
+            <div v-if="winnerToken" class="mt-5 text-white">
                 Winner: {{ winnerToken.name }}
                 <img :src="winnerToken.image" class="transform rounded-md shadow-lg h-52">
             </div>
