@@ -40,6 +40,15 @@ describe("Tournament unit tests", async () => {
     ).eventually.to.rejectedWith(Error, "Should pay the tournament fee");
   });
 
+  it("Should not allow not owned tokens as participant", async () => {
+    await mintTokens([user2, user3]);
+
+    // tournament registration
+    const eventFee = await tournament.getEventFee(0);
+    await expect(
+      tournament.connect(user3).addParticipant(1, 0, { value: eventFee })
+    ).eventually.to.rejectedWith(Error, "has to be owner");
+  });
   it("Should add participants", async () => {
     await mintTokens([user2, user3]);
 
@@ -56,7 +65,7 @@ describe("Tournament unit tests", async () => {
     const eventFee = await tournament.getEventFee(0);
     await tournament.connect(user2).addParticipant(1, 0, { value: eventFee });
     await expect(
-      tournament.connect(user3).addParticipant(1, 0, { value: eventFee })
+      tournament.connect(user2).addParticipant(1, 0, { value: eventFee })
     ).eventually.to.rejectedWith(Error, "Is already in this event");
   });
   it("Should fail simulate a tournament fight because of link", async () => {
@@ -114,7 +123,34 @@ describe("Tournament unit tests", async () => {
       tournament.startFight(requestId, 0)
     ).eventually.to.rejectedWith(Error, "Combat already finished");
   });
+  it("Should simulate multiples tournament fight", async () => {
+    await mintTokens([user2, user3]);
+
+    // tournament registration
+    const eventFee = await tournament.getEventFee(0);
+    await tournament.connect(user2).addParticipant(1, 0, { value: eventFee });
+    await tournament.connect(user3).addParticipant(2, 0, { value: eventFee });
+
+    await fundTournamentContract();
+
+    //  fights
+    await prepareFight(0, 1, 0, user2);
+    await prepareFight(1, 0, 0, user3);
+  });
 });
+
+async function prepareFight(
+  attackerPlayerId: number,
+  defensePlayerId: number,
+  eventId: number,
+  owner: SignerWithAddress
+): Promise<string> {
+  const trx = await tournament
+    .connect(owner)
+    .prepareFight(attackerPlayerId, defensePlayerId, eventId);
+  const receipt = await trx.wait(1);
+  return receipt.events[2].topics[1] || "";
+}
 
 async function setupContracts() {
   await hre.deployments.fixture(["mocks", "local"]);

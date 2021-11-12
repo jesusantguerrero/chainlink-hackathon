@@ -3,8 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-
-
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract TournamentBase is Ownable {
     using Counters for Counters.Counter;
@@ -99,6 +98,7 @@ contract TournamentBase is Ownable {
     }
 
     function addParticipant(uint _tokenId, uint _eventId) public payable {
+        require(IERC721(roosterFightAdress).ownerOf(_tokenId) == msg.sender, "has to be owner");
         TournamentEvent storage tEvents = events[_eventId];
         require(msg.value == prixes[tEvents.tokenId].seatFee, "Should pay the tournament fee");
         require(tokenToEvent[_tokenId][_eventId] == false, "Is already in this event");
