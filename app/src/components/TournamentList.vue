@@ -4,13 +4,15 @@ import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
+import { useMessage } from "../utils/useMessage";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
 const Cockfighter = useContract("RoosterFight", signer);
 const Tournament = useContract("Tournament", signer);
 
-const joinTournament = async (prixId: number) => {
+const { setMessage } = useMessage();
+const joinTournament = async (prixId: number, prixName: string) => {
     const myRoosters = await Cockfighter?.functions.getMyRoosters();
     if (myRoosters.length === 0) {
         alert("You need to have at least one rooster to join a tournament");
@@ -21,8 +23,7 @@ const joinTournament = async (prixId: number) => {
     const tournamentFee = await Tournament?.getEventFee(eventId);
     const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }); 
     const receipt = await trx?.wait();
-    const name = receipt?.events?.NewPrix?.returnValues?.name;
-    alert(`You has joined to the ${name} tournament`);
+    setMessage(`You has joined to the ${prixName} tournament`);
     await fetchTournaments();
 }
 
@@ -69,7 +70,10 @@ onMounted(async () => {
                     <p>Seats: {{ tournament.seats }}</p>
                     <p>Participants: {{ tournament.seatsTaken }}</p>
                     <p>Fee: {{ tournament.fee }}</p>
-                    <AtButton class="bg-purple-500" @click.p.prevent.stop="joinTournament(tournament.id)">
+                    <AtButton 
+                        class="bg-purple-500" 
+                        @click.p.prevent.stop="joinTournament(tournament.id, tournament.name)"
+                    >
                         Join
                     </AtButton>
                 </router-link>

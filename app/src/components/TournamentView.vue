@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {  ref } from "@vue/reactivity";
 import { ethers } from "ethers";
-import { useContract, uuseContract } from "../composables/useContract"
+import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
 import { IAsset } from "../utils/fetchMyItems";
 import axios from "axios";
+import { useMessage } from "../utils/useMessage";
 
 const props = defineProps({
     id: {
@@ -51,19 +52,27 @@ const joinTournament = async (prixId: number) => {
     await fetchPageData();
 }
 
+const { setMessage } = useMessage();
 const fight = async (eventId: number, defenderId: number) => {
     const myRoosters = await Cockfighter?.functions.getMyRoosters()
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const attackerId = players.value.find(p => p.tokenId === tokenId.toNumber())?.playerId;
     if (attackerId === defenderId) {
-        alert("You cant fight yourself bro");
+        setMessage("You cant fight yourself bro");
         return;
     }
-    const trx = await Tournament?.functions.prepareFight(eventId, attackerId, defenderId);
-    const receipt = await trx?.wait();
-    const name = receipt?.events?.NewPrix?.returnValues?.name;
-    alert(`The fight is going to take place in a minute`);
-    await fetchMatches(eventId);
+    try {
+        const event = await Tournament?.events(eventId);
+        console.log(event);
+        const trx = await Tournament?.prepareFight(attackerId, defenderId, eventId)
+        await trx?.wait();
+        setMessage(`The fight is going to take place in a minute`);
+        await fetchMatches(eventId);
+    } catch (err: any) {
+        const rpcMessage = err?.data?.message || "";
+        console.log(rpcMessage);
+        setMessage(rpcMessage.slice(rpcMessage.indexOf("'")));
+    }
 }
 
 interface IPlayer {

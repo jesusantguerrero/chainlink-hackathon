@@ -9,10 +9,10 @@ interface IRoosterFight {
 }
 
 contract Tournament is TournamentBase, VRFConsumerBase {
-    event FightStarted(bytes32 requestId, uint _attacker, uint _defense, uint _eventId, uint combatId);
-    event FightFinished(bytes32 requestId, uint _attacker, uint _defense, uint _eventId, uint combatId);
+    event FightStarted(bytes32 requestId, uint attacker, uint defense, uint eventId, uint combatId);
+    event FightFinished(bytes32 requestId, uint attacker, uint defense, uint eventId, uint combatId);
     event FightRound(uint eventId, uint attacker, uint damage);
-    event FightWinner(bytes32 requestId, uint winner, address owner);
+    event FightWinner(bytes32 requestId, uint winner, address indexed owner);
 
     struct MatchUp {
         uint token;
@@ -30,7 +30,8 @@ contract Tournament is TournamentBase, VRFConsumerBase {
     MatchUp[] public combats;
     
     mapping (uint => mapping(uint => mapping(uint => bool))) public eventToPlayerVsPlayer;
-    mapping (bytes32 => uint) public requestIdToRandomNumber;
+    mapping (bytes32 => uint) private requestIdToRandomNumber;
+    mapping (bytes32 => bool) public requestIdDone;
     
     constructor(address _vrfCoodinator, address _linkToken, bytes32 _keyhash  ) VRFConsumerBase(
         _vrfCoodinator,
@@ -45,7 +46,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         uint combatsCount = events[_eventId].combatsCount;
         MatchUp[] memory eCombats = new MatchUp[](combatsCount);
         for (uint256 index = 0; index < combats.length; index++) {
-            if (eventToPlayer[_eventId][index] != 0) {
+            if (combats[index].eventId == 0) {
                 eCombats[index] = combats[index];
             }
         }
@@ -66,6 +67,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
 
     function fulfillRandomness(bytes32 _requestId, uint _randomNumber) internal override {
         requestIdToRandomNumber[_requestId] = _randomNumber;
+        requestIdDone[_requestId] = true;
     }
 
     function expand(uint _randomValue, uint times) public pure returns (uint[] memory) {
