@@ -73,7 +73,7 @@ onMounted(async () => {
         </div>
         <div className="form-group">
             <label htmlFor="fee">Fee</label>
-            <input type="number" className="form-control" id="fee" v-model="form.fee">
+            <input type="number" className="form-control" id="fee" v-model="form.fee" min="0">
         </div>
 
         <div class="text-right">

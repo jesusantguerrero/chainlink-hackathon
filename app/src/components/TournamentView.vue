@@ -188,7 +188,7 @@ onMounted(async () => {
                         <td class="px-4 py-2 border">{{ index + 1 }}</td>
                         <td class="flex flex-col px-4 py-2 border">
                             <img :src="player.image" alt="" class="rounded-md w-28 h-28">
-                            <span>{{ player.name }} {{ player.playerId }}</span>
+                            <span>{{ player.name }}</span>
                             <AtButton 
                                 class="font-bold bg-purple-400" 
                                 @click="fight(tournament.eventId, player.playerId)"> 
