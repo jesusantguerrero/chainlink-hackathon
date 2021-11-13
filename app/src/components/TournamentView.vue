@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import {  ref } from "@vue/reactivity";
+import {  computed, ref, onMounted } from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
-import { onMounted } from "@vue/runtime-core";
 import { IAsset } from "../utils/fetchMyItems";
 import axios from "axios";
 import { useMessage } from "../utils/useMessage";
@@ -93,6 +92,9 @@ interface ITournamentWithEvent {
 }
 
 const players = ref<IPlayer[]>([]);
+const playerRankings = computed(() => {
+    return players.value.sort((a, b) =>  b.points - a.points);
+});
 
 const fetchPlayers = async (eventId: number) => {
     const playersData = await Tournament?.getEventParticipants(eventId);
@@ -171,8 +173,8 @@ onMounted(async () => {
         <div class="px-5 py-5">
             <h4> Rankings </h4>
             <div>
-                <table class="rounded-md">
-                    <thead>
+                <table class="w-full rounded-md">
+                    <thead class="bg-purple-400 border border-gray-500 rounded-md">
                         <tr>
                             <th class="px-4 py-2">Rank</th>
                             <th class="px-4 py-2">Name</th>
@@ -181,26 +183,29 @@ onMounted(async () => {
                             <th class="px-4 py-2">Draws</th>
                             <th class="px-4 py-2">Points</th>
                             <th class="px-4 py-2">Owner</th>
-                        
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(player, index) in players">
-                            <td class="px-4 py-2 border">{{ index + 1 }}</td>
-                            <td class="flex flex-col px-4 py-2 border">
-                                <img :src="player.image" alt="" class="rounded-md w-28 h-28">
-                                <span>{{ player.name }}</span>
-                                <AtButton 
-                                    class="font-bold bg-purple-400" 
-                                    @click="fight(tournament.eventId, player.playerId)"> 
-                                    Fight 
-                                </AtButton>
+                        <tr v-for="(player, index) in playerRankings" class="border border-gray-500" :class="{'bg-gray-600': index % 2}">
+                            <td class="px-4 py-2 ">{{ index + 1 }}</td>
+                            <td class="px-4 py-2">
+                            <div class="flex">
+                                <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
+                                <div class="ml-2">
+                                    <p class="capitalize">{{ player.name }}</p>
+                                    <AtButton 
+                                        class="font-bold bg-purple-400" 
+                                        @click="fight(tournament.eventId, player.playerId)"> 
+                                        Fight 
+                                    </AtButton>
+                                </div>
+                            </div>
                             </td>
-                            <td class="px-4 py-2 border">{{ player.record.wins }}</td>
-                            <td class="px-4 py-2 border">{{ player.record.losses }}</td>
-                            <td class="px-4 py-2 border">{{ player.record.draws }}</td>
-                            <td class="px-4 py-2 border">{{ player.points }}</td>
-                            <td class="px-4 py-2 border">{{ player.owner }}</td>
+                            <td class="px-4 py-2">{{ player.record.wins }}</td>
+                            <td class="px-4 py-2">{{ player.record.losses }}</td>
+                            <td class="px-4 py-2">{{ player.record.draws }}</td>
+                            <td class="px-4 py-2">{{ player.points }}</td>
+                            <td class="px-4 py-2">{{ player.owner }}</td>
                             
                         </tr>
                     </tbody>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PropType } from '@vue/runtime-core';
 import { format } from 'date-fns';
 import { ethers } from 'ethers';
 import { ICombat, IPlayer } from '../types';
@@ -6,11 +7,11 @@ import PlayerMiniCard from './PlayerMiniCard.vue';
 
 const props = defineProps({
     combats: {
-        type: Array,
+        type: Array as PropType<ICombat[]>,
         required: true,
     },
     players: {
-        type: Array,
+        type: Array as PropType<IPlayer[]>,
         required: true,
     },
 });
@@ -24,7 +25,8 @@ const formatDate = (date: Date|number): string => {
 };
 
 const isWinner = (combat: ICombat, playerId: ethers.BigNumber): boolean => {
-    return combat.winner.toNumber() === playerId.toNumber();
+    const player = getPlayer(playerId);
+    return combat.winner && player ? combat.winner.toNumber() === player.tokenId : false;
 };
 </script>
 
