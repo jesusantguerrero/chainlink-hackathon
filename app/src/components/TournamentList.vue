@@ -6,6 +6,7 @@ import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
 import { useMessage } from "../utils/useMessage";
 import { format } from "date-fns";
+import TournamentLogo from "./TournamentLogo.vue";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
@@ -70,9 +71,7 @@ onMounted(async () => {
             <li class="list-group-item" v-for="tournament in tournaments">
                 <router-link :to="`/tournaments/${tournament.id}`" class="flex items-center justify-between px-2 py-2 transition bg-gray-600 border-4 border-gray-500 rounded-md hover:border-purple-400 ">
                     <div class="flex tournament__image">
-                        <div class="w-16 h-20 overflow-hidden bg-purple-400 rounded-b-full">
-                            <div class="w-1/2 h-full bg-black bg-opacity-10"></div>
-                        </div>
+                        <TournamentLogo />
                         <div class="ml-2">
                             <h3>{{ tournament.name }}</h3>
                             <p>{{ tournament.description }}</p>
@@ -102,14 +101,3 @@ onMounted(async () => {
         </ul>
     </div>
 </template>
-
-<style lang="scss">
-.form-group {
-    margin-bottom: 1rem;
-    @apply flex flex-col;
-}
-
-.form-control {
-    @apply text-gray-700 rounded-md py-1 px-2;
-}
-</style>

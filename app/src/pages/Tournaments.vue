@@ -32,8 +32,7 @@ watch(() => route.path, () => {
 
 <template>
     <Game>
-        <div class="px-5 py-3 mt-2 bg-gray-700 current-training">
-            <h2 class="md-5"> {{ title }}</h2>
+        <div class="mt-2 bg-gray-700 current-training">
             <component :is="currentView"  :id="tournamentId" />
         </div>
     </Game>
