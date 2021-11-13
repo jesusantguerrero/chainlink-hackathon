@@ -5,6 +5,7 @@ import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { onMounted } from "@vue/runtime-core";
 import { useMessage } from "../utils/useMessage";
+import { format } from "date-fns";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 const signer = provider.getSigner();
@@ -42,8 +43,11 @@ const fetchTournaments = async () => {
             seats: t.seatsLimit,
             eventId: currentEvent.tokenId,
             edition: currentEvent.tournamentEdition,
-            startDate: currentEvent.startDate,
-            endDate:  currentEvent.endDate,
+            startDate: currentEvent.startDate.toNumber(),
+            endDate:  currentEvent.endDate.toNumber(),
+            prixId:  currentEvent.tokenId,
+            formattedPrize: ethers.utils.formatEther(t.prize),
+            prize: t.prize,
             seatsTaken: currentEvent.seatsTaken,
             fee: ethers.utils.formatEther(t.seatFee),
             realFee: t.seatFee
@@ -64,18 +68,35 @@ onMounted(async () => {
     <div>
         <ul class="mt-5 space-y-5 list-group">
             <li class="list-group-item" v-for="tournament in tournaments">
-                <router-link :to="`/tournaments/${tournament.id}`">
-                    <h3>{{ tournament.name }} - {{ tournament.id }}{{ tournament.eventId }}</h3>
-                    <p>{{ tournament.description }}</p>
-                    <p>Seats: {{ tournament.seats }}</p>
-                    <p>Participants: {{ tournament.seatsTaken }}</p>
-                    <p>Fee: {{ tournament.fee }}</p>
-                    <AtButton 
-                        class="bg-purple-500" 
-                        @click.p.prevent.stop="joinTournament(tournament.id, tournament.name)"
-                    >
-                        Join
-                    </AtButton>
+                <router-link :to="`/tournaments/${tournament.id}`" class="flex items-center justify-between px-2 py-2 transition bg-gray-600 border-4 border-gray-500 rounded-md hover:border-purple-400 ">
+                    <div class="flex tournament__image">
+                        <div class="w-16 h-20 overflow-hidden bg-purple-400 rounded-b-full">
+                            <div class="w-1/2 h-full bg-black bg-opacity-10"></div>
+                        </div>
+                        <div class="ml-2">
+                            <h3>{{ tournament.name }}</h3>
+                            <p>{{ tournament.description }}</p>
+                            <div>
+                                <p class="flex justify-between">Start: <span class="font-bold">{{ format(tournament.startDate, 'yyyy-MM-dd') }}</span></p>
+                            <p class="flex justify-between">End: <span class="font-bold">{{ format(tournament.endDate, 'yyyy-MM-dd') }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <p><i class="fa fa-users"></i>: {{ tournament.seatsTaken }} / {{ tournament.seats }}</p>
+                        <p>Fee: {{ tournament.fee }} MATIC</p>
+                        <AtButton 
+                            class="mt-5 bg-purple-500" 
+                            @click.p.prevent.stop="joinTournament(tournament.id, tournament.name)"
+                        >
+                            Join
+                        </AtButton>
+                    </div>
+                    <div class="w-40 py-2 text-center text-purple-200">
+                        <i class="text-7xl fa fa-medal"></i>
+                        <p class="text-2xl"><span class="font-bold">{{ tournament.formattedPrize }} MATIC</span></p>
+                        <p class="text-xl text-white">Acc. Prize</p>
+                    </div>
                 </router-link>
             </li>
         </ul>
