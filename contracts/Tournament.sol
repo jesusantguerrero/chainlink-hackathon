@@ -23,6 +23,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         uint defense;
         bool active;
         uint winner;
+        uint winnerPlayer;
     }
 
     bytes32 internal keyHash;
@@ -59,7 +60,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         bytes32 requestId = requestRandomness(keyHash, fee);
         uint combatId = combats.length;
         events[_eventId].combatsCount++;
-        combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defensePlayerId, true, 0));
+        combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defensePlayerId, true, 0, 0));
         emit FightStarted(requestId, eventToPlayer[_eventId][_attackerPlayerId], eventToPlayer[_eventId][_defensePlayerId], _eventId, combatId); 
         eventToPlayerVsPlayer[_eventId][_attackerPlayerId][_defensePlayerId] = true;
         return (requestId, combatId);       
@@ -98,10 +99,10 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         
         combat.active = false;
         combat.winner = winner;
-
         // Here I need players id
         uint winnerPlayerId = eventToPlayer[combat.eventId][combat.attacker] == winner ? combat.attacker : combat.defense;
         uint loserPlayerId = eventToPlayer[combat.eventId][combat.attacker] != winner ? combat.attacker : combat.defense;
+        combat.winnerPlayer = winnerPlayerId;
 
         // Give the prizes to the winners
         players[winnerPlayerId].record.wins++;

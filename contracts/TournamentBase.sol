@@ -100,7 +100,7 @@ contract TournamentBase is Ownable {
     function addParticipant(uint _tokenId, uint _eventId) public payable {
         require(IERC721(roosterFightAdress).ownerOf(_tokenId) == msg.sender, "has to be owner");
         TournamentEvent storage tEvents = events[_eventId];
-        require(msg.value == prixes[tEvents.tokenId].seatFee, "Should pay the tournament fee");
+        require(msg.value == prixes[tEvents.prixId].seatFee, "Should pay the tournament fee");
         require(tokenToEvent[_tokenId][_eventId] == false, "Is already in this event");
         tEvents.seatsTaken++;
         uint playerId = players.length; 
@@ -108,7 +108,7 @@ contract TournamentBase is Ownable {
         eventToPlayer[_eventId][playerId] = _tokenId; 
         tokenToEvent[_tokenId][_eventId] = true;
         uint percentage = (msg.value/housePercentage);
-        prixes[tEvents.tokenId].prize += msg.value - percentage;
+        prixes[tEvents.prixId].prize += msg.value - percentage;
         events[_eventId].houseFee += percentage;
     }
 

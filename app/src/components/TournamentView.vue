@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import {  ref } from "@vue/reactivity";
+import {  computed, ref, onMounted } from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
-import { onMounted } from "@vue/runtime-core";
 import { IAsset } from "../utils/fetchMyItems";
 import axios from "axios";
 import { useMessage } from "../utils/useMessage";
+import TournamentLogo from "./TournamentLogo.vue";
+import CombatsTable from "./CombatsTable.vue";
+import { ICombat, IPlayer } from "../types";
 
 const props = defineProps({
     id: {
@@ -75,12 +77,6 @@ const fight = async (eventId: number, defenderId: number) => {
     }
 }
 
-interface IPlayer {
-    playerId: number;
-    tokenId: number;
-    name: string;
-}
-
 interface ITournamentWithEvent {
     id: number,
     name: string,
@@ -96,6 +92,9 @@ interface ITournamentWithEvent {
 }
 
 const players = ref<IPlayer[]>([]);
+const playerRankings = computed(() => {
+    return players.value.sort((a, b) =>  b.points - a.points);
+});
 
 const fetchPlayers = async (eventId: number) => {
     const playersData = await Tournament?.getEventParticipants(eventId);
@@ -116,7 +115,7 @@ const fetchPlayers = async (eventId: number) => {
     }));
 }
 
-const combats = ref<any[]>([]);
+const combats = ref<ICombat[]>([]);
 const fetchMatches = async (eventId: number) => {
     combats.value = await Tournament?.getMatchesForEvent(eventId);
 }
@@ -151,77 +150,70 @@ const fetchPageData = async () => {
 onMounted(async () => {
     await fetchPageData();
 });
-
-
 </script>
 
 <template>
     <div>
-        <div>
-            <h3>{{ tournament.name }} - {{ tournament.id }}{{ tournament.eventId }}</h3>
+        <div class="py-3 text-center bg-gradient-to-b from-purple-700">
+            <div class="flex justify-center mb-3"> 
+                <TournamentLogo />
+            </div>
+            <h3 class="text-xl font-bold">{{ tournament.name }}</h3>
             <p>{{ tournament.description }}</p>
-            <p>Seats: {{ tournament.seats }}</p>
-            <p>Participants: {{ tournament.seatsTaken }}</p>
-            <p>Fee: {{ tournament.fee }}</p>
+
+            <div>
+                <p>Seats: {{ tournament.seatsTaken }} / {{ tournament.seats }}</p>
+            </div>
+            <p class="mt-5">Fee: {{ tournament.fee }} MATIC</p>
             <AtButton class="bg-purple-500" @click="joinTournament(tournament.id)">
                 Join
             </AtButton>
         </div>
 
-        <h4> Rankings </h4>
-        <div>
-            <table class="rounded-md">
-                <thead>
-                    <tr>
-                        <th class="px-4 py-2">Rank</th>
-                        <th class="px-4 py-2">Name</th>
-                        <th class="px-4 py-2">Wins</th>
-                        <th class="px-4 py-2">Loses</th>
-                        <th class="px-4 py-2">Draws</th>
-                        <th class="px-4 py-2">Points</th>
-                        <th class="px-4 py-2">Owner</th>
-                    
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(player, index) in players">
-                        <td class="px-4 py-2 border">{{ index + 1 }}</td>
-                        <td class="flex flex-col px-4 py-2 border">
-                            <img :src="player.image" alt="" class="rounded-md w-28 h-28">
-                            <span>{{ player.name }} {{ player.playerId }}</span>
-                            <AtButton 
-                                class="font-bold bg-purple-400" 
-                                @click="fight(tournament.eventId, player.playerId)"> 
-                                Fight 
-                            </AtButton>
-                        </td>
-                        <td class="px-4 py-2 border">{{ player.record.wins }}</td>
-                        <td class="px-4 py-2 border">{{ player.record.losses }}</td>
-                        <td class="px-4 py-2 border">{{ player.record.draws }}</td>
-                        <td class="px-4 py-2 border">{{ player.points }}</td>
-                        <td class="px-4 py-2 border">{{ player.owner }}</td>
-                        
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div class="px-5 py-5">
+            <h4> Rankings </h4>
+            <div>
+                <table class="w-full rounded-md">
+                    <thead class="bg-purple-400 border border-gray-500 rounded-md">
+                        <tr>
+                            <th class="px-4 py-2">Rank</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Wins</th>
+                            <th class="px-4 py-2">Loses</th>
+                            <th class="px-4 py-2">Draws</th>
+                            <th class="px-4 py-2">Points</th>
+                            <th class="px-4 py-2">Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(player, index) in playerRankings" class="border border-gray-500" :class="{'bg-gray-600': index % 2}">
+                            <td class="px-4 py-2 ">{{ index + 1 }}</td>
+                            <td class="px-4 py-2">
+                            <div class="flex">
+                                <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
+                                <div class="ml-2">
+                                    <p class="capitalize">{{ player.name }}</p>
+                                    <AtButton 
+                                        class="font-bold bg-purple-400" 
+                                        @click="fight(tournament.eventId, player.playerId)"> 
+                                        Fight 
+                                    </AtButton>
+                                </div>
+                            </div>
+                            </td>
+                            <td class="px-4 py-2">{{ player.record.wins }}</td>
+                            <td class="px-4 py-2">{{ player.record.losses }}</td>
+                            <td class="px-4 py-2">{{ player.record.draws }}</td>
+                            <td class="px-4 py-2">{{ player.points }}</td>
+                            <td class="px-4 py-2">{{ player.owner }}</td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <h4 class="mt-5 text-xl font-bold">Combats</h4>
-        <div class="mb-10 space-y-2">
-            <router-link class="block font-bold text-purple-400 underline" :to="`/match/${combat.token}`" v-for="(combat, index) in combats">
-                Fight {{index + 1}} - {{combat.attacker}} vs {{ combat.defense }}
-            </router-link>
+            <h4 class="mt-5 mb-5 text-xl font-bold">Combats</h4>
+            <CombatsTable :combats="combats" :players="players" />
         </div>
     </div>
 </template>
-
-<style lang="scss">
-.form-group {
-    margin-bottom: 1rem;
-    @apply flex flex-col;
-}
-
-.form-control {
-    @apply text-gray-700 rounded-md py-1 px-2;
-}
-</style>

@@ -17,3 +17,25 @@ export interface IPreToken {
   breed: number;
   claimed: boolean;
 }
+
+export interface IRecord {
+  wins: number;
+  losses: number;
+  draws: number;
+}
+export interface IPlayer {
+  playerId: number;
+  tokenId: number;
+  name: string;
+  image: string;
+  record: IRecord;
+  points: number;
+  owner: string;
+}
+
+export interface ICombat {
+  id: number;
+  attacker: ethers.BigNumber;
+  defense: ethers.BigNumber;
+  winner: ethers.BigNumber;
+}

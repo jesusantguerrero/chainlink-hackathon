@@ -38,19 +38,19 @@ const createEvent = async (formData: ITournamentEvent) => {
         <h2 class="mt-5 text-xl font-bold text-purple-400">Create Event for this tournament</h2>
         <div className="form-group mt-5">
             <label htmlFor="name">Tournament</label>
-            <select v-model="form.tournamentId" class="form-control">
+            <select v-model="form.tournamentId" class="mt-2 form-control">
                 <option  v-for="tournament in tournaments" :value="tournament.id">
                     {{ tournament.name }}
                 </option>
             </select>
         </div>
-        <div className="form-group">
+        <div className="form-group relative">
             <label htmlFor="name">Name</label>
-            <AtDateSelect v-model="form.startDate" />
+            <AtDateSelect v-model="form.startDate" @click.prevent class="w-24 mt-2 text-left" />
         </div>
-        <div className="form-group">
+        <div className="form-group relative">
             <label htmlFor="description">Description</label>
-            <AtDateSelect v-model="form.endDate" />
+            <AtDateSelect v-model="form.endDate" @click.prevent class="w-24 mt-2 text-left"/>
         </div>
 
         <div class="text-right">
@@ -58,7 +58,7 @@ const createEvent = async (formData: ITournamentEvent) => {
             Create
         </AtButton>
         </div>
-    </form>s
+    </form>
 </template>
 
 <style lang="scss">
