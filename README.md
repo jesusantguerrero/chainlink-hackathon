@@ -1,4 +1,4 @@
-# Chainlink Hackathon Project
+# RoosterFight
 [![codecov](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon/branch/master/graph/badge.svg?token=Y153S4JEZL)](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon)
 
 ## User Stories
