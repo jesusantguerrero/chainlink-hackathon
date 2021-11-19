@@ -32,8 +32,12 @@ onMounted(async () => {
     <div class="claimable-list">
         <div class="flex flex-wrap gap-2 mt-5 claimable-list__items">
             <div v-for="item in items" class="claimable-list__item">
-                <div class="overflow-hidden rounded-t-md claimable-list__item__image">
-                    <img :src="item.uri" class="w-64"/>
+                <div class="overflow-hidden border rounded-md claimable-list__item__image">
+                    <div class="relative w-64 h-64 bg-purple-500 border-roti-400">
+                        <img :src="item.uri" class="absolute z-20" />
+                        <div class="absolute bottom-0 right-0 w-1/2 h-full bg-black bg-opacity-10">
+                        </div>
+                    </div>
                     <div class="px-4 pb-3 bg-gray-700">
                         <h3 class="text-xl">Rooster #{{item.id}}</h3>
                     </div>
