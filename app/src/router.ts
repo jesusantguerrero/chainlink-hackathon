@@ -3,6 +3,7 @@ import Index from "./pages/index.vue";
 import Dashboard from "./pages/Dashboard.vue";
 import Admin from "./pages/Admin.vue";
 import Tournaments from "./pages/Tournaments.vue";
+import Marketplace from "./pages/Marketplace.vue";
 import Match from "./pages/Match.vue";
 
 export const router = createRouter({
@@ -26,6 +27,10 @@ export const router = createRouter({
     {
       path: "/tournaments",
       component: Tournaments,
+    },
+    {
+      path: "/marketplace",
+      component: Marketplace,
     },
     {
       path: "/tournaments/:id",

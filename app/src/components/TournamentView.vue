@@ -9,6 +9,7 @@ import { useMessage } from "../utils/useMessage";
 import TournamentLogo from "./TournamentLogo.vue";
 import CombatsTable from "./CombatsTable.vue";
 import { ICombat, IPlayer } from "../types";
+import { useFight } from "../composables/useMoralis";
 
 const props = defineProps({
     id: {
@@ -65,14 +66,23 @@ const fight = async (eventId: number, defenderId: number) => {
     }
     try {
         const event = await Tournament?.events(eventId);
-        console.log(event);
         const trx = await Tournament?.prepareFight(attackerId, defenderId, eventId)
-        await trx?.wait();
-        setMessage(`The fight is going to take place in a minute`);
-        await fetchMatches(eventId);
+        const receipt = await trx?.wait(1);
+        if (receipt && receipt.events[3].event) {
+            const {requestId, attacker, defense, combatId} = receipt.events[3].args;
+            const { saveFight } = useFight();
+            saveFight(
+                requestId,
+                combatId.toNumber(), 
+                eventId, 
+                attacker.toNumber(), 
+                defense.toNumber()
+            );
+            setMessage(`The fight is going to take place in a minute`);
+            await fetchMatches(eventId);
+        }
     } catch (err: any) {
         const rpcMessage = err?.data?.message || "";
-        console.log(rpcMessage);
         setMessage(rpcMessage.slice(rpcMessage.indexOf("'")));
     }
 }

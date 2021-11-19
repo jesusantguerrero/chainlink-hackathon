@@ -1,43 +1,16 @@
 <script lang="ts" setup>
-import { AtSiteHeader, AtButton } from "atmosphere-ui";
+import { AtButton } from "atmosphere-ui";
 import { useAppState } from "../composables/useAppState";
 import ClaimableList from "../components/ClaimableList.vue";
 import MintForm from "../components/MintForm.vue";
-import { RouterLink } from "vue-router";
+import LandingHeader from "../layouts/LandingHeader.vue";
 const { state } = useAppState();
 
-const links = [{
-    name: 'Home',
-    to: '/',
-    component: RouterLink
-}, {
-    name: 'Claim',
-    url: '/#claim'
-}, {
-    name: 'Marketplace',
-    to: '/marketplace',
-    component: RouterLink
-}, {
-    name: 'Dashboard',
-    to: '/dashboard',
-    component: RouterLink
-}];
 
-const actions = [{
-    name: 'Learn more',
-    url: '/login',
-    class: 'text-roti'
-}, {
-    name: 'Connect',
-    url: '/signup',
-    class: "relative px-5 py-2 overflow-hidden rounded-md focus:outline-none hover:bg-opacity-80 px-10 font-bold text-white bg-roti"
-}]
 </script>
 
 <template>
-<div class="bg-purple-900 border-b border-white">
-    <AtSiteHeader title="RoosterFight" :links="links" :actions="actions" dot-class="text-yellow-500" />
-</div>
+<LandingHeader @connect="$emit('connect')" />
 <div class="justify-center py-20 text-center text-white bg-purple-700">
     <div>
         <h1 class="text-2xl font-bold">Train your Roosters and fight</h1>

@@ -29,10 +29,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="px-5 claimable-list">
-        <div class="claimable-list__header">
-            <h2 class="text-2xl">Claimable Roosters</h2>
-        </div>
+    <div class="claimable-list">
         <div class="flex flex-wrap gap-2 mt-5 claimable-list__items">
             <div v-for="item in items" class="claimable-list__item">
                 <div class="overflow-hidden rounded-t-md claimable-list__item__image">

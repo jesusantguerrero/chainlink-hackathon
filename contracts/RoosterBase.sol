@@ -2,10 +2,6 @@
 pragma solidity ^0.8.4;
 
 contract RoosterBase {
-    uint internal _cooldownTime = 1 minutes;
-    uint internal dnaDigits = 16;
-    uint internal dnaModulus = 10 ** dnaDigits;
-    
     enum Breed{BLACK, PINTO, COLORAO, WHITE}
     string[] public breedNames = ["Black", "Pinto", "Colorao", "White"];
 
@@ -39,10 +35,10 @@ contract RoosterBase {
         uint64 agility;
     }
 
-    BreedAttributes internal whiteBreed = BreedAttributes(3, 10, 10);
+    BreedAttributes internal blackBreed = BreedAttributes(15, 7, 7);
     BreedAttributes internal coloraoBreed = BreedAttributes(5, 5, 5);
     BreedAttributes internal pintoBreed = BreedAttributes(10, 7, 5);
-    BreedAttributes internal blackBreed = BreedAttributes(15, 7, 7);
+    BreedAttributes internal whiteBreed = BreedAttributes(3, 10, 10);
 
     function getBreed(Breed _breed, BreedAttributes memory _attributes) view public returns(BreedAttributes memory) {
         BreedAttributes memory breeding;

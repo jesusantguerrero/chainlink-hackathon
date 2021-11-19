@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { useMoralis } from "./composables/useMoralis";
 import MessageProvider from "./components/MessageProvider.vue";
+import { onMounted } from "@vue/runtime-core";
 
-const { login } = useMoralis();
+const { login, init } = useMoralis();
+
+onMounted(async () => {
+  await init();
+});
 </script>
 
 <template>
