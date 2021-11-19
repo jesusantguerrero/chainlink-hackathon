@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import Moralis from "./utils/moralis";
+import Moralis from "../_shared/moralis";
 
 const getFights = async () => {
     try {

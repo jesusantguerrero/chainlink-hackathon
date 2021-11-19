@@ -1,7 +1,7 @@
 /* eslint-disable node/no-missing-import */
 /* eslint-disable node/no-unpublished-import */
 import Moralis from "moralis/node";
-import { useSecureString } from "../../_shared/useSecureString";
+import { useSecureString } from "./useSecureString";
 const { getEnv } = useSecureString(process.env);
 
 const serverUrl = getEnv("MORALIS_SERVER_URL");
