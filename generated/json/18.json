@@ -1,0 +1,32 @@
+{
+  "name": "RoosterFight #18",
+  "description": "Rooster NFT to play RoosterFight",
+  "image": "ipfs://NewUriToReplace/18.png",
+  "dna": "a33d7b420cecd951fb2a53b8905fe970b87e098c",
+  "edition": 18,
+  "date": 1636387704555,
+  "creator": "freesgen",
+  "attributes": [
+    {
+      "trait_type": "Feet",
+      "value": "Base"
+    },
+    {
+      "trait_type": "Breed",
+      "value": "Pinto"
+    },
+    {
+      "trait_type": "Cresta",
+      "value": "Moon_Red"
+    },
+    {
+      "trait_type": "NewEyes",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "NewPico",
+      "value": "Base"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}
