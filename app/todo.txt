@@ -1,0 +1,2 @@
+- Verificar si el token ya esta participando en el torneo.
+- Poner disponible el current PC/Token/Rooster para toda la app.

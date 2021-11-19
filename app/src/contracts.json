@@ -3,7 +3,7 @@
   "chainId": "1337",
   "contracts": {
     "LinkToken": {
-      "address": "0xcB3DB4226cF474D1e08cFa9De1245151b4E520f7",
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       "abi": [
         {
           "constant": true,
@@ -329,7 +329,7 @@
       ]
     },
     "RoosterFight": {
-      "address": "0xb10c5f52415C38E3C5C722656CeeFF40317aa5af",
+      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       "abi": [
         {
           "inputs": [
@@ -1244,7 +1244,7 @@
       ]
     },
     "Tournament": {
-      "address": "0xEbC044b36782bA7eA8fc7Aa00DDF2919411B96D2",
+      "address": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
       "abi": [
         {
           "inputs": [
@@ -1279,19 +1279,19 @@
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "_attacker",
+              "name": "attacker",
               "type": "uint256"
             },
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "_defense",
+              "name": "defense",
               "type": "uint256"
             },
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "_eventId",
+              "name": "eventId",
               "type": "uint256"
             },
             {
@@ -1341,19 +1341,19 @@
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "_attacker",
+              "name": "attacker",
               "type": "uint256"
             },
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "_defense",
+              "name": "defense",
               "type": "uint256"
             },
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "_eventId",
+              "name": "eventId",
               "type": "uint256"
             },
             {
@@ -1382,7 +1382,7 @@
               "type": "uint256"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "address",
               "name": "owner",
               "type": "address"
@@ -2135,12 +2135,12 @@
               "type": "bytes32"
             }
           ],
-          "name": "requestIdToRandomNumber",
+          "name": "requestIdDone",
           "outputs": [
             {
-              "internalType": "uint256",
+              "internalType": "bool",
               "name": "",
-              "type": "uint256"
+              "type": "bool"
             }
           ],
           "stateMutability": "view",
@@ -2217,7 +2217,7 @@
       ]
     },
     "VRFCoordinatorMock": {
-      "address": "0xEB83Cb4a7cb408b3a932fE33C93A511ab04DFa14",
+      "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       "abi": [
         {
           "inputs": [
