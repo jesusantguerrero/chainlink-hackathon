@@ -10,11 +10,6 @@ const route = useRoute();
 
 const tournamentId = ref<string>();
 
-
-const title = computed(() => {
-  return tournamentId.value  ? 'Tournament View' : 'Active Tournaments'
-});
-
 const currentView = computed(() => {
   return tournamentId.value ? TournamentView : TournamentList;
 });

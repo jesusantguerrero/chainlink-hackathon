@@ -42,3 +42,30 @@ export const useMoralis = () => {
     logout,
   };
 };
+
+export const useFight = () => {
+  const saveFight = async (
+    requestId: string,
+    combatId: string,
+    eventId: number,
+    attackerTokenId: number,
+    defenderTokenId: number,
+    status = "scheduled"
+  ) => {
+    const Fight = Moralis.Object.extend("Fight");
+    const newFight = new Fight();
+    newFight.set("requestId", requestId);
+    newFight.set("combatId", combatId);
+    newFight.set("eventId", eventId);
+    newFight.set("attackerTokenId", attackerTokenId);
+    newFight.set("defenderTokenId", defenderTokenId);
+    newFight.set("winnerTokenId", 0);
+    newFight.set("status", status);
+
+    newFight.save();
+  };
+
+  return {
+    saveFight,
+  };
+};

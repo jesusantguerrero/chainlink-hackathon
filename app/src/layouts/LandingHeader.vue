@@ -38,7 +38,7 @@ const actions = [{
         @action="$emit('connect')" 
     >
         <template #actions v-if="state.user">
-            <div>
+            <div class="text-white">
             {{ state.user?.getUsername() }}
             </div>
         </template>
