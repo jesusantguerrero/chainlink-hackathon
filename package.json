@@ -53,6 +53,7 @@
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",
     "agenda": "^4.2.1",
-    "bull": "^4.1.0"
+    "bull": "^4.1.0",
+    "moralis": "0.0.134"
   }
 }
