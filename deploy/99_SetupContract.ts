@@ -5,34 +5,26 @@ import { deployments } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { autoFundCheck, networkConfig } from "../helper-hardhat-config";
+import Moralis from "../_shared/moralis";
 
-//   Mint the initial tokens
-const premintedTokens = [
-  {
-    id: 0,
-    breed: 0,
-    uri: "https://lh3.googleusercontent.com/pnay7Gr6QdYT5V23hYlv8Dyvm1R6VfyvQgPHSrMmQJuLMHVwn8B2pth6DFHnWQZvrGPpiPP-DTPgdUFd-fa0pa7rbBwoboRP0Csu6MI=w600",
-    claimed: false,
-  },
-  {
-    id: 0,
-    breed: 1,
-    uri: "https://lh3.googleusercontent.com/bs5rirjgoAV5VQNFwp2EiVurf15o2bbNOIu_sac-nXnP3UTDVh6n2xVCIBLHCwG1odiJ656iP7fzmVPkSEqBYWs1HX73sSsU9FGo=w600",
-    claimed: false,
-  },
-  {
-    id: 0,
-    breed: 2,
-    uri: "https://lh3.googleusercontent.com/ioC2jjM0CTXuTCKWHJCsenkO0rmmcWczzlBt25_hbMP_mfaRh5iYAkckwoY1I6tzWM3vNR6RRotyFuOeVk9dUSCWW5GLyK6InmTUNQ=w600",
-    claimed: false,
-  },
-  {
-    id: 0,
-    breed: 3,
-    uri: "https://lh3.googleusercontent.com/ioC2jjM0CTXuTCKWHJCsenkO0rmmcWczzlBt25_hbMP_mfaRh5iYAkckwoY1I6tzWM3vNR6RRotyFuOeVk9dUSCWW5GLyK6InmTUNQ=w600",
-    claimed: false,
-  },
-];
+const getAvailableTokens = async () => {
+  const Metadata = new Moralis.Query("Metadata");
+  const preTokens = await Metadata.find();
+  const breedTypes = ["Black", "Colorao", "Pinto", "White"];
+  return preTokens.map((preToken) => {
+    const attributes = preToken.get("attributes");
+    const breedType = attributes.find(
+      (attribute: Record<string, string>) => attribute.trait_type === "Breed"
+    ).value;
+
+    return {
+      id: preToken.get("edition"),
+      breed: breedTypes.findIndex((breed: string) => breed === breedType),
+      uri: preToken.get("image_url"),
+      claimed: false,
+    };
+  });
+};
 
 const SetupContract: DeployFunction = async (
   hre: HardhatRuntimeEnvironment
@@ -64,10 +56,11 @@ const SetupContract: DeployFunction = async (
   }
 
   const keyHash = networkConfig[chainId].keyHash || "";
+  const preMintedTokens = await getAvailableTokens();
   const RoosterFight = await deploy("RoosterFight", {
     from: deployer,
     log: true,
-    args: [premintedTokens],
+    args: [preMintedTokens],
   });
 
   const Tournament = await deploy("Tournament", {
