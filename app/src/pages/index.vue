@@ -5,8 +5,6 @@ import ClaimableList from "../components/ClaimableList.vue";
 import MintForm from "../components/MintForm.vue";
 import LandingHeader from "../layouts/LandingHeader.vue";
 const { state } = useAppState();
-
-
 </script>
 
 <template>
@@ -21,7 +19,7 @@ const { state } = useAppState();
        <MintForm v-else />
     </div>
 </div>
-<div class="py-20 text-white bg-gray-900">
+<div class="py-20 text-white bg-gray-900" id="claim">
     <ClaimableList class="mx-auto max-w-7xl" />
 </div>
 </template>

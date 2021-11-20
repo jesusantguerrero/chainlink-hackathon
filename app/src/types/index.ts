@@ -11,6 +11,19 @@ export interface NFTAsset {
   claimable: boolean;
 }
 
+export interface INftDetails {
+  tokenId: number;
+  name: string;
+  image: string;
+  hp: number;
+  experience: number;
+  level: number;
+  wins: number;
+  losses: number;
+  strength: number;
+  speed: number;
+  agility: number;
+}
 export interface IPreToken {
   id: ethers.BigNumber;
   uri: string;

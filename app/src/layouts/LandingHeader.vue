@@ -10,9 +10,6 @@ const links = [{
     name: 'Claim',
     url: '/#claim'
 }, {
-    name: 'Marketplace',
-    to: '/marketplace',
-}, {
     name: 'Dashboard',
     to: '/dashboard',
 }];
