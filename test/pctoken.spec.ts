@@ -6,6 +6,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ethers } from "ethers";
 import hre from "hardhat";
 import { IPreToken } from "../types/index";
+import { getContract } from "../utils/getContract";
+import premintedTokens from "./mock/premintedTokens";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -25,12 +27,7 @@ const toNumberArray = (tokens: IPreToken[]) => {
 let pcToken: ethers.Contract;
 
 beforeEach(async () => {
-  await hre.deployments.fixture(["local"]);
-  const RoosterFight = await hre.deployments.get("RoosterFight");
-  pcToken = await hre.ethers.getContractAt(
-    "RoosterFight",
-    RoosterFight.address
-  );
+  pcToken = await getContract("RoosterFight", [premintedTokens]);
 });
 describe("PC Token", function () {
   it("Should mint a new nft token", async function () {

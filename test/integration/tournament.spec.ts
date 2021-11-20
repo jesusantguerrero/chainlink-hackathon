@@ -11,6 +11,7 @@ import {
   getNetworkIdFromName,
 } from "../../helper-hardhat-config";
 import { ethers } from "ethers";
+import premintedTokens from "../mock/premintedTokens";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -28,11 +29,11 @@ let tournament: ethers.Contract,
   vrfCoordinator: ethers.Contract,
   pcToken: ethers.Contract;
 
-before(async () => {
+beforeEach(async () => {
   await setupContracts();
 });
 
-describe("Tournament unit tests", async () => {
+describe("Tournament integration tests", async () => {
   it("Should fail to add participants if payment is not present", async () => {
     await mintTokens([user2, user3]);
     await expect(
@@ -153,19 +154,15 @@ async function prepareFight(
 }
 
 async function setupContracts() {
-  await hre.deployments.fixture(["mocks", "local"]);
+  await hre.deployments.fixture(["mocks"]);
   const LinkToken = await hre.deployments.get("LinkToken");
   const VRFCoordinatorMock = await hre.deployments.get("VRFCoordinatorMock");
-  const RoosterFight = await hre.deployments.get("RoosterFight");
   linkToken = await hre.ethers.getContractAt("LinkToken", LinkToken.address);
   vrfCoordinator = await hre.ethers.getContractAt(
     "VRFCoordinatorMock",
     VRFCoordinatorMock.address
   );
-  pcToken = await hre.ethers.getContractAt(
-    "RoosterFight",
-    RoosterFight.address
-  );
+  pcToken = await getContract("RoosterFight", [premintedTokens]);
   const networkId = await getNetworkIdFromName("localhost");
   const keyHash = networkConfig[networkId || 1].keyHash || "";
   tournament = await getContract("Tournament", [
