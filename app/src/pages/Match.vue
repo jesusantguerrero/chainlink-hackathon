@@ -101,11 +101,11 @@ watch(() => route.path, () => {
     <div class="relative bg-green-500 rounded-full w-96 h-96">
         <div class="absolute flex flex-col items-center justify-center w-full h-full" v-if="!isFetching">
             <div class="flex items-center justify-center w-full space-x-10">
-                <img :src="matchEvent.attackerToken.image" class="transform rounded-md shadow-lg h-52 skew-y-2">
+                <img :src="matchEvent.attackerToken.image" class="attacker h-52">
                 <span class="text-5xl text-white animate-pulse">
                     vs
                 </span>
-                <img :src="matchEvent.defenseToken.image" class="transform rounded-md shadow-lg h-52 skew-x-2">
+                <img :src="matchEvent.defenseToken.image" class="h-52">
             </div>
             <AtButton  
                 @click="processMatch()"
@@ -118,10 +118,16 @@ watch(() => route.path, () => {
 
             <div v-if="winnerToken" class="mt-5 text-white">
                 Winner: {{ winnerToken.name }}
-                <img :src="winnerToken.image" class="transform rounded-md shadow-lg h-52">
+                <img :src="winnerToken.image" class="transform rounded-md h-52">
             </div>
         </div>
     </div>
 </div>
 </template>
+
+<style>
+.attacker {
+    transform: rotateY(180deg);
+}
+</style>
 
