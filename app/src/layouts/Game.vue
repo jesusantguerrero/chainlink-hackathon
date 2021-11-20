@@ -47,15 +47,6 @@ const dashboardMenu = computed(() => {
         icon: 'fa fa-cogs',
         active: false
     } ];
-
-    if (isOwner.value) {
-        menu.push({
-            text: 'Admin',
-            to: '/admin',
-            icon: 'fa fa-shield',
-            active: false
-        });
-    }
     return menu;
 });
 
@@ -64,7 +55,7 @@ const dashboardMenu = computed(() => {
 <template>
    <GameHeader />
 
-    <div class="mx-auto mt-10 text-white max-w-7xl">
+    <div class="mx-auto mt-10 mb-10 text-white max-w-7xl">
         <ul class="flex justify-around text-white bg-gray-700">
             <router-link :to="item.to" v-for="item in dashboardMenu" class="w-full py-3 text-center border-b-4 border-transparent cursor-pointer game-link hover:bg-gray-800">
                <i :class="item.icon" />
