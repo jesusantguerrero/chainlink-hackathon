@@ -16,7 +16,7 @@ describe("Tournament unit tests", async () => {
     vrfCoordinator: ethers.Contract;
 
   beforeEach(async () => {
-    await hre.deployments.fixture(["mocks", "local"]);
+    await hre.deployments.fixture(["mocks"]);
     const LinkToken = await hre.deployments.get("LinkToken");
     const VRFCoordinatorMock = await hre.deployments.get("VRFCoordinatorMock");
     linkToken = await hre.ethers.getContractAt("LinkToken", LinkToken.address);
