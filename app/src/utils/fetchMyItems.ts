@@ -13,13 +13,7 @@ export const fetchMyItems = async () => {
   let roosters = await Cockfighter?.functions.getMyRoosters();
   roosters = await Promise.all(
     roosters[0].map(async (item: ethers.BigNumber) => {
-      const tokenURI = await Cockfighter?.tokenURI(item.toNumber());
-      console.log(tokenURI);
-      const rooster = await axios(tokenURI)
-        .then(({ data }) => data)
-        .catch(() => {
-          return {};
-        });
+      const rooster = await Cockfighter?.getDetails(item.toNumber());
 
       return {
         tokenId: item.toNumber(),
