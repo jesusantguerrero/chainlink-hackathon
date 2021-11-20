@@ -4,7 +4,9 @@ import Web3 from "web3/dist/web3.min";
 import Moralis from "moralis/dist/moralis";
 import { config } from "../config/";
 import { useAppState } from "./useAppState";
+import { ProviderState, useWeb3Provider } from "./useWeb3Provider";
 import { AppState } from "./AppState";
+import { fetchMyItems } from "../utils/fetchMyItems";
 
 const { setUser } = useAppState();
 window.Web3 = Web3;
@@ -12,32 +14,50 @@ window.Web3 = Web3;
 Moralis.initialize(config.moralisKey);
 Moralis.serverURL = config.moralisServerURL;
 
+const initUser = async (user: Moralis.user) => {
+  setUser(user);
+  ProviderState.account = user.attributes.accounts[0];
+  AppState.isLoading = true;
+  setTimeout(async () => {
+    if (AppState.signer) {
+      AppState.roosters = await fetchMyItems(AppState.signer);
+      AppState.isLoading = false;
+    }
+  }, 1000);
+};
+
+export const initProvider = () => {
+  const init = async () => {
+    if (window.ethereum) {
+      const currentUser = Moralis.User.current();
+      if (currentUser) {
+        initUser(currentUser);
+      }
+    }
+  };
+
+  useWeb3Provider(init);
+};
+
 export const useMoralis = () => {
   const login = async () => {
     const user = await Moralis.Web3.authenticate({
       provider: window.ethereum,
       signingMessage: "Please login to your wallet",
     });
+
     if (user) {
-      setUser(user);
+      initUser(user);
     }
+
+    return user;
   };
 
   const logout = async () => {
     return await Moralis.Web3.logout();
   };
 
-  const init = async () => {
-    if (window.ethereum) {
-      const currentuser = Moralis.User.current();
-      if (currentuser) {
-        AppState.user = currentuser;
-      }
-    }
-  };
-
   return {
-    init,
     login,
     logout,
   };
