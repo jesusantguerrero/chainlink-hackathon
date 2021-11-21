@@ -12,7 +12,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
     event FightStarted(bytes32 requestId, uint attacker, uint defense, uint eventId, uint combatId);
     event FightFinished(bytes32 requestId, uint attacker, uint defense, uint eventId, uint combatId);
     event FightRound(uint eventId, uint attacker, uint damage);
-    event FightWinner(bytes32 requestId, uint winner, address indexed owner);
+    event FightWinner(bytes32 requestId, uint winner, address indexed owner, uint attackerDamage, uint defenseDamage);
 
     struct MatchUp {
         uint token;
@@ -109,7 +109,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         players[winnerPlayerId].points += 3;
         players[loserPlayerId].record.losses++;
 
-        emit FightWinner(_requestId, winner, players[winnerPlayerId].owner);
-        emit FightFinished(_requestId, combat.attacker, combat.defense, combat.eventId, combat.token);
+        emit FightWinner(_requestId, winner, players[winnerPlayerId].owner, player1Attack, player2Attack);
+        emit FightFinished(_requestId, eventToPlayer[combat.eventId][combat.attacker], eventToPlayer[combat.eventId][combat.defense], combat.eventId, combat.token);
     }
 }
