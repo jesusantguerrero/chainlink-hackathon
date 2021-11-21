@@ -5,6 +5,7 @@ import Admin from "./pages/Admin.vue";
 import Tournaments from "./pages/Tournaments.vue";
 import Marketplace from "./pages/Marketplace.vue";
 import Match from "./pages/Match.vue";
+import Rooster from "./pages/Rooster.vue";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -35,6 +36,10 @@ export const router = createRouter({
     {
       path: "/tournaments/:id",
       component: Tournaments,
+    },
+    {
+      path: "/roosters/:id",
+      component: Rooster,
     },
     {
       path: "/match/:id",

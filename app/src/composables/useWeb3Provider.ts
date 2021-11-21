@@ -6,6 +6,7 @@ import {
   ref,
   ComputedRef,
   inject,
+  Ref,
 } from "vue";
 import { ethers } from "ethers";
 import { AppState } from "./AppState";
@@ -37,17 +38,27 @@ export const ProviderState = reactive<ICustomProvider>({
   chainId: "0",
   isConnectedToValidNetwork: computed(() => {
     const decimalChain = parseInt(ProviderState.chainId, 16);
-    return (
-      ProviderState.chainId &&
-      decimalChain === Number(config.chainId)
-    );
+    return ProviderState.chainId && decimalChain === Number(config.chainId);
   }),
   currency: "ETH",
 });
 
 export const signer = ref(null);
 
-export const useWeb3Provider = (initContract: Function) => {
+const onChangeAccountDefault = async (startApp: Ref<Function>) => {
+  ProviderState.web3 = new ethers.providers.Web3Provider(
+    window.ethereum,
+    "any"
+  );
+  const user = ProviderState.web3.getSigner();
+  startApp.value && (await startApp.value());
+  AppState.signer = user;
+};
+
+export const useWeb3Provider = (
+  initContract: Function,
+  onChangeAccount: null | Function
+) => {
   const ProviderState = inject("ProviderState", {});
   const startApp = ref(initContract);
 
@@ -70,20 +81,15 @@ export const useWeb3Provider = (initContract: Function) => {
   watch(
     () => ProviderState.account,
     async (current, previous) => {
-      if (current !== previous) {
-        await onChangeAccount();
+      if (current && current !== previous) {
+        await onChangeAccountDefault(startApp);
         await getBalance(current);
         await getAccounts();
+      } else if (!current) {
+        await resetProviderState();
       }
     }
   );
-
-  const onChangeAccount = async () => {
-    ProviderState.web3 = new ethers.providers.Web3Provider(ethereum, "any");
-    const user = ProviderState.web3.getSigner();
-    startApp.value && (await startApp.value());
-    AppState.signer = user;
-  };
 
   const resetProviderState = async () => {
     signer.value = null;
@@ -101,14 +107,18 @@ export const useWeb3Provider = (initContract: Function) => {
   onMounted(async () => {
     startApp.value && (await startApp.value());
     if (window.ethereum) {
-      ProviderState.chainId = await window.ethereum.request({ method: "eth_chainId" });
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
+      ProviderState.chainId = await window.ethereum.request({
+        method: "eth_chainId",
       });
-      window.ethereum.on("accountsChanged", (accounts: string[]) => {
-        ProviderState.accounts = accounts;
-        ProviderState.account = accounts[0];
-        console.log(ProviderState.account);
+      window.ethereum.on("chainChanged", async () => {
+        !onChangeAccount
+          ? await onChangeAccountDefault(startApp)
+          : await onChangeAccount();
+      });
+      window.ethereum.on("accountsChanged", async (accounts: string[]) => {
+        !onChangeAccount
+          ? await onChangeAccountDefault(startApp)
+          : await onChangeAccount();
       });
     }
   });

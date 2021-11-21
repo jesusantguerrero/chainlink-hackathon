@@ -13,6 +13,7 @@ import { useFight } from "../composables/useMoralis";
 import { AppState } from "../composables/AppState";
 import TournamentViewRow from "./TournamentViewRow.vue";
 import { ProviderState } from "../composables/useWeb3Provider";
+import { getProvider } from "../composables/getProvider";
 
 const props = defineProps({
     id: {
@@ -21,8 +22,9 @@ const props = defineProps({
     }
 });
 
-const RoosterFight = useContract("RoosterFight", AppState.signer);
-const Tournament = useContract("Tournament", AppState.signer);
+const provider = getProvider();
+const RoosterFight = useContract("RoosterFight", provider);
+const Tournament = useContract("Tournament", provider);
 
 const tournament = ref<ITournamentWithEvent>({
     id: 0,

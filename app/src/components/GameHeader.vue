@@ -20,7 +20,7 @@ const ProviderState = useWeb3();
         <div class="relative flex mr-24 space-x-2">
             <div class="flex items-center text-center">Tokens {{ ProviderState.balance }}</div>
             <NetworkBadge :chain="ProviderState.chainId" :valid-chain="config.chainId" />
-            <WalletAccount :account="ProviderState.account" />
+            <WalletAccount :account="ProviderState.account" v-if="ProviderState.account" />
         </div>
         <div class="absolute top-0 w-20 h-20 overflow-hidden bg-gray-700 border rounded-md right-5">
             <img :src="AppState.roosters[0].image" v-if="AppState.roosters.length" class="w-full" />

@@ -30,8 +30,8 @@ const dashboardMenu = computed(() => {
         active: false
     },
     {
-        text: 'Players',
-        to: '/players',
+        text: 'Rankings',
+        to: '/rankings',
         icon: 'fa fa-users',
         active: false
     }];

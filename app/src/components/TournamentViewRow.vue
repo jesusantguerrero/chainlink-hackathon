@@ -42,7 +42,9 @@ const alreadyFought = computed(() => {
         <td class="px-4 py-2 text-center"># {{ position }}</td>
         <td class="px-4 py-2">
         <div class="flex justify-center">
-            <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
+            <router-link :to="`/roosters/${player.tokenId}`">
+                <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
+            </router-link>
             <div class="ml-2">
                 <p class="capitalize">{{ player.name }}</p>
                 <AtButton 
@@ -51,7 +53,7 @@ const alreadyFought = computed(() => {
                     v-if="canRequestFight"
                     :disabled="alreadyFought"
                 >
-                    Fight {{ player.tokenId }} {{ currentTokenId }}
+                    Fight
                 </AtButton>
             </div>
         </div>

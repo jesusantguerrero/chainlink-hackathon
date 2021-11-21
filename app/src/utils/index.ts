@@ -3,3 +3,18 @@ export const formatMaskedWallet = (account: string): string => {
   const last = account.slice(-4);
   return `${first}***${last}`;
 };
+
+const networks: Record<number, string> = {
+  1: "Mainnet",
+  3: "Ropsten",
+  4: "Rinkeby",
+  42: "Kovan",
+  137: "Polygon",
+  80001: "Mumbai",
+  1337: "Localhost",
+  5777: "Ganache",
+};
+
+export const getChainName = (chainId: number | string) => {
+  return networks[Number(chainId)] || "Unknown";
+};

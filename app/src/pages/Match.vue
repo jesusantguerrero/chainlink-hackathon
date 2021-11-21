@@ -7,14 +7,14 @@ import { AtButton } from "atmosphere-ui";
 import { useMessage } from '../utils/useMessage';
 import Game from '../layouts/Game.vue';
 import { INftDetails } from '../types';
+import { getProvider } from '../composables/getProvider';
 
 const route = useRoute();
 const matchId = ref<string>();
 
-const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-const signer = provider.getSigner();
-const Cockfighter = useContract("RoosterFight", signer);
-const Tournament = useContract("Tournament", signer);
+const provider = getProvider();
+const Cockfighter = useContract("RoosterFight", provider);
+const Tournament = useContract("Tournament", provider);
 
 const matchEvent = ref<any>({});
 const isFetching = ref(true);

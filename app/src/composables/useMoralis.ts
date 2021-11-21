@@ -26,6 +26,12 @@ const initUser = async (user: Moralis.user) => {
   }, 1000);
 };
 
+const logout = async () => {
+  await Moralis.User?.logOut();
+  ProviderState.account = null;
+  AppState.user = Moralis.User.current();
+}
+
 export const initProvider = () => {
   const init = async () => {
     if (window.ethereum) {
@@ -36,7 +42,7 @@ export const initProvider = () => {
     }
   };
 
-  useWeb3Provider(init);
+  useWeb3Provider(init, logout);
 };
 
 export const useMoralis = () => {
@@ -51,10 +57,6 @@ export const useMoralis = () => {
     }
 
     return user;
-  };
-
-  const logout = async () => {
-    return await Moralis.Web3.logout();
   };
 
   return {
