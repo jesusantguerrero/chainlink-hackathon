@@ -25,6 +25,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     }
 
     address private contractOwner;
+    uint public tokenLimitByOwner = 1;
     mapping(uint => string) internal tokenToImage;
     mapping(uint => address) private tokenToClaimer;
     mapping(uint => PreToken) private minteableTokens;
@@ -38,6 +39,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     function mint(uint _preTokenId) public nonReentrant {
         require(totalSupply() < availableTokens.current(), "No more tokens available");
         require(minteableTokens[_preTokenId].claimed == false, "The token is already minted");
+        require(balanceOf(msg.sender) < tokenLimitByOwner, "You already reached the limit");
         _totalSupply.increment();
         uint tokenId = _totalSupply.current();
         _mint(msg.sender, tokenId);
