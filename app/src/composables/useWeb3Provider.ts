@@ -103,6 +103,9 @@ export const useWeb3Provider = (initContract: Function) => {
       ethereum.on("chainChanged", () => {
         window.location.reload();
       });
+      ethereum.on("accountsChanged", () => {
+        onChangeAccount();
+      });
     }
   });
 
