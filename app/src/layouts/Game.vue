@@ -41,12 +41,7 @@ const dashboardMenu = computed(() => {
         to: '/players',
         icon: 'fa fa-users',
         active: false
-    } , {
-        text: 'Settings',
-        to: '/settings',
-        icon: 'fa fa-cogs',
-        active: false
-    } ];
+    }];
     return menu;
 });
 

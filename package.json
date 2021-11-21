@@ -1,13 +1,14 @@
 {
   "name": "hardhat-project",
   "scripts": {
+    "start-scheduled-fights": "npx hardhat run tasks/startScheduledFights.ts --network localhost",
     "contract:test": "npx hardhat test",
     "contract:coverage": "npx hardhat coverage",
     "contract:compile": "npx hardhat compile",
-    "contract:serve": "npx hardhat node",
+    "contract:serve": "npx hardhat node --export app/src/contracts.json",
     "contract:deploy": "npx hardhat deploy --network localhost --tags local --export app/src/contracts.json",
     "contract:update": "npx hardhat run scripts/update.ts --network mainnet",
-    "contract:deploy-mumbai": "npx hardhat run scripts/deploy.ts --network mumbai",
+    "contract:deploy-mumbai": "npx hardhat run scripts/deploy.ts --network mumbai --export app/src/contracts.json",
     "contract:deploy-prod": "npx hardhat run scripts/deploy.ts --network mainnet"
   },
   "devDependencies": {

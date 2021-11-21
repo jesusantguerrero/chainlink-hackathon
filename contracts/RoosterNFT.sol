@@ -13,6 +13,7 @@ import "hardhat/console.sol";
 
 contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
     using Counters for Counters.Counter;
+    event Minted(address indexed to, uint256 indexed tokenId);
     Counters.Counter private _totalSupply;
     Counters.Counter public availableTokens;
 
@@ -43,6 +44,7 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
         _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", Strings.toString(tokenId))));
         minteableTokens[_preTokenId].claimed = true;
+        emit Minted(msg.sender, tokenId);
     }
 
     function batchPreMint(PreToken[] memory _uris) public onlyOwner {

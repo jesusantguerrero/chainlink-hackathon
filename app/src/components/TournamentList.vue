@@ -29,8 +29,10 @@ const joinTournament = async (prixId: number, prixName: string) => {
     await fetchTournaments();
 }
 
+const isLoading = ref(true);
 const tournaments = ref([]);
 const fetchTournaments = async () => {
+    isLoading.value = true;
     let prixes = await Tournament?.functions.getPrixes();
     prixes = await Promise.all(prixes[0]?.map(async (t:any) => {
 
@@ -55,6 +57,7 @@ const fetchTournaments = async () => {
         }
     }));
 
+    isLoading.value = false;
     tournaments.value = prixes;
 }
 
@@ -66,7 +69,10 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
+    <div class="mt-10 text-4xl text-center text-white" v-if="isLoading">
+        <i class=" fa fa-circle-notch fa-spin fa-3x fa-fw" />
+    </div>
+    <div v-else>
         <ul class="mt-5 space-y-5 list-group">
             <li class="list-group-item" v-for="tournament in tournaments">
                 <router-link :to="`/tournaments/${tournament.id}`" class="flex items-center justify-between px-2 py-2 transition bg-gray-600 border-4 border-gray-500 rounded-md hover:border-purple-400 ">

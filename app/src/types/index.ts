@@ -31,6 +31,12 @@ export interface IPreToken {
   claimed: boolean;
 }
 
+export interface IAsset {
+  name: string;
+  description: string;
+  attributes: Record<string, string>;
+}
+
 export interface IRecord {
   wins: number;
   losses: number;

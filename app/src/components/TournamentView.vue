@@ -10,6 +10,7 @@ import TournamentLogo from "./TournamentLogo.vue";
 import CombatsTable from "./CombatsTable.vue";
 import { ICombat, IPlayer } from "../types";
 import { useFight } from "../composables/useMoralis";
+import { AppState } from "../composables/AppState";
 
 const props = defineProps({
     id: {
@@ -37,13 +38,13 @@ const tournament = ref<ITournamentWithEvent>({
     realFee: 0
 });
 
+const { setMessage } = useMessage();
 const joinTournament = async (prixId: number) => {
-    const myRoosters = await Cockfighter?.functions.getMyRoosters();
-    if (myRoosters.length === 0) {
-        alert("You need to have at least one rooster to join a tournament");
+    if (AppState.roosters.length === 0) {
+        setMessage("You need to have at least one rooster to join a tournament");
         return;
     }
-    const tokenId: ethers.BigNumber = myRoosters[0][0];
+    const tokenId = AppState.roosters[0].tokenId;
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
     const tournamentFee = await Tournament?.getEventFee(eventId);
     const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
@@ -51,11 +52,10 @@ const joinTournament = async (prixId: number) => {
     }); 
     const receipt = await trx?.wait();
     const name = receipt?.events?.NewPrix?.returnValues?.name;
-    alert(`You has joined to the ${tournament.value.name} tournament`);
+    setMessage(`You has joined to the ${tournament.value.name} tournament`);
     await fetchPageData();
 }
 
-const { setMessage } = useMessage();
 const fight = async (eventId: number, defenderId: number) => {
     const myRoosters = await Cockfighter?.functions.getMyRoosters()
     const tokenId: ethers.BigNumber = myRoosters[0][0];
@@ -85,6 +85,19 @@ const fight = async (eventId: number, defenderId: number) => {
         const rpcMessage = err?.data?.message || "";
         setMessage(rpcMessage.slice(rpcMessage.indexOf("'")));
     }
+}
+
+const isJoined = ref<boolean>(false);
+
+const fetchIsJoined = async () => {
+    if (!AppState.roosters.length) {
+        return false;
+    }
+    return (await Tournament?.functions.tokenToEvent(AppState.roosters[0].tokenId, tournament.value.eventId))[0];
+}
+
+const canRequestFight = (tokenId: number) => {
+    return tokenId !== AppState.roosters[0].tokenId && isJoined.value;
 }
 
 interface ITournamentWithEvent {
@@ -159,6 +172,7 @@ const fetchPageData = async () => {
 }
 onMounted(async () => {
     await fetchPageData();
+    isJoined.value = await fetchIsJoined();
 });
 </script>
 
@@ -175,7 +189,7 @@ onMounted(async () => {
                 <p>Seats: {{ tournament.seatsTaken }} / {{ tournament.seats }}</p>
             </div>
             <p class="mt-5">Fee: {{ tournament.fee }} MATIC</p>
-            <AtButton class="bg-purple-500" @click="joinTournament(tournament.id)">
+            <AtButton class="bg-purple-500" @click="joinTournament(tournament.id)" v-if="!isJoined">
                 Join
             </AtButton>
         </div>
@@ -205,7 +219,10 @@ onMounted(async () => {
                                     <p class="capitalize">{{ player.name }}</p>
                                     <AtButton 
                                         class="font-bold bg-purple-400" 
-                                        @click="fight(tournament.eventId, player.playerId)"> 
+                                        @click="fight(tournament.eventId, player.playerId)"
+                                        v-if="canRequestFight(player.tokenId)"
+                                    > 
+
                                         Fight 
                                     </AtButton>
                                 </div>

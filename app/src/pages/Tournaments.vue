@@ -27,7 +27,7 @@ watch(() => route.path, () => {
 
 <template>
     <Game>
-        <div class="mt-2 bg-gray-700 current-training">
+        <div class="mt-2 current-training">
             <component :is="currentView"  :id="tournamentId" />
         </div>
     </Game>
