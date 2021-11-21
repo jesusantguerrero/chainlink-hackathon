@@ -4,6 +4,7 @@ import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { IPlayer } from "../types";
 import { AppState } from "../composables/AppState";
+import { formatMaskedWallet } from "../utils";
 
 const props = defineProps({
     currentTokenId: {
@@ -38,9 +39,9 @@ const alreadyFought = computed(() => {
 
 <template>
     <tr class="border border-gray-500" :class="{'bg-gray-600': isDarker}">
-        <td class="px-4 py-2 "># {{ position }}</td>
+        <td class="px-4 py-2 text-center"># {{ position }}</td>
         <td class="px-4 py-2">
-        <div class="flex">
+        <div class="flex justify-center">
             <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
             <div class="ml-2">
                 <p class="capitalize">{{ player.name }}</p>
@@ -55,11 +56,11 @@ const alreadyFought = computed(() => {
             </div>
         </div>
         </td>
-        <td class="px-4 py-2">{{ player.record.wins + player.record.losses }}</td>
-        <td class="px-4 py-2">{{ player.record.wins }}</td>
-        <td class="px-4 py-2">{{ player.record.losses }}</td>
-        <td class="px-4 py-2">{{ player.record.draws }}</td>
-        <td class="px-4 py-2">{{ player.points }}</td>
-        <td class="px-4 py-2">{{ player.owner }}</td>
+        <td class="px-4 py-2 text-center">{{ player.record.wins + player.record.losses }}</td>
+        <td class="px-4 py-2 text-center">{{ player.record.wins }}</td>
+        <td class="px-4 py-2 text-center">{{ player.record.losses }}</td>
+        <td class="px-4 py-2 text-center">{{ player.record.draws }}</td>
+        <td class="px-4 py-2 text-center">{{ player.points }}</td>
+        <td class="px-4 py-2 text-center">{{ formatMaskedWallet(player.owner) }}</td>
     </tr>
 </template>

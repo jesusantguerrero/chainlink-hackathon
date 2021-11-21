@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from '@vue/reactivity';
+import { formatMaskedWallet } from '../../utils';
 
 const props = defineProps({
     account: {
@@ -9,10 +10,9 @@ const props = defineProps({
 })
 
 const maskedWallet = computed(() => {
-    const first = props.account.slice(0, 4); 
-    const last = props.account.slice(-4);
-    return `${first}***${last}`;
+    return formatMaskedWallet(props.account)
 });
+
 </script>
 
 <template>
