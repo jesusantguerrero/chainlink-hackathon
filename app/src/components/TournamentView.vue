@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  computed, ref, onMounted } from "vue";
+import {  computed, ref, onMounted , watch} from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
@@ -11,6 +11,8 @@ import CombatsTable from "./CombatsTable.vue";
 import { ICombat, IPlayer } from "../types";
 import { useFight } from "../composables/useMoralis";
 import { AppState } from "../composables/AppState";
+import TournamentViewRow from "./TournamentViewRow.vue";
+import { ProviderState } from "../composables/useWeb3Provider";
 
 const props = defineProps({
     id: {
@@ -19,10 +21,8 @@ const props = defineProps({
     }
 });
 
-const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-const signer = provider.getSigner();
-const Cockfighter = useContract("RoosterFight", signer);
-const Tournament = useContract("Tournament", signer);
+const RoosterFight = useContract("RoosterFight", AppState.signer);
+const Tournament = useContract("Tournament", AppState.signer);
 
 const tournament = ref<ITournamentWithEvent>({
     id: 0,
@@ -50,14 +50,13 @@ const joinTournament = async (prixId: number) => {
     const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
         console.log(err);
     }); 
-    const receipt = await trx?.wait();
-    const name = receipt?.events?.NewPrix?.returnValues?.name;
+    await trx?.wait();
     setMessage(`You has joined to the ${tournament.value.name} tournament`);
     await fetchPageData();
 }
 
 const fight = async (eventId: number, defenderId: number) => {
-    const myRoosters = await Cockfighter?.functions.getMyRoosters()
+    const myRoosters = await RoosterFight?.functions.getMyRoosters()
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const attackerId = players.value.find(p => p.tokenId === tokenId.toNumber())?.playerId;
     if (attackerId === defenderId) {
@@ -88,16 +87,16 @@ const fight = async (eventId: number, defenderId: number) => {
 }
 
 const isJoined = ref<boolean>(false);
+const currentToken = computed(() => {
+    const tokenId = AppState.roosters.length ? AppState.roosters[0]?.tokenId : null;
+    return tokenId;
+});
 
 const fetchIsJoined = async () => {
     if (!AppState.roosters.length) {
         return false;
     }
-    return (await Tournament?.functions.tokenToEvent(AppState.roosters[0].tokenId, tournament.value.eventId))[0];
-}
-
-const canRequestFight = (tokenId: number) => {
-    return tokenId !== AppState.roosters[0].tokenId && isJoined.value;
+    return (await Tournament?.functions.tokenToEvent(currentToken.value, tournament.value.eventId))[0];
 }
 
 interface ITournamentWithEvent {
@@ -122,7 +121,7 @@ const playerRankings = computed(() => {
 const fetchPlayers = async (eventId: number) => {
     const playersData = await Tournament?.getEventParticipants(eventId);
     players.value = await Promise.all(playersData.map(async (player: any) => {
-        const tokenURI = await Cockfighter?.functions.tokenURI(player.tokenId);
+        const tokenURI = await RoosterFight?.functions.tokenURI(player.tokenId);
         const rooster = await axios(tokenURI[0])
         .then(({ data } : { data: IAsset}): IAsset => data)
         .catch(err => {
@@ -169,11 +168,15 @@ const fetchPageData = async () => {
     await fetchTournament();
     await fetchPlayers(tournament.value.eventId);
     await fetchMatches(tournament.value.eventId);
-}
-onMounted(async () => {
-    await fetchPageData();
     isJoined.value = await fetchIsJoined();
-});
+}
+
+watch(
+    () => ProviderState.account, 
+    async () => {
+        await fetchPageData();
+    }, 
+{ immediate: true });
 </script>
 
 <template>
@@ -194,14 +197,15 @@ onMounted(async () => {
             </AtButton>
         </div>
 
-        <div class="px-5 py-5">
+        <div class="py-5">
             <h4> Rankings </h4>
             <div>
                 <table class="w-full rounded-md">
                     <thead class="bg-purple-400 border border-gray-500 rounded-md">
                         <tr>
                             <th class="px-4 py-2">Rank</th>
-                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Rooster</th>
+                            <th class="px-4 py-2">Fights</th>
                             <th class="px-4 py-2">Wins</th>
                             <th class="px-4 py-2">Loses</th>
                             <th class="px-4 py-2">Draws</th>
@@ -210,31 +214,15 @@ onMounted(async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(player, index) in playerRankings" class="border border-gray-500" :class="{'bg-gray-600': index % 2}">
-                            <td class="px-4 py-2 ">{{ index + 1 }}</td>
-                            <td class="px-4 py-2">
-                            <div class="flex">
-                                <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
-                                <div class="ml-2">
-                                    <p class="capitalize">{{ player.name }}</p>
-                                    <AtButton 
-                                        class="font-bold bg-purple-400" 
-                                        @click="fight(tournament.eventId, player.playerId)"
-                                        v-if="canRequestFight(player.tokenId)"
-                                    > 
-
-                                        Fight 
-                                    </AtButton>
-                                </div>
-                            </div>
-                            </td>
-                            <td class="px-4 py-2">{{ player.record.wins }}</td>
-                            <td class="px-4 py-2">{{ player.record.losses }}</td>
-                            <td class="px-4 py-2">{{ player.record.draws }}</td>
-                            <td class="px-4 py-2">{{ player.points }}</td>
-                            <td class="px-4 py-2">{{ player.owner }}</td>
-                            
-                        </tr>
+                        <TournamentViewRow 
+                            v-for="(player, index) in playerRankings" 
+                            :player="player" 
+                            :is-darker="index % 2"
+                            :position="index+1"
+                            @fight="fight(tournament.eventId, player.playerId)"
+                            :current-token-id="currentToken"
+                            :is-joined="isJoined"
+                        />
                     </tbody>
                 </table>
             </div>
