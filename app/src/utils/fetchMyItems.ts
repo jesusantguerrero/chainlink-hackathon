@@ -3,11 +3,8 @@
 /* eslint-disable node/no-extraneous-import */
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract";
-import axios from "axios";
 
-export const fetchMyItems = async () => {
-  const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-  const signer = provider.getSigner();
+export const fetchMyItems = async (signer: ethers.providers.JsonRpcSigner) => {
   const Cockfighter = useContract("RoosterFight", signer);
 
   let roosters = await Cockfighter?.functions.getMyRoosters();
@@ -24,18 +21,3 @@ export const fetchMyItems = async () => {
 
   return roosters;
 };
-
-export interface IAsset {
-  name: string;
-  description: string;
-  attributes: Record<string, string>;
-}
-export interface NFTAsset {
-  tokenId: number;
-  name: string;
-  description: string;
-  image: string;
-  price: string;
-  owner: string;
-  claimable: boolean;
-}

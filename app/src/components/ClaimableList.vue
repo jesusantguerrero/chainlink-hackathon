@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted } from "@vue/runtime-core";
+import { onMounted, nextTick } from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract";
 import { getProvider } from "../composables/getProvider";
 import { ref } from "vue";
 import { IPreToken } from "../types";
+import { AppState } from "../composables/AppState";
 
 const provider = getProvider()
 const Cockfighter = useContract("RoosterFight", provider);
@@ -18,19 +19,28 @@ const claim = async (token: IPreToken) => {
     const provider = new ethers.providers.Web3Provider(window?.ethereum, "any");
     const signer = provider.getSigner();
     const RoosterFight = useContract("RoosterFight", signer);
-    await RoosterFight?.functions.mint(token.id);
+    const trx = await RoosterFight?.functions.mint(token.id);
+    trx?.wait();
+    await AppState.fetchMyNfts();
     await fetchMarketItems();
 } 
 
 const items = ref<IPreToken[]>([]);
+const isLoading = ref(true);
 onMounted(async () => {
     items.value = await fetchMarketItems();
+    nextTick(() => {
+        isLoading.value = false;
+    });
 })
 </script>
 
 <template>
     <div class="claimable-list">
-        <div class="flex flex-wrap gap-2 mt-5 claimable-list__items">
+        <div class="mt-10 text-4xl text-center text-white" v-if="isLoading">
+            <i class=" fa fa-circle-notch fa-spin fa-3x fa-fw" />
+        </div>
+        <div class="flex flex-wrap gap-2 mt-5 claimable-list__items" v-else>
             <div v-for="item in items" class="claimable-list__item">
                 <div class="overflow-hidden border rounded-md claimable-list__item__image">
                     <div class="relative w-64 h-64 bg-purple-500 border-roti-400">
