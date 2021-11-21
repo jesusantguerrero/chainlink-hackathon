@@ -10,4 +10,5 @@ export const config = {
   claimerAddress: getEnv("VITE_CLAIMER_ADDRESS"),
   tournamentAddress: getEnv("VITE_TOURNAMENT_ADDRESS"),
   rpcURL: getEnv("VITE_RPC_URL", "http://localhost:8545"),
+  chainId: getEnv("VITE_CHAIN_ID", "1337"),
 };

@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import { AppState } from '../composables/AppState';
 import { useWeb3 } from '../composables/useWeb3Provider';
-
+import WalletAccount from './basic/WalletAccount.vue';
+import NetworkBadge from './basic/NetworkBadge.vue';
+import { config } from '../config';
 const ProviderState = useWeb3();
 </script>
 
@@ -15,12 +18,12 @@ const ProviderState = useWeb3();
             </h1>
         </div>
         <div class="relative flex mr-24 space-x-2">
-            <div>Tokens {{ ProviderState.balance }}</div>
-            <div>Network {{ ProviderState.chainId }}</div>
-            <div>{{ ProviderState.account }}</div>
+            <div class="flex items-center text-center">Tokens {{ ProviderState.balance }}</div>
+            <NetworkBadge :chain="ProviderState.chainId" :valid-chain="config.chainId" />
+            <WalletAccount :account="ProviderState.account" />
         </div>
-        <div class="absolute top-0 w-20 h-20 bg-gray-700 border rounded-md right-5">
-        
+        <div class="absolute top-0 w-20 h-20 overflow-hidden bg-gray-700 border rounded-md right-5">
+            <img :src="AppState.roosters[0].image" v-if="AppState.roosters.length" class="w-full" />
         </div>
     </div>
 </template>

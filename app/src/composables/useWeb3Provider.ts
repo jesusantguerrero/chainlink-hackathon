@@ -9,6 +9,7 @@ import {
 } from "vue";
 import { ethers } from "ethers";
 import { AppState } from "./AppState";
+import { config } from "../config";
 
 export interface ICustomProvider {
   web3: any;
@@ -38,7 +39,7 @@ export const ProviderState = reactive<ICustomProvider>({
     const decimalChain = parseInt(ProviderState.chainId, 16);
     return (
       ProviderState.chainId &&
-      decimalChain === Number(import.meta.env.VITE_CHAIN_ID)
+      decimalChain === Number(config.chainId)
     );
   }),
   currency: "ETH",
@@ -47,6 +48,7 @@ export const ProviderState = reactive<ICustomProvider>({
 export const signer = ref(null);
 
 export const useWeb3Provider = (initContract: Function) => {
+  const ProviderState = inject("ProviderState", {});
   const startApp = ref(initContract);
 
   const getBalance = async (address: string) => {
@@ -63,15 +65,15 @@ export const useWeb3Provider = (initContract: Function) => {
 
   const getAccounts = async () => {
     ProviderState.accounts = await ProviderState.web3.listAccounts();
-    ProviderState.account = ProviderState.accounts[0];
   };
 
   watch(
     () => ProviderState.account,
-    (current, previous) => {
+    async (current, previous) => {
       if (current !== previous) {
-        onChangeAccount();
-        getBalance(current);
+        await onChangeAccount();
+        await getBalance(current);
+        await getAccounts();
       }
     }
   );
@@ -98,13 +100,15 @@ export const useWeb3Provider = (initContract: Function) => {
 
   onMounted(async () => {
     startApp.value && (await startApp.value());
-    if (ethereum) {
-      ProviderState.chainId = await ethereum.request({ method: "eth_chainId" });
-      ethereum.on("chainChanged", () => {
+    if (window.ethereum) {
+      ProviderState.chainId = await window.ethereum.request({ method: "eth_chainId" });
+      window.ethereum.on("chainChanged", () => {
         window.location.reload();
       });
-      ethereum.on("accountsChanged", () => {
-        onChangeAccount();
+      window.ethereum.on("accountsChanged", (accounts: string[]) => {
+        ProviderState.accounts = accounts;
+        ProviderState.account = accounts[0];
+        console.log(ProviderState.account);
       });
     }
   });
