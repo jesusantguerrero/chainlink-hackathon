@@ -2,16 +2,15 @@
 import Game from '../layouts/Game.vue';
 import NFTList from '../components/NFTList.vue';
 import { AppState } from '../composables/AppState';
+import AuthHelper from '../components/basic/AuthHelper.vue';
 </script>
 
 <template>
     <Game>
-        <div class="px-5 py-3 mt-2 bg-gray-700 h-96 current-training">
+        <div class="mt-5 bg-gray-700 h-96 current-training" :class="{'px-5 py-3': AppState.isConnected}">
             <NFTList v-if="AppState.isConnected"/>
-            <div v-else>
-            </div>
-        </div>
-    
+            <AuthHelper v-else />
+        </div>   
     </Game>
 
 </template>

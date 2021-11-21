@@ -10,6 +10,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@metamask/onboarding": "^1.0.1",
     "vue": "^3.2.16",
     "vue-router": "^4.0.12"
   },
