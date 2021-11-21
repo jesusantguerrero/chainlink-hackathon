@@ -85,6 +85,7 @@ onMounted(async () => {
                 v-model="updateForm[attrName]" 
                 :base-value="rooster[attrName]" 
                 :available-points="pointsToAssign"
+                :is-editing="isOwner"
             />
         </div>
         

@@ -16,6 +16,10 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    isEditable: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 const emit = defineEmits(['update:modelValue']);
@@ -36,7 +40,7 @@ const increment  = () => {
 <div class="flex justify-between w-60">
  <div class="capitalize">{{ name }}: {{ Number(baseValue) + Number(modelValue) }} 
  <span v-if="modelValue">(+{{modelValue}})</span></div> 
- <div class="flex ml-2 space-x-1">
+ <div class="flex ml-2 space-x-1" v-if="isEditable">
     <button 
             @click="decrement()" 
             :disabled="modelValue == 0"
