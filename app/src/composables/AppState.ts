@@ -3,6 +3,7 @@ import { Moralis } from "moralis";
 import { reactive, computed, ComputedRef } from "vue";
 import { INftDetails } from "../types";
 import { fetchMyItems } from "../utils/fetchMyItems";
+import { ProviderState } from "./useWeb3Provider";
 
 export interface IAppState {
   user: null | Moralis.User;
@@ -11,6 +12,7 @@ export interface IAppState {
   isLoading: boolean;
   currentNft: ComputedRef<null | INftDetails>;
   fetchMyNfts: () => Promise<void>;
+  isConnected: ComputedRef<boolean>;
 }
 
 export const AppState = reactive<IAppState>({
@@ -28,4 +30,7 @@ export const AppState = reactive<IAppState>({
       AppState.isLoading = false;
     }
   },
+  isConnected: computed(() => {
+    return AppState.user && ProviderState.isConnectedToValidNetwork.value;
+  }),
 });

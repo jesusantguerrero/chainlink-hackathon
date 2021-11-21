@@ -7,11 +7,11 @@ import { onMounted } from "@vue/runtime-core";
 import { useMessage } from "../utils/useMessage";
 import { format } from "date-fns";
 import TournamentLogo from "./TournamentLogo.vue";
+import { getProvider } from "../composables/getProvider";
 
-const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-const signer = provider.getSigner();
-const Cockfighter = useContract("RoosterFight", signer);
-const Tournament = useContract("Tournament", signer);
+const provider = getProvider();
+const Cockfighter = useContract("RoosterFight", provider);
+const Tournament = useContract("Tournament", provider);
 
 const { setMessage } = useMessage();
 const joinTournament = async (prixId: number, prixName: string) => {
