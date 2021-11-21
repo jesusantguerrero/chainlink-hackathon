@@ -168,13 +168,13 @@ const fetchPageData = async () => {
     await fetchTournament();
     await fetchPlayers(tournament.value.eventId);
     await fetchMatches(tournament.value.eventId);
+    isJoined.value = await fetchIsJoined();
 }
 
 watch(
     () => ProviderState.account, 
     async () => {
         await fetchPageData();
-        isJoined.value = await fetchIsJoined();
     }, 
 { immediate: true });
 </script>

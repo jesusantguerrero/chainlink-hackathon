@@ -4,19 +4,12 @@ import { computed, onMounted, ref } from 'vue';
 import { useContract } from '../composables/useContract';
 import GameHeader from '../components/GameHeader.vue';
 
-const isOwner = ref(false);
-
-const getIsOwner = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    const signer = provider.getSigner();
-    const Tournament = useContract("Tournament", signer);
-    const contractOwner = await Tournament?.functions.contractOwner();
-    return contractOwner[0] === await signer.getAddress();
-}
-
-onMounted(async () => {
-    isOwner.value = await getIsOwner();
-})
+defineProps({
+  showNavbar: {
+    type: Boolean,
+    default: true,
+  },
+});
 
 const dashboardMenu = computed(() => {    
     const menu = [ {
@@ -51,12 +44,12 @@ const dashboardMenu = computed(() => {
    <GameHeader />
 
     <div class="mx-auto mt-10 mb-10 text-white max-w-7xl">
-        <ul class="flex justify-around text-white bg-gray-700">
+        <nav class="flex justify-around text-white bg-gray-700" v-if="showNavbar">
             <router-link :to="item.to" v-for="item in dashboardMenu" class="w-full py-3 text-center border-b-4 border-transparent cursor-pointer game-link hover:bg-gray-800">
                <i :class="item.icon" />
                {{ item.text }}
             </router-link>
-        </ul>
+        </nav>
        <slot />
     </div>
 </template>
