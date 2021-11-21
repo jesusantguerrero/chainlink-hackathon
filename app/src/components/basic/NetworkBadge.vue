@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { getChainName } from '../../utils';
 
 const props = defineProps({
     chain: {
@@ -12,23 +13,14 @@ const props = defineProps({
     },
 });
 
-const networks: Record<number, string> = {
-    1: 'Mainnet',
-    3: 'Ropsten',
-    4: 'Rinkeby',
-    42: 'Kovan',
-    137: 'Polygon',
-    80001: 'Mumbai',
-    1337: 'Localhost',
-    5777: 'Ganache',
-}
+const chainName = computed(() => {
+    return getChainName(formattedChain.value);
+});
+
 const formattedChain = computed(() => {
     return parseInt(props.chain, 16);
 });
 
-const chainName = computed(() => {
-    return networks[formattedChain.value];
-});
 
 const bgColor = computed(() => {
     return formattedChain.value === Number(props.validChain) ? 'text-green-300 bg-green-500' : 'text-red-300 bg-red-500';

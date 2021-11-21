@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { watch } from "vue";
 import { Moralis } from "moralis";
 import { reactive, computed, ComputedRef } from "vue";
 import { INftDetails } from "../types";
@@ -31,6 +32,17 @@ export const AppState = reactive<IAppState>({
     }
   },
   isConnected: computed(() => {
-    return AppState.user && ProviderState.isConnectedToValidNetwork.value;
+    return AppState.user && ProviderState.isConnectedToValidNetwork;
   }),
 });
+
+watch(
+  () => AppState.user,
+  async () => {
+    if (AppState.user) {
+      AppState.fetchMyNfts();
+    } else {
+      AppState.roosters = [];
+    }
+  }
+);

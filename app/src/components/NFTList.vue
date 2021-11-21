@@ -12,7 +12,7 @@ import { AppState } from "../composables/AppState";
         </div>
         <div class="flex flex-wrap gap-2 mt-5 claimable-list__items" v-else-if="AppState.roosters.length">
             <div v-for="rooster in AppState.roosters" class="overflow-hidden rounded-md claimable-list__item">
-                <RoosterCard :rooster="rooster" :is-owner="true"/>                    
+                <RoosterCard :rooster="rooster" :is-owner="true" />                    
             </div>
         </div>
         <div class="flex items-center mt-5 space-x-2" v-else>

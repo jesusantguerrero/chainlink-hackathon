@@ -85,7 +85,7 @@ onMounted(async () => {
                 v-model="updateForm[attrName]" 
                 :base-value="rooster[attrName]" 
                 :available-points="pointsToAssign"
-                :is-editing="isOwner"
+                :is-editable="isOwner"
             />
         </div>
         
@@ -102,10 +102,10 @@ onMounted(async () => {
     </div>
     <div>
         <img :src="rooster.image" class="w-64"/>
-        <div class="flex items-center px-4 pb-3 space-x-2 bg-gray-700">
+        <div class="flex items-center px-4 pb-3 space-x-2">
             <input class="px-3 text-xl capitalize bg-transparent" 
             :class="{'border rounded-md py-1 bg-gray-800': isEditing}"
-            :disabled="!isEditing" v-model="rooster.name" />
+            :disabled="!isOwner" v-model="rooster.name" />
             <AtButton class="bg-purple-500" @click="isEditing=true" v-if="!isEditing && isOwner">
                 <i class="fa fa-edit"></i>
             </AtButton>
