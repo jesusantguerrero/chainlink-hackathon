@@ -3,7 +3,7 @@ import {  computed, ref, onMounted , watch} from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
-import { IAsset } from "../utils/fetchMyItems";
+import { IAsset } from "../types";
 import axios from "axios";
 import { useMessage } from "../utils/useMessage";
 import TournamentLogo from "./TournamentLogo.vue";
@@ -58,9 +58,9 @@ const joinTournament = async (prixId: number) => {
 }
 
 const fight = async (eventId: number, defenderId: number) => {
-    const myRoosters = await RoosterFight?.functions.getMyRoosters()
-    const tokenId: ethers.BigNumber = myRoosters[0][0];
-    const attackerId = players.value.find(p => p.tokenId === tokenId.toNumber())?.playerId;
+    const tokenId = AppState.roosters[0].tokenId;
+    const attackerId = players.value.find(p => p.tokenId === tokenId)?.playerId;
+    const Tournament = useContract("Tournament", AppState.signer);
     if (attackerId === defenderId) {
         setMessage("You cant fight yourself bro");
         return;
