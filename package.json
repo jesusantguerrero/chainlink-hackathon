@@ -1,15 +1,15 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "start-scheduled-fights": "npx hardhat run tasks/startScheduledFights.ts --network localhost",
+    "start-fights": "npx ts-node ./tasks/startScheduledFights.ts",
     "contract:test": "npx hardhat test",
     "contract:coverage": "npx hardhat coverage",
     "contract:compile": "npx hardhat compile",
     "contract:serve": "npx hardhat node --export app/src/contracts.json",
     "contract:deploy": "npx hardhat deploy --network localhost --tags local --export app/src/contracts.json",
     "contract:update": "npx hardhat run scripts/update.ts --network mainnet",
-    "contract:deploy-mumbai": "npx hardhat run scripts/deploy.ts --network mumbai --export app/src/contracts.json",
-    "contract:deploy-prod": "npx hardhat run scripts/deploy.ts --network mainnet"
+    "contract:deploy-mumbai": "npx hardhat deploy --network mumbai --export app/src/contracts.json",
+    "contract:deploy-prod": "npx hardhat deploy --network mainnet"
   },
   "devDependencies": {
     "@appliedblockchain/chainlink-plugins-fund-link": "0.0.3",
@@ -41,6 +41,7 @@
     "ether": "0.0.9",
     "ethers": "^5.5.1",
     "hardhat": "^2.6.7",
+    "hardhat-contract-sizer": "^2.1.1",
     "hardhat-deploy": "^0.9.4",
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "^2.4.1",
