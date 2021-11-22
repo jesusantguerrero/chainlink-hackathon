@@ -8,6 +8,7 @@ import { useMessage } from '../utils/useMessage';
 import Game from '../layouts/Game.vue';
 import { INftDetails } from '../types';
 import { getProvider } from '../composables/getProvider';
+import { AppState } from '../composables/AppState';
 
 const route = useRoute();
 const matchId = ref<string>();
@@ -60,6 +61,8 @@ const getTokenName = (playerId: number, byToken = false) => {
 }
 
 const processMatch = async () => {
+   if (!AppState.signer) return;
+   const Tournament = useContract("Tournament", AppState.signer);
    const trx = await Tournament?.functions?.startFight(matchEvent.value.requestId, matchId.value)
    const receipt = await trx?.wait();
    if (receipt) {

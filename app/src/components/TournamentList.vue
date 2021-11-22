@@ -8,6 +8,7 @@ import { useMessage } from "../utils/useMessage";
 import { format } from "date-fns";
 import TournamentLogo from "./TournamentLogo.vue";
 import { getProvider } from "../composables/getProvider";
+import { AppState } from "../composables/AppState";
 
 const provider = getProvider();
 const Cockfighter = useContract("RoosterFight", provider);
@@ -15,7 +16,9 @@ const Tournament = useContract("Tournament", provider);
 
 const { setMessage } = useMessage();
 const joinTournament = async (prixId: number, prixName: string) => {
-    const myRoosters = await Cockfighter?.functions.getMyRoosters();
+    const SignedRoosterFight = useContract("RoosterFight", AppState.signer);
+    const Tournament = useContract("Tournament", AppState.signer);
+    const myRoosters = await SignedRoosterFight?.functions.getMyRoosters();
     if (myRoosters.length === 0) {
         alert("You need to have at least one rooster to join a tournament");
         return;
@@ -23,8 +26,8 @@ const joinTournament = async (prixId: number, prixName: string) => {
     const tokenId: ethers.BigNumber = myRoosters[0][0];
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
     const tournamentFee = await Tournament?.getEventFee(eventId);
-    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }); 
-    const receipt = await trx?.wait();
+    const trx = await Tournament?.addParticipant(tokenId, eventId, { value:tournamentFee }); 
+    await trx?.wait();
     setMessage(`You has joined to the ${prixName} tournament`);
     await fetchTournaments();
 }
