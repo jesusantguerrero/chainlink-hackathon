@@ -15,13 +15,14 @@ const { expect } = chai;
 let owner: SignerWithAddress;
 let user2: SignerWithAddress;
 let user3: SignerWithAddress;
+let user4: SignerWithAddress;
 
 const toNumberArray = (tokens: IPreToken[]) => {
   return tokens.map((item) => item.id.toNumber());
 };
 
 (async () => {
-  [owner, user2, user3] = await hre.ethers.getSigners();
+  [owner, user2, user3, user4] = await hre.ethers.getSigners();
 })();
 
 let pcToken: ethers.Contract;
@@ -40,7 +41,7 @@ describe("PC Token", function () {
     await pcToken.mint(1);
     await pcToken.connect(user2).mint(2);
     await pcToken.connect(user3).mint(3);
-    await pcToken.connect(user3).mint(4);
+    await pcToken.connect(user4).mint(4);
     await expect(pcToken.connect(user3).mint(5)).eventually.to.rejectedWith(
       Error,
       "No more tokens available"
