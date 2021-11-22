@@ -11,7 +11,7 @@ import { getProvider } from "../composables/getProvider";
 import { AppState } from "../composables/AppState";
 
 const provider = getProvider();
-const Cockfighter = useContract("RoosterFight", provider);
+const RoosterFight = useContract("RoosterFight", provider);
 const Tournament = useContract("Tournament", provider);
 
 const { setMessage } = useMessage();

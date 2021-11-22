@@ -14,14 +14,14 @@ const route = useRoute();
 const matchId = ref<string>();
 
 const provider = getProvider();
-const Cockfighter = useContract("RoosterFight", provider);
+const RoosterFight = useContract("RoosterFight", provider);
 const Tournament = useContract("Tournament", provider);
 
 const matchEvent = ref<any>({});
 const isFetching = ref(true);
 
 const fetchRooster = async (tokenId: ethers.BigNumber): Promise<INftDetails> => {
-    return await Cockfighter?.functions.getDetails(tokenId.toNumber());
+    return await RoosterFight?.functions.getDetails(tokenId.toNumber());
 };
 
 const fetchMatch = async (matchId: string) => {

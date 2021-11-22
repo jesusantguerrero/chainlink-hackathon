@@ -7,11 +7,8 @@ import { ref } from "vue";
 import { AppState } from "../composables/AppState";
 
 const mintToken = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    const signer = provider.getSigner();
-    const Cockfighter  = useContract("RoosterFight" ,signer);
-
-    Cockfighter?.functions.mint(await signer.getAddress(), "https://localhost:3000/image.jpg");
+    const RoosterFight  = useContract("RoosterFight", AppState.signer);
+    RoosterFight?.functions.mint();
 }
 
 </script>
