@@ -70,8 +70,8 @@ onMounted(async () => {
 </script>
 
 <template>
-<div class="flex">
-    <div class="mr-20 space-y-5 text-left">
+<div class="flex w-full">
+    <div class="w-1/2 space-y-5 text-left">
         <div>
             <div>Health: {{ rooster?.hp}}</div>
             <div>XP: <span class="font-bold">{{ rooster.experience }}</span> (Level: {{ rooster?.level }})</div>
@@ -100,12 +100,15 @@ onMounted(async () => {
             </div>
         </div>
     </div>
-    <div>
-        <img :src="rooster.image" class="w-64"/>
+    <div class="w-1/2">
+        <div class="relative h-72">
+            <img :src="rooster.image" class="absolute z-10 w-72"/>
+            <div class="absolute z-0 w-40 h-40 transform bg-gray-800 rounded-full shadow-md animate-pulse -bottom-14 rotate-y-2 plate bg-opacity-70 left-9" />
+        </div>
         <div class="flex items-center px-4 pb-3 space-x-2">
             <input class="px-3 text-xl capitalize bg-transparent" 
             :class="{'border rounded-md py-1 bg-gray-800': isEditing}"
-            :disabled="!isOwner" v-model="rooster.name" />
+            :disabled="!isOwner || !isEditing" v-model="rooster.name" /> <span>- {{ rooster.breed }}</span> 
             <AtButton class="bg-purple-500" @click="isEditing=true" v-if="!isEditing && isOwner">
                 <i class="fa fa-edit"></i>
             </AtButton>
@@ -121,3 +124,10 @@ onMounted(async () => {
     </div>
 </div>
 </template>
+
+<style>
+.plate {
+    transform: rotateX(75deg);
+}
+
+</style>

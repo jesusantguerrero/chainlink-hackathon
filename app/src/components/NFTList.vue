@@ -10,7 +10,7 @@ import { AppState } from "../composables/AppState";
         <div class="mt-10 text-4xl text-white" v-if="AppState.isLoading">
             <i class=" fa fa-circle-notch fa-spin fa-3x fa-fw" />
         </div>
-        <div class="flex flex-wrap gap-2 mt-5 claimable-list__items" v-else-if="AppState.roosters.length">
+        <div class="flex flex-col flex-wrap w-full gap-2 mt-5 claimable-list__items" v-else-if="AppState.roosters.length">
             <div v-for="rooster in AppState.roosters" class="overflow-hidden rounded-md claimable-list__item">
                 <RoosterCard :rooster="rooster" :is-owner="true" />                    
             </div>
