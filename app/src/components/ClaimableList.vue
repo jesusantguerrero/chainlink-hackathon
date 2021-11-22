@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, nextTick } from "vue";
+import { onMounted, nextTick, computed } from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract";
 import { getProvider } from "../composables/getProvider";
@@ -7,11 +7,17 @@ import { ref } from "vue";
 import { IPreToken } from "../types";
 import { AppState } from "../composables/AppState";
 
+const props = defineProps({
+    limit: {
+        type: Number,
+    }
+});
+
 const provider = getProvider()
-const Cockfighter = useContract("RoosterFight", provider);
+const RoosterFight = useContract("RoosterFight", provider);
 
 const fetchMarketItems = async () => {
-    let roosters = await Cockfighter?.functions.pendingToMint();
+    let roosters = await RoosterFight?.functions.pendingToMint();
     return roosters[0];
 }
 
@@ -33,6 +39,10 @@ onMounted(async () => {
         isLoading.value = false;
     });
 })
+
+const visibleItems = computed(() => {
+    return props.limit ? items.value.slice(0, props.limit) : items.value;
+})
 </script>
 
 <template>
@@ -41,7 +51,7 @@ onMounted(async () => {
             <i class=" fa fa-circle-notch fa-spin fa-3x fa-fw" />
         </div>
         <div class="flex flex-wrap gap-2 mt-5 claimable-list__items" v-else>
-            <div v-for="item in items" class="claimable-list__item">
+            <div v-for="item in visibleItems" class="claimable-list__item">
                 <div class="overflow-hidden border rounded-md claimable-list__item__image">
                     <div class="relative w-64 h-64 bg-purple-500 border-roti-400">
                         <img :src="item.uri" class="absolute z-20" />
@@ -59,6 +69,10 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
+
+            <RouterLink to="/marketplace" class="px-5 py-1 mx-auto mt-5 font-bold text-purple-300 transition transform border-2 border-purple-300 rounded-md hover:scale-105 hover:bg-purple-300 hover:text-white" v-if="limit">
+                View More
+            </RouterLink>
         </div>
     </div>
 </template>
