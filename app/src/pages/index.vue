@@ -25,7 +25,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
         </div>
         <div class="py-12 text-center">
             <AtButton class="font-bold text-white bg-purple-400" v-if="!state.user" @click="$emit('connect')"> Connect </AtButton>
-        <MintForm v-else />
+            <MintForm v-else />
         </div>
     </div>
 </div>
@@ -48,7 +48,14 @@ const breeds = ["black", "colorao", "pinto", "white"];
             with a duration of a week were you can fight once with every other Rooster in the tournament if you win you got 3 points at the end the rooster with more points get the prize.
          </template>
         
-        <img src="/images/tournaments.png" alt="tournaments" class="rounded-lg">
+        <div>
+            <img src="/images/tournaments.png" alt="tournaments" class="rounded-lg">
+            <div class="flex justify-center w-full">
+                <RouterLink to="/tournaments" class="inline-block px-5 py-1 mt-5 font-bold text-purple-500 transition transform bg-white border-2 rounded-md hover:scale-105 hover:bg-purple-500 hover:text-white">
+                    Go to Tournaments
+                </RouterLink>
+            </div>
+        </div>
 </LandingSection>
 <LandingSection title="Fighting System">
         <template #description>
@@ -81,7 +88,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
         <div class="absolute text-3xl font-bold -top-6">
             Free Roosters to Claim
         </div>
-        <ClaimableList class="w-full px-5" />
+        <ClaimableList class="w-full px-5" :limit="8" />
     </div>
 </div>
 </template>

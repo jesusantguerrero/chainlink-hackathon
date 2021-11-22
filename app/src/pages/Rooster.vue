@@ -9,13 +9,13 @@ import RoosterCard from '../components/RoosterCard.vue';
 
 const route = useRoute();
 const provider = getProvider();
-const Cockfighter = useContract("RoosterFight", provider);
+const RoosterFight = useContract("RoosterFight", provider);
 
 const rooster = ref<null|INftDetails>(null);
 const isFetching = ref(true);
 
 const fetchRooster = async (tokenId: number): Promise<INftDetails> => {
-    return await Cockfighter?.functions.getDetails(tokenId);
+    return await RoosterFight?.functions.getDetails(tokenId);
 };
 watch(() => route.path, async () => {
     if (route.params.id && typeof route.params.id == 'string') {
