@@ -1,11 +1,17 @@
 # RoosterFight
 [![codecov](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon/branch/master/graph/badge.svg?token=Y153S4JEZL)](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon)
 
-## User Stories
+## Overview
+RoosterFight is a NFT game where you can claim and train a Rooster to fight and reach the top of the tournaments.
 
-- User Story: I can connect my wallet using metamask.
+## Inspiration
+I took inspiration from zed.run a virtual horse race game and a tradition of my country cockfight to bring a virtual game where users can have a like experience of raise and train a nice looking rooster and compete with others.
 
-- User Story: I can claim NFTRoosters.
+## What is does
+### User Stories
+- User Story: I can connect my wallet using metamask/Moralis.
+
+- User Story: I can claim Roosters for free.
 
 - User Story: I can participate in tournaments.
 
@@ -14,37 +20,27 @@
 - User Story: I can win if at the end of the tourmament I have more points.
 
 ## Technical Details
-In the following application tried to cover all main aspects of solidity and smart contract topics
-
-- Use external contracts and libraries
-- Protect external configuration functions with Ownable
-- Use VRFCoordinator to generate radom number decide the damage
-- Implement ERC721 Interface
-- Testing the contracts
-
-In addition to the following Dapp topics
-
-- Connecting a wallet (Metamask)
-- Connect a frontend with a smart contract (ethers.js)
-- Listen events from the contracts
-
-## The contracts
-
-| Contract                 | Description                                      |
-|--------------------------|-----------------------------------------         |
-| **RoosterBase.sol**      | Stores Attributes and States of tokens           |
-| **RoosterNFT.sol**       | Stores Mint and Claim and NFT logic              | 
-| **RoosterFight.sol**     | Stores helpers and inherit from NFT and Base     | 
-| **Tournament.sol**       | Stores Tournament and fight logic                |
-
-## Built with
-Frontend:
-- [Vue.js 3](https://v3.vuejs.org/) - The Progressive JavaScript Framework
-- [ethers.js](https://docs.ethers.io/v5/) - JS library for interacting with the Ethereum Blockchain and its ecosystem
+on the frontend i used: 
+- [Vue.js 3](https://v3.vuejs.org/) as framework Framework
+- [Moralis](https://moralis.io/) to manage auth and store some off-chain data as well as IPFS provider for the assets
+- [ethers.js](https://docs.ethers.io/v5/) JS library for interacting with the Ethereum Blockchain and its ecosystem
 
 Blockchain Environment:
 - [Hardhat](https://hardhat.org/) - Flexible, extensible and fast Ethereum development environment for professionals.
-- [hardhat-deploy]
+- [hardhat-deploy]() - Provided utilities for deployments and tasks
+- [Chainlink VRF]() - To get random numbers to generate damage
+- [Open Zepplin]() - and their contracts and utilities forn ERC721, String, SafeMath, Counters, Ownable and not reentrancy guard
+- [hashlip nft engine]() - to generate arts
+
+### The contracts
+
+| Contract                 | Description                                      |
+|--------------------------|-----------------------------------------         |
+| **RoosterBase.sol**      | Stores Attributes and Stats of tokens            |
+| **RoosterNFT.sol**       | Stores Mint and Claim and NFT logic              | 
+| **RoosterFight.sol**     | Stores helpers for gaming mechanics and inherit from NFT and Base | 
+| **TournamentBase.sol**   | Stores tournaments (prixes) and events (Prix edition) logic |
+| **Tournament.sol**       | Stores tournament matches and inherit from **TournamentBase.sol**|
 
 ## Installation
 
@@ -52,7 +48,8 @@ Blockchain Environment:
 
 | Prerequisite                                          | Version |
 | ------------------------------------------------------| ------- |
-| [MetaMask](https://metamask.io/)                                          |         |
+| [MetaMask](https://metamask.io/)                      |         |
+| [Moralis](https://moralis.io/)                        |         |
 | npm (comes with Node) or yarn (used)                  | `~ ^12.20.0`|
 | npm (comes with Node) or yarn (used)                  | `~ ^6.14.8`  |
 
