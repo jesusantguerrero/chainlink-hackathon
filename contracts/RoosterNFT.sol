@@ -1,20 +1,18 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol"; 
 import "./RoosterBase.sol";
-import "hardhat/console.sol";
 
-contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
+contract RoosterNFT is RoosterBase, ERC721 {
     using Counters for Counters.Counter;
     event Minted(address indexed to, uint256 indexed tokenId);
-    Counters.Counter private _totalSupply;
+
+    Counters.Counter public totalSupply;
     Counters.Counter public availableTokens;
 
     struct PreToken {
@@ -24,26 +22,22 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         bool claimed;
     }
 
-    address private contractOwner;
     uint public tokenLimitByOwner = 1;
-    mapping(uint => string) internal tokenToImage;
-    mapping(uint => address) private tokenToClaimer;
-    mapping(uint => PreToken) private minteableTokens;
-
+    mapping(uint => string) public tokenToImage;
+    mapping(uint => PreToken) internal minteableTokens;
 
     constructor(PreToken[] memory _uris) ERC721("CRF", "Crypto RoosterFight") {
-        contractOwner = msg.sender;
         batchPreMint(_uris);
     }
 
-    function mint(uint _preTokenId) public nonReentrant {
-        require(totalSupply() < availableTokens.current(), "No more tokens available");
+    function mint(uint _preTokenId) public {
+        require(totalSupply.current() < availableTokens.current(), "No more tokens available");
         require(minteableTokens[_preTokenId].claimed == false, "The token is already minted");
         require(balanceOf(msg.sender) < tokenLimitByOwner, "You already reached the limit");
-        _totalSupply.increment();
-        uint tokenId = _totalSupply.current();
+        totalSupply.increment();
+        uint tokenId = totalSupply.current();
         _mint(msg.sender, tokenId);
-        _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
+        tokenToImage[tokenId] = minteableTokens[_preTokenId].uri;
         _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", Strings.toString(tokenId))));
         minteableTokens[_preTokenId].claimed = true;
         emit Minted(msg.sender, tokenId);
@@ -62,12 +56,8 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         }
     }
 
-    function totalSupply () public view returns (uint) {
-        return _totalSupply.current();
-    }
-
     function pendingToMint() public view returns (PreToken[] memory) {
-        PreToken[] memory pending = new PreToken[](availableTokens.current() - totalSupply());
+        PreToken[] memory pending = new PreToken[](availableTokens.current() - totalSupply.current());
         uint count = 0;
         for (uint i = 1; i <= availableTokens.current(); i++) {
             if (minteableTokens[i].claimed == false) {
@@ -79,13 +69,12 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         return pending;
     }
 
-    // Tokens storage to save images to generate tokenURI programmatically
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_exists(_tokenId), "URI query for nonexistent token");
-        return formatTokenURI(tokenToImage[_tokenId], _tokenId);
+        return _formatTokenURI(_tokenId);
     }
 
-    function formatTokenURI(string memory _imageURI, uint _tokenId) public view virtual returns (string memory) {
+    function _formatTokenURI(uint _tokenId) private view returns (string memory) {
         Attributes memory attributes = tokenIdToAttributes[_tokenId];
         return string(
             abi.encodePacked(
@@ -93,9 +82,9 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
                 Base64.encode(bytes(
                     abi.encodePacked(
                         '{"name": "',attributes.name, '",',
-                        '"description": "This is a description",',
+                        '"description": "An nft collection",',
                         '"image":"', 
-                        _imageURI, '",',
+                        tokenToImage[_tokenId], '",',
                         '"attributes":[',
                         '{"breed":"', breedNames[uint(attributes.breed)], '"}', 
                         ']',
@@ -105,40 +94,15 @@ contract RoosterNFT is RoosterBase, ERC721URIStorage, ReentrancyGuard, Ownable {
         );
     }
 
-    /**
-     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual override {
-        require(_exists(tokenId), "URI set of nonexistent token");
-        tokenToImage[tokenId] = _tokenURI;
-    }
-
-    function getImageURI(uint256 tokenId) external view returns (string memory) {
-        require(_exists(tokenId), "URI set of nonexistent token");
-        return tokenToImage[tokenId];
-    }
-
-    function _getRoostersOf(address _owner) internal view returns (uint[] memory) {
+    function getRoostersOf(address _owner) public view returns (uint[] memory) {
         uint[] memory nfts = new uint[](balanceOf(_owner));
         uint counter = 0;
-        for (uint i = 1; i <= _totalSupply.current(); i++) {
+        for (uint i = 1; i <= totalSupply.current(); i++) {
             if (ownerOf(i) == _owner) {
                 nfts[counter] = i;
                 counter++;
             }
         }
         return nfts;
-    }
-
-    function getRoostersByOwner(address _owner) external view returns (uint[] memory) {
-        return _getRoostersOf(_owner);
-    }
-
-    function getMyRoosters() public view returns (uint[] memory) {
-        return _getRoostersOf(msg.sender);
     }
 }

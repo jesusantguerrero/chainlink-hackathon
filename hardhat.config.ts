@@ -8,6 +8,7 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-deploy";
 import "@appliedblockchain/chainlink-plugins-fund-link";
+import "hardhat-contract-sizer";
 
 dotenv.config();
 
@@ -63,6 +64,12 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 100000,
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
   },
 };
 
