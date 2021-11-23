@@ -5,6 +5,7 @@
     "contract:test": "npx hardhat test",
     "contract:coverage": "npx hardhat coverage",
     "contract:compile": "npx hardhat compile",
+    "contract:size": "npx hardhat size-contracts",
     "contract:serve": "npx hardhat node --export app/src/contracts.json",
     "contract:deploy": "npx hardhat deploy --network localhost --tags local --export app/src/contracts.json",
     "contract:update": "npx hardhat run scripts/update.ts --network mainnet",

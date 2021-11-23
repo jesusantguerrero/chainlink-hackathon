@@ -65,6 +65,12 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 100000,
   },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
+  },
 };
 
 function safeAccounts() {
