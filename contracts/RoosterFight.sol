@@ -56,7 +56,7 @@ contract RoosterFight is RoosterNFT {
         Attributes memory attributes = tokenIdToAttributes[_tokenId];
         Stats memory stats = tokenIdToStats[_tokenId];
         image = tokenToImage[_tokenId];
-        uint playerLevel = getLevel(_tokenId);  
+        uint playerLevel = getLevel(_tokenId);
 
         return (
             attributes.name,
@@ -83,7 +83,6 @@ contract RoosterFight is RoosterNFT {
     function simulateRound(uint _attackerId, uint _targetId, uint[] memory _randomNumber) public returns (uint, uint, uint, uint) {
         uint myAttack = sendAttack(_attackerId, _randomNumber[0]);
         uint enemyAttack = sendAttack(_targetId, _randomNumber[1]);
-       
         uint winner = myAttack > enemyAttack ? _attackerId : _targetId;
         uint loser = winner == _attackerId ? _targetId : _attackerId;
         tokenIdToStats[winner].points = tokenIdToStats[winner].points.add(3);

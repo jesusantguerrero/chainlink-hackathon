@@ -22,15 +22,11 @@ contract RoosterNFT is RoosterBase, ERC721 {
         bool claimed;
     }
 
-    address private contractOwner;
     uint public tokenLimitByOwner = 1;
-    mapping(uint => string) internal tokenToImage;
-    mapping(uint => address) private tokenToClaimer;
-    mapping(uint => PreToken) private minteableTokens;
-
+    mapping(uint => string) public tokenToImage;
+    mapping(uint => PreToken) internal minteableTokens;
 
     constructor(PreToken[] memory _uris) ERC721("CRF", "Crypto RoosterFight") {
-        contractOwner = msg.sender;
         batchPreMint(_uris);
     }
 
@@ -41,7 +37,7 @@ contract RoosterNFT is RoosterBase, ERC721 {
         totalSupply.increment();
         uint tokenId = totalSupply.current();
         _mint(msg.sender, tokenId);
-        _setTokenURI(tokenId, minteableTokens[_preTokenId].uri);
+        tokenToImage[tokenId] = minteableTokens[_preTokenId].uri;
         _generateTokenAttributes(tokenId, minteableTokens[_preTokenId].breed, string(abi.encodePacked("token ", Strings.toString(tokenId))));
         minteableTokens[_preTokenId].claimed = true;
         emit Minted(msg.sender, tokenId);
@@ -73,13 +69,12 @@ contract RoosterNFT is RoosterBase, ERC721 {
         return pending;
     }
 
-    // Tokens storage to save images to generate tokenURI programmatically
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_exists(_tokenId), "URI query for nonexistent token");
-        return formatTokenURI(tokenToImage[_tokenId], _tokenId);
+        return _formatTokenURI(_tokenId);
     }
 
-    function formatTokenURI(string memory _imageURI, uint _tokenId) public view virtual returns (string memory) {
+    function _formatTokenURI(uint _tokenId) private view returns (string memory) {
         Attributes memory attributes = tokenIdToAttributes[_tokenId];
         return string(
             abi.encodePacked(
@@ -87,9 +82,9 @@ contract RoosterNFT is RoosterBase, ERC721 {
                 Base64.encode(bytes(
                     abi.encodePacked(
                         '{"name": "',attributes.name, '",',
-                        '"description": "This is a description",',
+                        '"description": "An nft collection",',
                         '"image":"', 
-                        _imageURI, '",',
+                        tokenToImage[_tokenId], '",',
                         '"attributes":[',
                         '{"breed":"', breedNames[uint(attributes.breed)], '"}', 
                         ']',
@@ -97,18 +92,6 @@ contract RoosterNFT is RoosterBase, ERC721 {
                     )
                 )))
         );
-    }
-
-    /**
-     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal {
-        require(_exists(tokenId), "URI set of nonexistent token");
-        tokenToImage[tokenId] = _tokenURI;
     }
 
     function getRoostersOf(address _owner) public view returns (uint[] memory) {

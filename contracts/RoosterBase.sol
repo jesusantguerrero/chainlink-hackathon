@@ -26,7 +26,7 @@ contract RoosterBase is Ownable {
         uint agility;
         Record record;
     }
-
+    
     mapping(uint => Attributes) internal tokenIdToAttributes;
     mapping(uint => Stats) internal tokenIdToStats;
 
@@ -41,7 +41,7 @@ contract RoosterBase is Ownable {
     BreedAttributes internal pintoBreed = BreedAttributes(10, 7, 5);
     BreedAttributes internal whiteBreed = BreedAttributes(3, 10, 10);
 
-    function getBreed(Breed _breed, BreedAttributes memory _attributes) view public returns(BreedAttributes memory) {
+    function getBreedAttributes(Breed _breed) view public returns(BreedAttributes memory) {
         BreedAttributes memory breeding;
         if (_breed == Breed.BLACK) {
             breeding = blackBreed;
@@ -53,16 +53,12 @@ contract RoosterBase is Ownable {
             breeding = whiteBreed;
         }
 
-        breeding.strength += _attributes.strength;
-        breeding.speed += _attributes.speed;
-        breeding.agility += _attributes.agility;
         return breeding;
     }
 
     function _generateTokenAttributes(uint _tokenId, uint _breedCode ,string memory _name) internal {
-        Breed breed = Breed(_breedCode);
-        BreedAttributes memory breedAttributes = getBreed(breed, BreedAttributes(0, 0, 0));
-        tokenIdToAttributes[_tokenId] = Attributes(_name, breed);
+        BreedAttributes memory breedAttributes = getBreedAttributes(Breed(_breedCode));
+        tokenIdToAttributes[_tokenId] = Attributes(_name,  Breed(_breedCode));
         tokenIdToStats[_tokenId] = Stats(
             100,
             0,
