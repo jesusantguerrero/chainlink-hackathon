@@ -17,8 +17,8 @@ const provider = getProvider()
 const RoosterFight = useContract("RoosterFight", provider);
 
 const fetchMarketItems = async () => {
-    let roosters = await RoosterFight?.functions.pendingToMint();
-    return roosters[0];
+    let roosters = await RoosterFight?.pendingToMint();
+    return roosters;
 }
 
 const claim = async (token: IPreToken) => {

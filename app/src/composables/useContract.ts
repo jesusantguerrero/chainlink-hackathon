@@ -11,7 +11,6 @@ interface IContractDefinition {
   address: string;
 }
 
-
 const findNetworkContracts = (
   chainId: string
 ): Record<string, IContractDefinition> | null => {
@@ -22,7 +21,7 @@ export const useContract = (
   contractName: string,
   provider: ethers.providers.Provider | ethers.Signer
 ) => {
-  const contracts = findNetworkContracts("1337");
+  const contracts = findNetworkContracts(config.chainId);
   if (contracts && contracts[contractName]) {
     const contract: IContractDefinition = contracts[contractName];
     return new ethers.Contract(contract.address, contract.abi, provider);

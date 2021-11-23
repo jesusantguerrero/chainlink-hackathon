@@ -92,6 +92,7 @@ const SetupContract: DeployFunction = async (
   await tournament.functions.addEvent(0, new Date().getTime(), endDate);
 
   if (
+    chainId === "1337" &&
     chainLink.linkTokenAddress &&
     (await autoFundCheck(
       Tournament.address,
