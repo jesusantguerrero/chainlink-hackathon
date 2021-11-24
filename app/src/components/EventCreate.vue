@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { reactive } from "@vue/reactivity";
+import { reactive, PropType } from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton, AtDateSelect } from "atmosphere-ui";
+import { ITournamentWithEvent } from "../types";
 
 defineProps({
     tournaments: {
-        type: Array,
+        type: Array as PropType<ITournamentWithEvent[]>,
         default: () => []
     },
 });

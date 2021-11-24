@@ -1,32 +1,10 @@
-import {
-  reactive,
-  computed,
-  onMounted,
-  watch,
-  ref,
-  ComputedRef,
-  inject,
-  Ref,
-} from "vue";
+import { reactive, computed, onMounted, watch, ref, inject, Ref } from "vue";
 import { ethers } from "ethers";
 import { AppState } from "./AppState";
 import { config } from "../config";
+import { ICustomProvider } from "../types";
 
-export interface ICustomProvider {
-  web3: any;
-  account?: string;
-  accounts: string[];
-  networkId?: number;
-  balance: number;
-  loading: boolean;
-  error: any;
-  connected: boolean;
-  isConnectedToValidNetwork: ComputedRef<boolean>;
-  chainId: string;
-  currency: string;
-}
-
-export const ProviderState = reactive<ICustomProvider>({
+export const ProviderState: ICustomProvider = reactive({
   web3: null,
   account: undefined,
   accounts: [],
@@ -38,7 +16,9 @@ export const ProviderState = reactive<ICustomProvider>({
   chainId: "0",
   isConnectedToValidNetwork: computed(() => {
     const decimalChain = parseInt(ProviderState.chainId, 16);
-    return ProviderState.chainId && decimalChain === Number(config.chainId);
+    const isValid =
+      ProviderState.chainId && decimalChain === Number(config.chainId);
+    return Boolean(isValid);
   }),
   currency: "ETH",
 });
@@ -59,7 +39,6 @@ export const useWeb3Provider = (
   initContract: Function,
   onChangeAccount: null | Function
 ) => {
-  const ProviderState = inject("ProviderState", {});
   const startApp = ref(initContract);
 
   const getBalance = async (address: string) => {
@@ -70,7 +49,7 @@ export const useWeb3Provider = (
     };
   };
 
-  const formatBalance = (balance: string): string => {
+  const formatBalance = (balance: number): string => {
     return Number(ethers.utils.formatEther(balance)).toFixed(4);
   };
 

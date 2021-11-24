@@ -76,9 +76,9 @@ const processMatch = async () => {
                         await fetchMatch(matchId.value);
                     }
                 } else if (event.event == 'FightWinner' && event.args) {
-                    const { winner } = event.args;
+                    const { winner, attackerDamage, defenseDamage } = event.args;
                     const tokenName = getTokenName(winner, true);
-                    setMessage(`${tokenName} won the fight. You has received ${damageReceived} and attack caused ${damage}`, eventDelay);
+                    setMessage(`${tokenName} won the fight. You has received ${defenseDamage} and attack caused ${attackerDamage}`, eventDelay);
                 } else if (event.args) {
                     const {  attacker, damage } = event.args;
                     const tokenName = getTokenName(attacker.toNumber());

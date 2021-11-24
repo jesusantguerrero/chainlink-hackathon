@@ -14,7 +14,7 @@ window.Web3 = Web3;
 Moralis.initialize(config.moralisKey);
 Moralis.serverURL = config.moralisServerURL;
 
-const initUser = async (user: Moralis.user) => {
+const initUser = async (user: Moralis.User) => {
   setUser(user);
   ProviderState.account = user.attributes.accounts[0];
   AppState.isLoading = true;
@@ -28,9 +28,9 @@ const initUser = async (user: Moralis.user) => {
 
 const logout = async () => {
   await Moralis.User?.logOut();
-  ProviderState.account = null;
+  ProviderState.account = "";
   AppState.user = Moralis.User.current();
-}
+};
 
 export const initProvider = () => {
   const init = async () => {
@@ -49,7 +49,7 @@ export const useMoralis = () => {
   const login = async () => {
     const user = await Moralis.Web3.authenticate({
       provider: window.ethereum,
-      signingMessage: "Please login to your wallet",
+      chainId: Number(config.chainId),
     });
 
     if (user) {
