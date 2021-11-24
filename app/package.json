@@ -17,6 +17,8 @@
   "devDependencies": {
     "@types/web3": "^1.2.2",
     "@vitejs/plugin-vue": "^1.9.3",
+    "@vueuse/core": "^7.0.3",
+    "@vueuse/motion": "github:vueuse/motion",
     "atmosphere-ui": "^0.3.9",
     "autoprefixer": "^10.4.0",
     "axios": "^0.24.0",

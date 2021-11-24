@@ -9,6 +9,7 @@ import Game from '../layouts/Game.vue';
 import { INftDetails } from '../types';
 import { getProvider } from '../composables/getProvider';
 import { AppState } from '../composables/AppState';
+import MatchPresentation from '../components/animated/MatchPresentation.vue';
 
 const route = useRoute();
 const matchId = ref<string>();
@@ -141,6 +142,7 @@ watch(() => route.path, () => {
                 </div>
             </div>
         </div>
+        <MatchPresentation />
     </div>
 </Game>
 </template>

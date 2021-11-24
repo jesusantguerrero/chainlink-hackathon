@@ -8,7 +8,6 @@ declare module "*.vue" {
   export default component;
 }
 
-
 declare module "myConfig" {
   global {
     // eslint-disable-next-line no-unused-vars

@@ -8,7 +8,7 @@ const ProviderState = useWeb3();
 </script>
 
 <template>
-   <div class="relative flex justify-between px-5 py-3 text-white bg-gray-700">
+   <div class="relative z-50 flex justify-between px-5 py-3 text-white bg-gray-700">
         <div class="flex items-center space-x-2">
             <router-link to="/" class="px-3 text-2xl border border-transparent rounded-md hover:bord hover:bg-gray-800 er-gray-600">
                 <i class="fa fa-chevron-left"></i>
