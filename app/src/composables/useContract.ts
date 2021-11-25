@@ -7,7 +7,7 @@ import { config } from "../config";
 import contracts from "../contracts.json";
 
 interface IContractDefinition {
-  abi: string;
+  abi: any[];
   address: string;
 }
 

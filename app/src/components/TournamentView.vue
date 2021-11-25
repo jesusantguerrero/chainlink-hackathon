@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  computed, ref, onMounted , watch} from "vue";
+import {  computed, ref, watch} from "vue";
 import { ethers } from "ethers";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
@@ -8,7 +8,7 @@ import axios from "axios";
 import { useMessage } from "../utils/useMessage";
 import TournamentLogo from "./TournamentLogo.vue";
 import CombatsTable from "./CombatsTable.vue";
-import { ICombat, IPlayer } from "../types";
+import { ICombat, IPlayer, ITournamentWithEvent } from "../types";
 import { useFight } from "../composables/useMoralis";
 import { AppState } from "../composables/AppState";
 import TournamentViewRow from "./TournamentViewRow.vue";
@@ -66,7 +66,6 @@ const fight = async (eventId: number, defenderId: number) => {
         return;
     }
     try {
-        const event = await Tournament?.events(eventId);
         const trx = await Tournament?.prepareFight(attackerId, defenderId, eventId)
         const receipt = await trx?.wait(1);
         if (receipt && receipt.events[3].event) {
@@ -101,20 +100,6 @@ const fetchIsJoined = async () => {
     return (await Tournament?.functions.tokenToEvent(currentToken.value, tournament.value.eventId))[0];
 }
 
-interface ITournamentWithEvent {
-    id: number,
-    name: string,
-    description: string,
-    seats: number,
-    eventId: number,
-    edition: number,
-    startDate: number,
-    endDate:  number,
-    seatsTaken: number,
-    fee: number,
-    realFee: number
-}
-
 const players = ref<IPlayer[]>([]);
 const playerRankings = computed(() => {
     return players.value.sort((a, b) =>  b.points - a.points);
@@ -145,7 +130,7 @@ const fetchMatches = async (eventId: number) => {
 }
 
 const fetchTournament = async () => {
-    let prix = await Tournament?.functions.prixes(props.id);
+    let prix = await Tournament?.prixes(props.id);
     const currentEventId = await Tournament?.prixToCurrentEvent(prix.tokenId);
     const currentEvent = await Tournament?.events(currentEventId);
 
@@ -166,11 +151,14 @@ const fetchTournament = async () => {
     tournament.value = prix;
 }
 
+const isLoading = ref<boolean>(false);
 const fetchPageData = async () => {
+    isLoading.value = true;
     await fetchTournament();
     await fetchPlayers(tournament.value.eventId);
     await fetchMatches(tournament.value.eventId);
     isJoined.value = await fetchIsJoined();
+    isLoading.value = false;
 }
 
 watch(
@@ -216,15 +204,22 @@ watch(
                         </tr>
                     </thead>
                     <tbody>
-                        <TournamentViewRow 
-                            v-for="(player, index) in playerRankings" 
-                            :player="player" 
-                            :is-darker="index % 2"
-                            :position="index+1"
-                            @fight="fight(tournament.eventId, player.playerId)"
-                            :current-token-id="currentToken"
-                            :is-joined="isJoined"
-                        />
+                        <template v-if="!isLoading">
+                            <TournamentViewRow 
+                                v-for="(player, index) in playerRankings" 
+                                :player="player" 
+                                :is-darker="!!(index % 2)"
+                                :position="index+1"
+                                @fight="fight(tournament.eventId, player.playerId)"
+                                :current-token-id="currentToken"
+                                :is-joined="isJoined"
+                            />
+                        </template>
+                        <td colspan="8" v-else>
+                            <div class="w-full">
+                                loading...
+                            </div>
+                        </td>
                     </tbody>
                 </table>
             </div>

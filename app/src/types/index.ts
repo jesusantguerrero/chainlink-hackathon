@@ -1,6 +1,20 @@
+/* eslint-disable node/no-unpublished-import */
 /* eslint-disable node/no-extraneous-import */
 import { ethers } from "ethers";
 
+export interface ICustomProvider {
+  web3: any;
+  account?: string;
+  accounts: string[];
+  networkId?: number;
+  balance: number;
+  loading: boolean;
+  error: any;
+  connected: boolean;
+  isConnectedToValidNetwork: boolean;
+  chainId: string;
+  currency: string;
+}
 export interface NFTAsset {
   tokenId: number;
   name: string;
@@ -11,9 +25,24 @@ export interface NFTAsset {
   claimable: boolean;
 }
 
+export interface ITournamentWithEvent {
+  id: number;
+  name: string;
+  description: string;
+  seats: number;
+  eventId: number;
+  edition: number;
+  startDate: number;
+  endDate: number;
+  seatsTaken: number;
+  fee: number;
+  realFee: number;
+}
+
 export interface INftDetails {
   tokenId: number;
   name: string;
+  breed: string;
   image: string;
   hp: number;
   experience: number;
@@ -54,7 +83,9 @@ export interface IPlayer {
 
 export interface ICombat {
   id: number;
+  token: number;
   attacker: ethers.BigNumber;
   defense: ethers.BigNumber;
   winner: ethers.BigNumber;
+  date: number;
 }

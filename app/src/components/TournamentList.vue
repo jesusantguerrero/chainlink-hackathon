@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import TournamentLogo from "./TournamentLogo.vue";
 import { getProvider } from "../composables/getProvider";
 import { AppState } from "../composables/AppState";
+import { ProviderState } from "../composables/useWeb3Provider";
 
 const provider = getProvider();
 const RoosterFight = useContract("RoosterFight", provider);
@@ -18,12 +19,12 @@ const { setMessage } = useMessage();
 const joinTournament = async (prixId: number, prixName: string) => {
     const SignedRoosterFight = useContract("RoosterFight", AppState.signer);
     const Tournament = useContract("Tournament", AppState.signer);
-    const myRoosters = await SignedRoosterFight?.functions.getMyRoosters();
+    const myRoosters = await SignedRoosterFight?.getRoostersOf(ProviderState.account);
     if (myRoosters.length === 0) {
         alert("You need to have at least one rooster to join a tournament");
         return;
     }
-    const tokenId: ethers.BigNumber = myRoosters[0][0];
+    const tokenId: ethers.BigNumber = myRoosters[0];
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
     const tournamentFee = await Tournament?.getEventFee(eventId);
     const trx = await Tournament?.addParticipant(tokenId, eventId, { value:tournamentFee }); 

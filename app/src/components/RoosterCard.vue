@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, PropType, ref, reactive, computed } from '@vue/runtime-core';
+import { onMounted, PropType, ref, reactive, computed, nextTick } from '@vue/runtime-core';
 import { useContract } from '../composables/useContract';
 import { INftDetails } from '../types';
 import { AtButton } from "atmosphere-ui";
@@ -7,7 +7,6 @@ import { useMessage } from '../utils/useMessage';
 import { AppState } from '../composables/AppState';
 import RoosterStatLine from './RoosterStatLine.vue';
 import { fetchMyItems } from '../utils/fetchMyItems';
-import { nextTick } from 'process';
 
 const props = defineProps({
     rooster: {
