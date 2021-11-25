@@ -1,5 +1,5 @@
 <template>
-<div class="absolute top-0 w-3/4 h-screen bg-black bg-opacity-50 border-l-4 border-r-4 entrance-banner animate__animated animate__backInLeft v-motion-roll-bottom"
+<div class="absolute top-0 w-3/4 h-screen bg-black bg-opacity-50 border-l-4 border-r-4 entrance-banner animate__animated animate__backInLeft"
 >
     <div class="w-full h-full bg-black opacity-25 filter blur-md">
     

@@ -15,16 +15,14 @@
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
-    "@types/web3": "^1.2.2",
     "@vitejs/plugin-vue": "^1.9.3",
-    "@vueuse/core": "^7.0.3",
-    "@vueuse/motion": "github:vueuse/motion",
+    "animate.css": "^4.1.1",
     "atmosphere-ui": "^0.3.9",
     "autoprefixer": "^10.4.0",
     "axios": "^0.24.0",
     "date-fns": "^2.25.0",
     "ethers": "^5.5.1",
-    "moralis": "0.0.112",
+    "moralis": "0.0.135",
     "postcss": "^8.3.11",
     "sass": "^1.43.4",
     "tailwindcss": "^2.2.19",
