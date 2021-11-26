@@ -44,16 +44,16 @@ const increment  = () => {
     <button 
             @click="decrement()" 
             :disabled="modelValue == 0"
-            class="px-2 transition bg-purple-400 border-2 rounded-md border-roti "
-            :class="[ modelValue == 0 ? 'opacity-70' : 'hover:bg-purple-700']"
+            class="px-2 transition border-2 rounded-md bg-primary-400 border-roti "
+            :class="[ modelValue == 0 ? 'opacity-70' : 'hover:bg-primary-700']"
         >
             <i class="fa fa-chevron-left"></i> 
         </button>
     <button 
         :disabled="!availablePoints" 
         @click="increment()" 
-        class="px-2 transition bg-purple-400 border-2 rounded-md border-roti "
-        :class="[!availablePoints ? 'opacity-75': 'hover:bg-purple-700']"
+        class="px-2 transition border-2 rounded-md bg-primary-400 border-roti "
+        :class="[!availablePoints ? 'opacity-75': 'hover:bg-primary-700']"
     > 
         <i class="fa fa-chevron-right"></i>
     </button>
