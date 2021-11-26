@@ -108,14 +108,14 @@ onMounted(async () => {
             <input class="px-3 text-xl capitalize bg-transparent" 
             :class="{'border rounded-md py-1 bg-gray-800': isEditing}"
             :disabled="!isOwner || !isEditing" v-model="rooster.name" /> <span>- {{ rooster.breed }}</span> 
-            <AtButton class="bg-purple-500" @click="isEditing=true" v-if="!isEditing && isOwner">
+            <AtButton class="bg-primary-500" @click="isEditing=true" v-if="!isEditing && isOwner">
                 <i class="fa fa-edit"></i>
             </AtButton>
             <div v-else-if="isOwner" class="inline-flex space-x-2">
                 <AtButton class="bg-gray-500" @click="isEditing=false">
                     <i class="fa fa-times"></i>
                 </AtButton>
-                <AtButton class="bg-purple-500" @click="setName(rooster.name)">
+                <AtButton class="bg-primary-500" @click="setName(rooster.name)">
                     <i class="fa fa-save"></i>
                 </AtButton>
             </div>
