@@ -1,10 +1,10 @@
 /* eslint-disable node/no-unpublished-import */
 /* eslint-disable node/no-missing-import */
-import "../_shared/initDotenv";
+import "../../_shared/initDotenv";
 import path = require("path");
 import fs = require("fs");
-import Moralis from "../_shared/moralis";
-import { useSecureString } from "../_shared/useSecureString";
+import Moralis from "../../_shared/moralis";
+import { useSecureString } from "../../_shared/useSecureString";
 
 const { getEnv } = useSecureString(process.env);
 const basePath = getEnv("NFT_ART_PATH");
