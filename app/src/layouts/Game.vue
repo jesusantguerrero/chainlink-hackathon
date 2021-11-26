@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ethers } from 'ethers';
-import { computed, onMounted, ref } from 'vue';
-import { useContract } from '../composables/useContract';
+import { computed, ref } from 'vue';
 import GameHeader from '../components/GameHeader.vue';
 
 defineProps({
@@ -56,6 +54,6 @@ const dashboardMenu = computed(() => {
 
 <style lang="scss">
 .game-link.router-link-active, .game-link:hover {
-    @apply bg-purple-50 border-b-4 border-purple-400 bg-opacity-5 text-purple-400;
+    @apply bg-primary-50 border-b-4 border-primary bg-opacity-5 text-primary;
 }
 </style>

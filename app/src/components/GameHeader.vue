@@ -13,7 +13,7 @@ const ProviderState = useWeb3();
             <router-link to="/" class="px-3 text-2xl border border-transparent rounded-md hover:bord hover:bg-gray-800 er-gray-600">
                 <i class="fa fa-chevron-left"></i>
             </router-link>
-            <h1 class="text-2xl font-bold text-purple-400">
+            <h1 class="text-2xl font-bold text-primary">
                 RoosterFight
             </h1>
         </div>

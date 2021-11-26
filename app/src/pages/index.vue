@@ -12,20 +12,28 @@ const breeds = ["black", "colorao", "pinto", "white"];
 
 <template>
 <div :style="{background: 'url(/landing-background.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
-    <div class="flex justify-center w-full h-10 font-bold text-white bg-purple-400">
+    <div class="flex justify-center w-full h-10 font-bold text-white bg-primary" v-if="false">
         <div class="flex items-center w-full max-w-7xl">
             The chainlink hackathon
         </div>
     </div>
-    <LandingHeader @connect="$emit('connect')" class="bg-black bg-opacity-60 blur-3xl"/>
-    <div class="justify-center py-20 text-center text-white bg-black bg-opacity-60">
-        <div>
-            <h1 class="text-2xl font-bold">Train your Roosters and fight</h1>
-            <p class="font-bold"> Build your legacy as a rooster trainer and scale up the tops</p>
-        </div>
-        <div class="py-12 text-center">
-            <AtButton class="font-bold text-white bg-purple-400" v-if="!state.user" @click="$emit('connect')"> Connect </AtButton>
-            <MintForm v-else />
+    <LandingHeader @connect="$emit('connect')" class="bg-black bg-opacity-80"/>
+    <div class="justify-center py-32 text-center text-white bg-black bg-opacity-80">
+        <div class="flex items-center mx-auto max-w-7xl">
+            <div class="text-left">
+                <div>
+                    <h1 class="text-5xl font-bold">Train your Roosters and fight</h1>
+                    <p class="font-bold"> Build your legacy as a rooster trainer and scale up the tops</p>
+                </div>
+                <div class="py-12 space-x-2 text-left">
+                    <AtButton class="font-bold border-2 text-primary border-primary" v-if="!state.user" @click="$emit('connect')"> Connect </AtButton>
+                    <AtButton class="font-bold text-white border-2 border-primary bg-primary" v-if="!state.user" @click="$emit('connect')"> Claim a free rooster </AtButton>
+                    <MintForm v-else />
+                </div>
+            </div>
+            <div class="flex justify-end w-full h-full text-right">
+                <img alt="" class="w-96" src="/images/breed_colorao.png">
+            </div>
         </div>
     </div>
 </div>
