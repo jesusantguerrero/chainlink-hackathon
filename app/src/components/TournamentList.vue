@@ -10,9 +10,9 @@ import TournamentLogo from "./TournamentLogo.vue";
 import { getProvider } from "../composables/getProvider";
 import { AppState } from "../composables/AppState";
 import { ProviderState } from "../composables/useWeb3Provider";
+import PageLoader from "./animated/PageLoader.vue";
 
 const provider = getProvider();
-const RoosterFight = useContract("RoosterFight", provider);
 const Tournament = useContract("Tournament", provider);
 
 const { setMessage } = useMessage();
@@ -74,20 +74,20 @@ onMounted(async () => {
 
 <template>
     <div class="mt-10 text-4xl text-center text-white" v-if="isLoading">
-        <i class=" fa fa-circle-notch fa-spin fa-3x fa-fw" />
+        <PageLoader />
     </div>
     <div v-else>
         <ul class="mt-5 space-y-5 list-group">
             <li class="list-group-item" v-for="tournament in tournaments">
-                <router-link :to="`/tournaments/${tournament.id}`" class="flex items-center justify-between px-2 py-2 transition bg-gray-600 border-4 border-gray-500 rounded-md hover:border-purple-400 ">
+                <router-link :to="`/tournaments/${tournament.id}`" class="flex items-center justify-between px-2 py-2 transition bg-gray-600 border-4 border-gray-500 rounded-md hover:border-primary-400 ">
                     <div class="flex tournament__image">
                         <TournamentLogo />
-                        <div class="ml-2">
-                            <h3>{{ tournament.name }}</h3>
-                            <p>{{ tournament.description }}</p>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold">{{ tournament.name }}</h3>
+                            <p class="italic font-semibold">{{ tournament.description }}</p>
                             <div>
-                                <p class="flex justify-between">Start: <span class="font-bold">{{ format(tournament.startDate, 'yyyy-MM-dd') }}</span></p>
-                            <p class="flex justify-between">End: <span class="font-bold">{{ format(tournament.endDate, 'yyyy-MM-dd') }}</span></p>
+                                <p class="flex justify-between text-sm">Start: <span class="font-bold">{{ format(tournament.startDate, 'yyyy-MM-dd') }}</span></p>
+                                <p class="flex justify-between text-sm">End: <span class="font-bold">{{ format(tournament.endDate, 'yyyy-MM-dd') }}</span></p>
                             </div>
                         </div>
                     </div>
@@ -95,13 +95,13 @@ onMounted(async () => {
                         <p><i class="fa fa-users"></i>: {{ tournament.seatsTaken }} / {{ tournament.seats }}</p>
                         <p>Fee: {{ tournament.fee }} MATIC</p>
                         <AtButton 
-                            class="mt-5 bg-purple-500" 
+                            class="mt-5 bg-primary-500" 
                             @click.p.prevent.stop="joinTournament(tournament.id, tournament.name)"
                         >
                             Join
                         </AtButton>
                     </div>
-                    <div class="w-40 py-2 text-center text-purple-200">
+                    <div class="w-40 py-2 text-center text-primary-200">
                         <i class="text-7xl fa fa-medal"></i>
                         <p class="text-2xl"><span class="font-bold">{{ tournament.formattedPrize }} MATIC</span></p>
                         <p class="text-xl text-white">Acc. Prize</p>
