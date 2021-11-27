@@ -5,16 +5,31 @@
     
     </div>
 </div>
-<div class="absolute top-0 flex items-center justify-center w-3/4 h-screen">
+<div ref="logo" class="absolute top-0 flex items-center justify-center w-3/4 h-screen animate__animated animate__backInLeft">
 <div class="text-center">
-    <h1 class="font-bold text-purple-400 text-7xl text-stroke-wite">RoosterFight</h1>
-    <h2 class="text-4xl font-bold text-roti">The rooster game</h2>
+    <img src="../../assets/logo.svg">
+    <h2 class="text-4xl font-bold text-white">The rooster game</h2>
 </div>
 </div>
 </template>
 
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
+const logo = ref<HTMLElement>();
+onMounted(() => {
+    setTimeout(() => {
+        document.querySelector('.entrance-banner').classList.add('animate__fadeOut');
+        logo.value.classList.add('animate__fadeOut');
+    }, 3000);
+})
+</script>
+
+
 <style>
-.entrance-banner {
-    transform: skewX(45deg);
+.animate__fadeOut {
+    position: absolute;
+    display: none;
+    z-index: -1;
 }
 </style>
