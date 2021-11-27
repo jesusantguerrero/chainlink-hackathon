@@ -53,9 +53,9 @@ const visibleItems = computed(() => {
         <div class="flex flex-wrap justify-center gap-2 mt-5 claimable-list__items" v-else>
             <div v-for="item in visibleItems" class="claimable-list__item">
                 <div class="overflow-hidden border rounded-md claimable-list__item__image">
-                    <div class="relative w-64 h-64 bg-primary border-roti-400">
+                    <div class="relative w-64 h-64 bg-gray-900 border-roti-400">
                         <img :src="item.uri" class="absolute z-20" />
-                        <div class="absolute bottom-0 right-0 w-1/2 h-full bg-black bg-opacity-10">
+                        <div class="absolute bottom-0 right-0 w-1/2 h-full bg-black bg-opacity-40">
                         </div>
                     </div>
                     <div class="px-4 pb-3 bg-gray-700">

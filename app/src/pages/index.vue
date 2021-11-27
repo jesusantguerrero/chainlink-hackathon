@@ -50,7 +50,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
             </div>
         </div>
 </LandingSection>
-<LandingSection class="bg-purple-500" title="Tournaments" inner-class="bg-purple-700">
+<LandingSection class="bg-fire-400" title="Tournaments" inner-class="bg-fire-500">
          <template #description>
             Tournaments are periodic events where the Roosters can join by paying a determined fee
             with a duration of a week were you can fight once with every other Rooster in the tournament if you win you got 3 points at the end the rooster with more points get the prize.
@@ -84,7 +84,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
             </p>
         </div>
 </LandingSection>
-<LandingSection class="bg-roti-500" title="Train and Upgrade" inner-class="bg-roti-700">
+<LandingSection class="bg-primary-500" title="Train and Upgrade" inner-class="bg-primary-700">
          <template #description>
             After each fight a rooster will gain attribute points that you can assign to whatever attribute you like.
          </template>

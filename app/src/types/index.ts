@@ -84,8 +84,10 @@ export interface IPlayer {
 export interface ICombat {
   id: number;
   token: number;
+  eventId: number;
   attacker: ethers.BigNumber;
   defense: ethers.BigNumber;
   winner: ethers.BigNumber;
   date: number;
+  active: boolean;
 }

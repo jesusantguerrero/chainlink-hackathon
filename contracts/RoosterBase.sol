@@ -14,7 +14,6 @@ contract RoosterBase is Ownable {
     struct Record {
         uint32 wins;
         uint32 losses;
-        uint32 draws;
     }
 
     struct Stats {
@@ -66,7 +65,7 @@ contract RoosterBase is Ownable {
             breedAttributes.strength,
             breedAttributes.speed,
             breedAttributes.agility,
-            Record(0, 0, 0)
+            Record(0, 0)
         );
     }
 }

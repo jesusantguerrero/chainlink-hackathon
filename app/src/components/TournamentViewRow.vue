@@ -38,7 +38,7 @@ const fetchAlreadyFought = async () => {
     if (!AppState.roosters.length) {
         return false;
     }
-    return (await Tournament?.eventToPlayerVsPlayer[props.eventId][props.playerId][props.player.playerId]);
+    return (await Tournament?.eventToPlayerVsPlayer(props.eventId, props.playerId, props.player.playerId));
 }
 
 const canRequestFight = computed(() => {

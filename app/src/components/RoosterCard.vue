@@ -102,7 +102,7 @@ onMounted(async () => {
     <div class="w-1/2">
         <div class="relative h-72">
             <img :src="rooster.image" class="absolute z-10 w-72"/>
-            <div class="absolute z-0 w-40 h-40 transform bg-gray-800 rounded-full shadow-md animate-pulse -bottom-14 rotate-y-2 plate bg-opacity-70 left-9" />
+            <div class="absolute z-0 w-40 h-40 bg-gray-800 rounded-full shadow-md animate-pulse bottom-10 plate bg-opacity-70 left-9" />
         </div>
         <div class="flex items-center px-4 pb-3 space-x-2">
             <input class="px-3 text-xl capitalize bg-transparent" 
@@ -126,7 +126,6 @@ onMounted(async () => {
 
 <style>
 .plate {
-    transform: rotateX(75deg);
+    transform: rotateX(75deg) !important;
 }
-
 </style>
