@@ -168,6 +168,7 @@ const joinTournament = async (prixId: number) => {
         return;
     }
     const tokenId = AppState.roosters[0].tokenId;
+    const Tournament = useContract("Tournament", AppState.signer);
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
     const tournamentFee = await Tournament?.getEventFee(eventId);
     const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
