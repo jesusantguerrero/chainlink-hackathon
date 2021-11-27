@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  computed, PropType } from "vue";
+import {  computed, PropType, ref, onMounted } from "vue";
 import { useContract } from "../composables/useContract"
 import { AtButton } from "atmosphere-ui";
 import { IPlayer } from "../types";
@@ -8,6 +8,9 @@ import { formatMaskedWallet } from "../utils";
 
 const props = defineProps({
     currentTokenId: {
+        type: Number,
+    },
+    playerId: {
         type: Number,
     },
     position: {
@@ -23,16 +26,31 @@ const props = defineProps({
         type: Object as PropType<IPlayer>,
         required: true,
     },
+    eventId: {
+        type: Number,
+        required: true,
+    },
 });
 
 const Tournament = useContract("Tournament", AppState.signer);
+
+const fetchAlreadyFought = async () => {
+    if (!AppState.roosters.length) {
+        return false;
+    }
+    return (await Tournament?.eventToPlayerVsPlayer[props.eventId][props.playerId][props.player.playerId]);
+}
 
 const canRequestFight = computed(() => {
     return props.player.tokenId !== props.currentTokenId && props.isJoined;
 });
 
-const alreadyFought = computed(() => {
-    return props.currentTokenId === props.player.tokenId;
+const alreadyFought = ref(true);
+
+onMounted(async () => {
+    if (props.isJoined) {
+        alreadyFought.value = await fetchAlreadyFought();
+    }
 });
 
 </script>
@@ -41,17 +59,16 @@ const alreadyFought = computed(() => {
     <tr class="border border-gray-500" :class="{'bg-gray-600': isDarker}">
         <td class="px-4 py-2 text-center"># {{ position }}</td>
         <td class="px-4 py-2">
-        <div class="flex justify-center">
+        <div class="flex items-center justify-center">
             <router-link :to="`/roosters/${player.tokenId}`">
                 <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
+                <p class="font-bold capitalize">{{ player.name }}</p>
             </router-link>
             <div class="ml-2">
-                <p class="capitalize">{{ player.name }}</p>
                 <AtButton 
-                    class="font-bold bg-purple-400" 
+                    class="font-bold border-2 text-primary border-primary-400" 
                     @click="$emit('fight')"
-                    v-if="canRequestFight"
-                    :disabled="alreadyFought"
+                    v-if="canRequestFight && !alreadyFought"
                 >
                     Fight
                 </AtButton>

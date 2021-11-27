@@ -34,7 +34,7 @@ describe("PC Token", function () {
   it("Should mint a new nft token", async function () {
     expect((await pcToken.totalSupply()).toNumber()).to.equal(0);
     await pcToken.mint(1);
-    expect((await pcToken.getMyRoosters()).length).to.equal(1);
+    expect((await pcToken.getRoostersOf(owner.address)).length).to.equal(1);
   });
 
   it("Should not allow mint more than the limit nft's", async function () {
@@ -51,9 +51,7 @@ describe("PC Token", function () {
   it("Should allow users claim tokens", async function () {
     await pcToken.connect(user2).mint(1);
 
-    expect((await pcToken.getRoostersByOwner(user2.address)).length).to.equal(
-      1
-    );
+    expect((await pcToken.getRoostersOf(user2.address)).length).to.equal(1);
   });
 
   it("Should return supply and availability", async () => {
@@ -62,15 +60,15 @@ describe("PC Token", function () {
     expect(toNumberArray(await pcToken.pendingToMint())).to.eql([1, 2, 3, 4]); // total available to claim;
   });
 
-  it("Should fail to get token URI", async () => {
-    await expect(pcToken.getImageURI(1)).eventually.to.rejectedWith(
+  it.only("Should fail to get token URI", async () => {
+    await expect(pcToken.tokenURI(1)).eventually.to.rejectedWith(
       Error,
-      "URI set of nonexistent token"
+      "URI query for nonexistent token"
     );
   });
   it("Should return the custom generated URI", async () => {
     pcToken.mint(1);
-    expect(await pcToken.getImageURI(1)).to.equal(
+    expect(await pcToken.tokenToImage(1)).to.equal(
       "https://lh3.googleusercontent.com/pnay7Gr6QdYT5V23hYlv8Dyvm1R6VfyvQgPHSrMmQJuLMHVwn8B2pth6DFHnWQZvrGPpiPP-DTPgdUFd-fa0pa7rbBwoboRP0Csu6MI=w600"
     );
     const result = await pcToken.tokenURI(1);

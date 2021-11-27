@@ -22,10 +22,37 @@ const props = defineProps({
     }
 });
 
+// contracts and utils
+const { setMessage } = useMessage();
 const provider = getProvider();
 const RoosterFight = useContract("RoosterFight", provider);
 const Tournament = useContract("Tournament", provider);
 
+// player state
+const getPlayerId = (tokenId: number): number => {
+   return players.value.find(p => p.tokenId === tokenId)?.playerId
+}
+
+const isJoined = ref<boolean>(false);
+const currentToken = computed(() => {
+    const tokenId = AppState.roosters.length ? AppState.roosters[0]?.tokenId : null;
+    return tokenId;
+});
+
+const currentPlayerId = computed(() => {
+    return getPlayerId(currentToken.value);
+});
+
+const fetchIsJoined = async () => {
+    if (!AppState.roosters.length) {
+        return false;
+    }
+    return (await Tournament?.functions.tokenToEvent(currentToken.value, tournament.value.eventId))[0];
+}
+
+// data fetching
+const combats = ref<ICombat[]>([]);
+const players = ref<IPlayer[]>([]);
 const tournament = ref<ITournamentWithEvent>({
     id: 0,
     name: "",
@@ -39,27 +66,75 @@ const tournament = ref<ITournamentWithEvent>({
     fee: 0,
     realFee: 0
 });
+const playerRankings = computed(() => {
+    return players.value.sort((a, b) =>  b.points - a.points);
+});
+const isLoading = ref<boolean>(false);
 
-const { setMessage } = useMessage();
-const joinTournament = async (prixId: number) => {
-    if (AppState.roosters.length === 0) {
-        setMessage("You need to have at least one rooster to join a tournament");
-        return;
-    }
-    const tokenId = AppState.roosters[0].tokenId;
-    const eventId = await Tournament?.prixToCurrentEvent(prixId);
-    const tournamentFee = await Tournament?.getEventFee(eventId);
-    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
-        console.log(err);
-    }); 
-    await trx?.wait();
-    setMessage(`You has joined to the ${tournament.value.name} tournament`);
-    await fetchPageData();
+const fetchPlayers = async (eventId: number) => {
+    const playersData = await Tournament?.getEventParticipants(eventId);
+    players.value = await Promise.all(playersData.map(async (player: any) => {
+        const tokenURI = await RoosterFight?.functions.tokenURI(player.tokenId);
+        const rooster = await axios(tokenURI[0])
+        .then(({ data } : { data: IAsset}): IAsset => data)
+        .catch(err => {
+          return {};
+        });
+        
+        return {
+            ...player,
+            playerId: player.playerId.toNumber(),
+            tokenId: player.tokenId.toNumber(),
+            ...rooster
+        }
+    }));
 }
 
+const fetchMatches = async (eventId: number) => {
+    combats.value = await Tournament?.getMatchesForEvent(eventId);
+}
+
+const fetchTournament = async () => {
+    let prix = await Tournament?.prixes(props.id);
+    const currentEventId = await Tournament?.prixToCurrentEvent(prix.tokenId);
+    const currentEvent = await Tournament?.events(currentEventId);
+
+    prix = {
+        id: prix.tokenId,
+        name: prix.name,
+        description: prix.description,
+        seats: prix.seatsLimit,
+        eventId: currentEvent.tokenId.toNumber(),
+        edition: currentEvent.tournamentEdition,
+        startDate: currentEvent.startDate,
+        endDate:  currentEvent.endDate,
+        seatsTaken: currentEvent.seatsTaken,
+        fee: ethers.utils.formatEther(prix.seatFee),
+        realFee: prix.seatFee
+    }
+
+    tournament.value = prix;
+}
+
+const fetchPageData = async () => {
+    isLoading.value = true;
+    await fetchTournament();
+    await fetchPlayers(tournament.value.eventId);
+    await fetchMatches(tournament.value.eventId);
+    isJoined.value = await fetchIsJoined();
+    isLoading.value = false;
+}
+
+watch(
+    () => ProviderState.account, 
+    async () => {
+        await fetchPageData();
+    }, 
+{ immediate: true });
+
+// Player actions
 const fight = async (eventId: number, defenderId: number) => {
-    const tokenId = AppState.roosters[0].tokenId;
-    const attackerId = players.value.find(p => p.tokenId === tokenId)?.playerId;
+    const attackerId = getPlayerId(AppState.roosters[0].tokenId);
     const Tournament = useContract("Tournament", AppState.signer);
     if (attackerId === defenderId) {
         setMessage("You cant fight yourself bro");
@@ -87,91 +162,27 @@ const fight = async (eventId: number, defenderId: number) => {
     }
 }
 
-const isJoined = ref<boolean>(false);
-const currentToken = computed(() => {
-    const tokenId = AppState.roosters.length ? AppState.roosters[0]?.tokenId : null;
-    return tokenId;
-});
-
-const fetchIsJoined = async () => {
-    if (!AppState.roosters.length) {
-        return false;
+const joinTournament = async (prixId: number) => {
+    if (AppState.roosters.length === 0) {
+        setMessage("You need to have at least one rooster to join a tournament");
+        return;
     }
-    return (await Tournament?.functions.tokenToEvent(currentToken.value, tournament.value.eventId))[0];
+    const tokenId = AppState.roosters[0].tokenId;
+    const eventId = await Tournament?.prixToCurrentEvent(prixId);
+    const tournamentFee = await Tournament?.getEventFee(eventId);
+    const trx = await Tournament?.functions.addParticipant(tokenId, eventId, { value:tournamentFee }).catch((err) => {
+        console.log(err);
+    }); 
+    await trx?.wait();
+    setMessage(`You has joined to the ${tournament.value.name} tournament`);
+    await fetchPageData();
 }
 
-const players = ref<IPlayer[]>([]);
-const playerRankings = computed(() => {
-    return players.value.sort((a, b) =>  b.points - a.points);
-});
-
-const fetchPlayers = async (eventId: number) => {
-    const playersData = await Tournament?.getEventParticipants(eventId);
-    players.value = await Promise.all(playersData.map(async (player: any) => {
-        const tokenURI = await RoosterFight?.functions.tokenURI(player.tokenId);
-        const rooster = await axios(tokenURI[0])
-        .then(({ data } : { data: IAsset}): IAsset => data)
-        .catch(err => {
-          return {};
-        });
-        
-        return {
-            ...player,
-            playerId: player.playerId.toNumber(),
-            tokenId: player.tokenId.toNumber(),
-            ...rooster
-        }
-    }));
-}
-
-const combats = ref<ICombat[]>([]);
-const fetchMatches = async (eventId: number) => {
-    combats.value = await Tournament?.getMatchesForEvent(eventId);
-}
-
-const fetchTournament = async () => {
-    let prix = await Tournament?.prixes(props.id);
-    const currentEventId = await Tournament?.prixToCurrentEvent(prix.tokenId);
-    const currentEvent = await Tournament?.events(currentEventId);
-
-    prix = {
-        id: prix.tokenId,
-        name: prix.name,
-        description: prix.description,
-        seats: prix.seatsLimit,
-        eventId: currentEvent.tokenId.toNumber(),
-        edition: currentEvent.tournamentEdition,
-        startDate: currentEvent.startDate,
-        endDate:  currentEvent.endDate,
-        seatsTaken: currentEvent.seatsTaken,
-        fee: ethers.utils.formatEther(prix.seatFee),
-        realFee: prix.seatFee
-    }
-
-    tournament.value = prix;
-}
-
-const isLoading = ref<boolean>(false);
-const fetchPageData = async () => {
-    isLoading.value = true;
-    await fetchTournament();
-    await fetchPlayers(tournament.value.eventId);
-    await fetchMatches(tournament.value.eventId);
-    isJoined.value = await fetchIsJoined();
-    isLoading.value = false;
-}
-
-watch(
-    () => ProviderState.account, 
-    async () => {
-        await fetchPageData();
-    }, 
-{ immediate: true });
 </script>
 
 <template>
     <div>
-        <div class="py-3 text-center bg-gradient-to-b from-purple-700">
+        <div class="py-3 text-center bg-gradient-to-b from-primary-700">
             <div class="flex justify-center mb-3"> 
                 <TournamentLogo />
             </div>
@@ -181,8 +192,8 @@ watch(
             <div>
                 <p>Seats: {{ tournament.seatsTaken }} / {{ tournament.seats }}</p>
             </div>
-            <p class="mt-5">Fee: {{ tournament.fee }} MATIC</p>
-            <AtButton class="bg-purple-500" @click="joinTournament(tournament.id)" v-if="!isJoined">
+            <p class="mt-5 font-bold">Fee: {{ tournament.fee }} MATIC</p>
+            <AtButton class="bg-primary-500" @click="joinTournament(tournament.id)" v-if="!isJoined">
                 Join
             </AtButton>
         </div>
@@ -191,7 +202,7 @@ watch(
             <h4> Rankings </h4>
             <div>
                 <table class="w-full rounded-md">
-                    <thead class="bg-purple-400 border border-gray-500 rounded-md">
+                    <thead class="border border-gray-500 rounded-md bg-primary-400">
                         <tr>
                             <th class="px-4 py-2">Rank</th>
                             <th class="px-4 py-2">Rooster</th>
@@ -211,7 +222,9 @@ watch(
                                 :is-darker="!!(index % 2)"
                                 :position="index+1"
                                 @fight="fight(tournament.eventId, player.playerId)"
+                                :event-id="tournament.eventId"
                                 :current-token-id="currentToken"
+                                :player-id="currentPlayerId"
                                 :is-joined="isJoined"
                             />
                         </template>
