@@ -76,7 +76,7 @@ contract RoosterFight is RoosterNFT {
     function sendAttack(uint _attacker, uint _randomNumber) internal view returns(uint) {
         uint level = getLevel(_attacker);
         uint maxDamage = tokenIdToStats[_attacker].strength + tokenIdToStats[_attacker].speed + (level * bonusLevel);
-        uint damage = _randomNumber % maxDamage + tokenIdToStats[_attacker].strength;
+        uint damage = (_randomNumber % maxDamage) + tokenIdToStats[_attacker].strength;
         return damage;
     }
 
@@ -86,7 +86,9 @@ contract RoosterFight is RoosterNFT {
         uint winner = myAttack > enemyAttack ? _attackerId : _targetId;
         uint loser = winner == _attackerId ? _targetId : _attackerId;
         tokenIdToStats[winner].points = tokenIdToStats[winner].points.add(3);
-        tokenIdToStats[loser].points = tokenIdToStats[loser].points.add(2);
+        tokenIdToStats[loser].points = tokenIdToStats[loser].points.add(1);
+        tokenIdToStats[winner].record.wins = uint32(tokenIdToStats[winner].record.wins.add(1));
+        tokenIdToStats[loser].record.losses = uint32(tokenIdToStats[loser].record.losses.add(1));
         return (winner, loser, myAttack, enemyAttack);
     }
 

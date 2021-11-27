@@ -6,7 +6,7 @@ import { useContract } from '../composables/useContract';
 import { AtButton } from "atmosphere-ui";
 import { useMessage } from '../utils/useMessage';
 import Game from '../layouts/Game.vue';
-import { INftDetails } from '../types';
+import { ICombat, INftDetails } from '../types';
 import { getProvider } from '../composables/getProvider';
 import { AppState } from '../composables/AppState';
 import MatchPresentation from '../components/animated/MatchPresentation.vue';
@@ -26,25 +26,26 @@ const fetchRooster = async (tokenId: ethers.BigNumber): Promise<INftDetails> => 
 };
 
 const fetchMatch = async (matchId: string) => {
-    const combat = await Tournament?.combats(matchId);;
-    const player1TokenId = await Tournament?.functions?.eventToPlayer(combat.eventId, combat.attacker.toNumber());
-    const player2TokenId = await Tournament?.functions?.eventToPlayer(combat.eventId, combat.defense.toNumber());
+    const combat: ICombat = await Tournament?.combats(matchId);;
+    const player1TokenId = await Tournament?.eventToPlayer(combat.eventId, combat.attacker.toNumber());
+    const player2TokenId = await Tournament?.eventToPlayer(combat.eventId, combat.defense.toNumber());
 
     const [rooster1, rooster2] = await Promise.all([
-        fetchRooster(player1TokenId[0]),
-        fetchRooster(player2TokenId[0]),
+        fetchRooster(player1TokenId),
+        fetchRooster(player2TokenId),
     ]);
 
     matchEvent.value = {
         ...combat,
         attackerToken: {
             ...rooster1,
-            tokenId: player1TokenId[0].toNumber(),
+            tokenId: player1TokenId.toNumber(),
         },
         defenseToken: {
             ...rooster2,
-            tokenId: player2TokenId[0].toNumber(),
+            tokenId: player2TokenId.toNumber(),
         },
+        logs: combat.active ? [] : await Tournament?.combatLogs(matchId, combat.attacker, combat.defense),
     }
     isFetching.value = false;
    
@@ -68,23 +69,24 @@ const processMatch = async () => {
    const receipt = await trx?.wait();
    if (receipt) {
         const eventDelay = 3000; 
+        const damages = []
         receipt.events.forEach(async (event: ethers.Event, index: number) => {
             setTimeout(async () => {
                 if (event.event == 'FightFinished' && event.args) {
                     const { damage, damageReceived, winner } = event.args;
-                    setMessage(`${winner} won the fight. You has received ${damageReceived} and attack caused ${damage}`, eventDelay);
+                    const tokenName = getTokenName(winner, true);
+                    setMessage(`after an intense fight ${tokenName} won the fight. You has received ${damages[1]} and attack caused ${damages[0]}`, eventDelay);
                     if (matchId.value) {
                         await fetchMatch(matchId.value);
                     }
-                } else if (event.event == 'FightWinner' && event.args) {
-                    const { winner, attackerDamage, defenseDamage } = event.args;
-                    const tokenName = getTokenName(winner, true);
-                    setMessage(`${tokenName} won the fight. You has received ${defenseDamage} and attack caused ${attackerDamage}`, eventDelay);
                 } else if (event.args) {
                     const {  attacker, damage } = event.args;
                     const tokenName = getTokenName(attacker.toNumber());
-                    setMessage(`${tokenName} goes for its opponent... ${damage}`, eventDelay / 2);
-                    setMessage(`${tokenName} cause a damage of ${damage} on its opponent`, eventDelay / 2);
+                    damages.push(damage);
+                    setMessage(`${tokenName} goes for its opponent...`, eventDelay / 2);
+                    setTimeout(() => {
+                        setMessage(`${tokenName} cause a damage of ${damage} on its opponent`, eventDelay / 2);
+                    }, eventDelay / 2);
                 }
             }, eventDelay * (index + 1));
         });
@@ -108,7 +110,7 @@ watch(() => route.path, () => {
 
 <template>
 <Game :show-navbar="false">
-    <div class="flex flex-col items-center justify-center w-full">
+    <div class="flex flex-col items-center justify-center w-full overflow-hidden">
         <h4 class="mb-20 text-5xl font-bold text-purple-400"> Tournament Match </h4>
         <div class="relative bg-green-500 rounded-full w-96 h-96">
             <div class="absolute flex flex-col items-center justify-center w-full h-full" v-if="!isFetching">
@@ -142,7 +144,7 @@ watch(() => route.path, () => {
                 </div>
             </div>
         </div>
-        <MatchPresentation />
+        <MatchPresentation v-if="matchEvent.active" />
     </div>
 </Game>
 </template>
