@@ -23,7 +23,7 @@ const logVars = computed(() => {
     return {
         attackerName: props.matchEvent.attackerToken.name,
         attackerDamage: props.matchEvent.logs.attackerDamage,
-        defenseDamage: props.matchEvent.logs.attackerDamage,
+        defenseDamage: props.matchEvent.logs.defenseDamage,
         defenseName: props.matchEvent.defenseToken.name
     }
 })

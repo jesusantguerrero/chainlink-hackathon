@@ -61,33 +61,66 @@ const getTokenName = (playerId: number, byToken = false) => {
     return rooster.name;
 }
 
+const runFight = async (actions: any[], eventDelay: number = 6000, callback: Function) => {
+    const damages = []
+    isFetching.value = true;
+    actions.forEach(async (event: ethers.Event, index: number) => {
+    setTimeout(async () => {
+        if (event.event == 'FightFinished' && event.args) {
+            const { winner } = event.args;
+            const tokenName = getTokenName(winner, true);
+            setMessage(`after an intense fight ${tokenName} won the fight. the Attacker has received ${damages[1]} and attack caused ${damages[0]}`, eventDelay);
+            callback();
+        } else if (event.args) {
+            isFetching.value = false;
+            const {  attacker, damage } = event.args;
+            const tokenName = getTokenName(attacker.toNumber());
+            damages.push(damage);
+            setMessage(`${tokenName} goes for its opponent...`, eventDelay / 2);
+            setTimeout(() => {
+                setMessage(`${tokenName} cause a damage of ${damage} on its opponent`, eventDelay / 2);
+            }, eventDelay / 2);
+        }
+    }, eventDelay * index);
+});
+}
+
+const isReplay = ref(false);
+const replayFight = async () => {
+    if (isReplay.value) {
+        return;
+    }
+    isReplay.value = true;
+    const actions = [{
+        args: {
+            attacker: matchEvent.value.attacker,
+            damage: matchEvent.value.logs.attackerDamage,
+        }
+    }, {
+        args: {
+            attacker: matchEvent.value.defense,
+            damage: matchEvent.value.logs.defenseDamage,
+        }
+    }, {
+        event: 'FightFinished',
+        args: {
+            winner: matchEvent.value.winner,
+        }
+    }];
+    await runFight(actions, 6000, () => {
+        isReplay.value = false;
+    });
+}
+
 const processMatch = async () => {
    if (!AppState.signer) return;
    const Tournament = useContract("Tournament", AppState.signer);
    const trx = await Tournament?.functions?.startFight(matchEvent.value.requestId, matchId.value)
    const receipt = await trx?.wait();
    if (receipt) {
-        const eventDelay = 6000; 
-        const damages = []
-        receipt.events.forEach(async (event: ethers.Event, index: number) => {
-            setTimeout(async () => {
-                if (event.event == 'FightFinished' && event.args) {
-                    const { winner } = event.args;
-                    const tokenName = getTokenName(winner, true);
-                    setMessage(`after an intense fight ${tokenName} won the fight. You has received ${damages[1]} and attack caused ${damages[0]}`, eventDelay);
-                    if (matchId.value) {
-                        await fetchMatch(matchId.value);
-                    }
-                } else if (event.args) {
-                    const {  attacker, damage } = event.args;
-                    const tokenName = getTokenName(attacker.toNumber());
-                    damages.push(damage);
-                    setMessage(`${tokenName} goes for its opponent...`, eventDelay / 2);
-                    setTimeout(() => {
-                        setMessage(`${tokenName} cause a damage of ${damage} on its opponent`, eventDelay / 2);
-                    }, eventDelay / 2);
-                }
-            }, eventDelay * (index + 1));
+        runFight(receipt.events, 6000, () => {
+            isFetching.value = true;
+            fetchMatch(matchId.value);
         });
    }
 }
@@ -124,7 +157,6 @@ const fetchEventTournament = async (eventId: number) => {
 }
 
 const isLoading = ref(false);
-const isReply = ref(false);
 watch(() => route.path, async () => {
   if (route.params.id && typeof route.params.id == 'string') {
     matchId.value = route.params.id;
@@ -154,15 +186,16 @@ watch(() => route.path, async () => {
         :winner-token="winnerToken"
     />
     <MatchLive 
-        v-else-if="isReply" 
+        v-else-if="isReplay" 
         @processMatch="processMatch" 
         :match-event="matchEvent" 
         :is-fetching="isFetching" 
+        :is-replay="isReplay"
         :winner-token="winnerToken"
     />
     <MatchResults 
         v-else="matchEvent.active" 
-        @reply="isReply=true" 
+        @reply="replayFight()" 
         :match-event="matchEvent" :is-fetching="isFetching" 
         :winner-token="winnerToken"
     />
