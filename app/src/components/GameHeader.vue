@@ -3,8 +3,14 @@ import { AppState } from '../composables/AppState';
 import { useWeb3 } from '../composables/useWeb3Provider';
 import WalletAccount from './basic/WalletAccount.vue';
 import NetworkBadge from './basic/NetworkBadge.vue';
+import { AtButton } from "atmosphere-ui";
 import { config } from '../config';
+import { useMoralis } from '../composables/useMoralis';
+import { formatEther } from '../utils';
 const ProviderState = useWeb3();
+
+const { login, logout} = useMoralis();
+
 </script>
 
 <template>
@@ -18,9 +24,16 @@ const ProviderState = useWeb3();
             </h1>
         </div>
         <div class="relative flex mr-24 space-x-2">
-            <div class="flex items-center text-center">Tokens {{ ProviderState.balance }}</div>
+            <div class="flex items-center text-center" v-if="ProviderState.account">Tokens {{ formatEther(ProviderState.balance) }}</div>
             <NetworkBadge :chain="ProviderState.chainId" :valid-chain="config.chainId" />
             <WalletAccount :account="ProviderState.account" v-if="ProviderState.account" />
+            <AtButton v-if="ProviderState.account" @click="logout()" class="text-white bg-red-500" type="error">
+                <i class="fa fa-power-off"></i>
+            </AtButton>
+            <AtButton v-else @click="login()" class="text-white bg-primary">
+                <i class="fa fa-sign-in-alt"></i>
+                Connect
+            </AtButton>
         </div>
         <router-link to="/dashboard" class="absolute top-0 w-20 h-20 overflow-hidden bg-gray-700 border rounded-md cursor-pointer right-5" v-if="ProviderState.account">
             <img :src="AppState.roosters[0].image" v-if="AppState.roosters.length" class="profile-card" />

@@ -90,4 +90,6 @@ export interface ICombat {
   winner: ethers.BigNumber;
   date: number;
   active: boolean;
+  attackerToken?: INftDetails;
+  defenseToken?: INftDetails;
 }
