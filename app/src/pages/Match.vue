@@ -126,7 +126,7 @@ const processMatch = async () => {
 }
 
 const winnerToken = computed(() => {
-    if (matchEvent.value.winner.toNumber() === matchEvent.value.attackerToken.tokenId) {
+    if (matchEvent.value.winner && matchEvent.value.winner.toNumber() === matchEvent.value.attackerToken.tokenId) {
         return matchEvent.value.attackerToken;
     }
     return matchEvent.value.winner.toNumber() !== 0 ? matchEvent.value.defenseToken : null;

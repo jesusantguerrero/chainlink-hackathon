@@ -37,14 +37,15 @@ const claim = async (token: IPreToken) => {
 const items = ref<IPreToken[]>([]);
 const isLoading = ref(true);
 onMounted(async () => {
-    items.value = await fetchMarketItems();
+    items.value = (await fetchMarketItems()) || [];
     nextTick(() => {
         isLoading.value = false;
     });
 })
 
 const visibleItems = computed(() => {
-    return props.limit ? items.value.slice(0, props.limit) : items.value;
+    const visibleItems = items.value || [];
+    return props.limit ? visibleItems.slice(0, props.limit) : visibleItems;
 })
 </script>
 
