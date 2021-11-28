@@ -6,6 +6,7 @@ import { getProvider } from "../composables/getProvider";
 import { ref } from "vue";
 import { IPreToken } from "../types";
 import { AppState } from "../composables/AppState";
+import PageLoader from "./animated/PageLoader.vue";
 
 const props = defineProps({
     limit: {
@@ -48,7 +49,7 @@ const visibleItems = computed(() => {
 <template>
     <div class="claimable-list">
         <div class="mt-10 text-4xl text-center text-white" v-if="isLoading">
-            <i class=" fa fa-circle-notch fa-spin fa-3x fa-fw" />
+            <PageLoader />
         </div>
         <div class="flex flex-wrap justify-center gap-2 mt-5 claimable-list__items" v-else>
             <div v-for="item in visibleItems" class="claimable-list__item">
@@ -70,7 +71,7 @@ const visibleItems = computed(() => {
                 </div>
             </div>
 
-            <RouterLink to="/marketplace" class="px-5 py-1 mx-auto mt-5 font-bold text-purple-300 transition transform border-2 border-purple-300 rounded-md hover:scale-105 hover:bg-purple-300 hover:text-white" v-if="limit">
+            <RouterLink to="/marketplace" class="px-5 py-1 mx-auto mt-5 font-bold transition transform border-2 rounded-md text-primary-300 border-primary-300 hover:scale-105 hover:bg-primary-300 hover:text-white" v-if="limit">
                 View More
             </RouterLink>
         </div>

@@ -162,11 +162,17 @@ const fight = async (eventId: number, defenderId: number) => {
     }
 }
 
+const canJoin = computed(() => {
+    return (tournament.value.seatsTaken < tournament.value.seats) && !isJoined.value && AppState && AppState.roosters.length;
+});
+const isJoining = ref<boolean>(false);
+
 const joinTournament = async (prixId: number) => {
     if (AppState.roosters.length === 0) {
         setMessage("You need to have at least one rooster to join a tournament");
         return;
     }
+    isJoining.value = true;
     const tokenId = AppState.roosters[0].tokenId;
     const Tournament = useContract("Tournament", AppState.signer);
     const eventId = await Tournament?.prixToCurrentEvent(prixId);
@@ -176,6 +182,7 @@ const joinTournament = async (prixId: number) => {
     }); 
     await trx?.wait();
     setMessage(`You has joined to the ${tournament.value.name} tournament`);
+    isJoining.value = false;
     await fetchPageData();
 }
 
@@ -194,7 +201,8 @@ const joinTournament = async (prixId: number) => {
                 <p>Seats: {{ tournament.seatsTaken }} / {{ tournament.seats }}</p>
             </div>
             <p class="mt-5 font-bold">Fee: {{ tournament.fee }} MATIC</p>
-            <AtButton class="bg-primary-500" @click="joinTournament(tournament.id)" v-if="!isJoined">
+            <AtButton class="bg-primary-500" @click="joinTournament(tournament.id)" v-if="canJoin" :disabled="isJoining">
+                <i class="fa fa-circle-notch fa-spin fa-3x fa-fw"  v-if="isJoining"/>
                 Join
             </AtButton>
         </div>

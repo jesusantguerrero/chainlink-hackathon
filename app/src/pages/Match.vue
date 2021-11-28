@@ -3,13 +3,13 @@ import { ethers } from 'ethers';
 import { watch, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useContract } from '../composables/useContract';
-import { AtButton } from "atmosphere-ui";
 import { useMessage } from '../utils/useMessage';
 import Game from '../layouts/Game.vue';
-import { ICombat, INftDetails } from '../types';
+import { ICombat, INftDetails, ITournamentWithEvent } from '../types';
 import { getProvider } from '../composables/getProvider';
 import { AppState } from '../composables/AppState';
-import MatchPresentation from '../components/animated/MatchPresentation.vue';
+import MatchLive from '../components/MatchLive.vue';
+import MatchResults from '../components/MatchResults.vue';
 
 const route = useRoute();
 const matchId = ref<string>();
@@ -48,7 +48,6 @@ const fetchMatch = async (matchId: string) => {
         logs: combat.active ? [] : await Tournament?.combatLogs(matchId, combat.attacker, combat.defense),
     }
     isFetching.value = false;
-   
 }
 
 const { setMessage, timeout } = useMessage()
@@ -68,12 +67,12 @@ const processMatch = async () => {
    const trx = await Tournament?.functions?.startFight(matchEvent.value.requestId, matchId.value)
    const receipt = await trx?.wait();
    if (receipt) {
-        const eventDelay = 3000; 
+        const eventDelay = 6000; 
         const damages = []
         receipt.events.forEach(async (event: ethers.Event, index: number) => {
             setTimeout(async () => {
                 if (event.event == 'FightFinished' && event.args) {
-                    const { damage, damageReceived, winner } = event.args;
+                    const { winner } = event.args;
                     const tokenName = getTokenName(winner, true);
                     setMessage(`after an intense fight ${tokenName} won the fight. You has received ${damages[1]} and attack caused ${damages[0]}`, eventDelay);
                     if (matchId.value) {
@@ -100,52 +99,74 @@ const winnerToken = computed(() => {
     return matchEvent.value.winner.toNumber() !== 0 ? matchEvent.value.defenseToken : null;
 });
 
-watch(() => route.path, () => {
+const tournament = ref<ITournamentWithEvent>();
+const fetchEventTournament = async (eventId: number) => {
+    let currentEvent = await Tournament?.events(eventId);
+    let prix = await Tournament?.prixes(currentEvent.prixId);
+
+    prix = {
+        id: prix.tokenId,
+        name: prix.name,
+        description: prix.description,
+        seats: prix.seatsLimit,
+        eventId: currentEvent.tokenId.toNumber(),
+        edition: currentEvent.tournamentEdition,
+        startDate: currentEvent.startDate,
+        endDate:  currentEvent.endDate,
+        seatsTaken: currentEvent.seatsTaken,
+        fee: ethers.utils.formatEther(prix.seatFee),
+        realFee: prix.seatFee,
+        formattedPrize: ethers.utils.formatEther(prix.prize),
+        prize: prix.prize
+    }
+
+    tournament.value = prix;
+}
+
+const isLoading = ref(false);
+const isReply = ref(false);
+watch(() => route.path, async () => {
   if (route.params.id && typeof route.params.id == 'string') {
     matchId.value = route.params.id;
-    fetchMatch(matchId.value);
+    isLoading.value = true;
+    await fetchMatch(matchId.value);
+    await fetchEventTournament(matchEvent.value.eventId);
+    isLoading.value = false;
   }
 }, {immediate: true });
 </script>
 
 <template>
 <Game :show-navbar="false">
-    <div class="flex flex-col items-center justify-center w-full overflow-hidden">
-        <h4 class="mb-20 text-5xl font-bold text-purple-400"> Tournament Match </h4>
-        <div class="relative bg-green-500 rounded-full w-96 h-96">
-            <div class="absolute flex flex-col items-center justify-center w-full h-full" v-if="!isFetching">
-                <div class="flex items-center justify-center w-full space-x-10">
-                    <div class="w-full text-center">
-                        <img :src="matchEvent.attackerToken.image" class="attacker h-52">
-                        <p>{{ matchEvent.attackerToken.name }}</p>
-                    </div>
-                    <span class="text-5xl text-white animate-pulse">
-                        vs
-                    </span>
-                    <div class="w-full text-center">
-                        <img :src="matchEvent.defenseToken.image" class="h-52">
-                        <p>{{ matchEvent.defenseToken.name }}</p>
-                    </div>
-                </div>
-                <AtButton  
-                    @click="processMatch()"
-                    :disabled="!matchEvent.active" 
-                    class="mt-10 text-white bg-purple-500"
-                    v-if="matchEvent.active"
-                > 
-                    Fight  
-                </AtButton>
-
-                <div v-if="winnerToken" class="mt-5 text-center text-white">
-                    <p class="font-bold">
-                        Winner: {{ winnerToken.name }}
-                    </p> 
-                    <img :src="winnerToken.image" class="transform rounded-md h-52">
-                </div>
-            </div>
+    <div class="flex justify-between" v-if="tournament">
+        <div class="flex items-center space-x-3 " >
+            <RouterLink :to="`/tournaments/${tournament.id}`" class="flex items-center hover:text-primary">
+                <i class="fa fa-chevron-left"></i>
+                <h4 class="ml-4 text-xl font-bold">
+                {{ tournament.name }}: <span class="text-gray-300">{{ tournament.description }}</span></h4>
+            </RouterLink>
         </div>
-        <MatchPresentation v-if="matchEvent.active" />
+        <div>Prizepool: <span class="text-xl font-bold text-roti">{{ tournament.formattedPrize }} MATIC</span></div>
     </div>
+    <MatchLive 
+        v-if="matchEvent.active" @processMatch="processMatch" 
+        :match-event="matchEvent" :is-fetching="isFetching" 
+        :winner-token="winnerToken"
+    />
+    <MatchLive 
+        v-else-if="isReply" 
+        @processMatch="processMatch" 
+        :match-event="matchEvent" 
+        :is-fetching="isFetching" 
+        :winner-token="winnerToken"
+    />
+    <MatchResults 
+        v-else="matchEvent.active" 
+        @reply="isReply=true" 
+        :match-event="matchEvent" :is-fetching="isFetching" 
+        :winner-token="winnerToken"
+    />
+    
 </Game>
 </template>
 

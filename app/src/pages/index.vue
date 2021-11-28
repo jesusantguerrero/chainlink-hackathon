@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { AtButton } from "atmosphere-ui";
+import { AtButton, AtSiteFooter } from "atmosphere-ui";
 import { useAppState } from "../composables/useAppState";
 import ClaimableList from "../components/ClaimableList.vue";
 import MintForm from "../components/MintForm.vue";
@@ -11,14 +11,9 @@ const breeds = ["black", "colorao", "pinto", "white"];
 </script>
 
 <template>
-<div :style="{background: 'url(/landing-background.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
-    <div class="flex justify-center w-full h-10 font-bold text-white bg-primary" v-if="false">
-        <div class="flex items-center w-full max-w-7xl">
-            The chainlink hackathon
-        </div>
-    </div>
+<div :style="{background: 'url(/cockfight-bg.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
     <LandingHeader @connect="$emit('connect')" class="bg-black bg-opacity-80"/>
-    <div class="justify-center py-32 text-center text-white bg-black bg-opacity-80">
+    <div class="justify-center pt-32 pb-12 text-center text-white bg-black bg-opacity-80">
         <div class="flex items-center mx-auto max-w-7xl">
             <div class="text-left">
                 <div>
@@ -33,6 +28,22 @@ const breeds = ["black", "colorao", "pinto", "white"];
             </div>
             <div class="flex justify-end w-full h-full text-right">
                 <img alt="" class="w-96" src="/images/breed_colorao.png">
+            </div>
+        </div>
+        <div class="relative h-24 max-w-5xl mx-auto mt-10 overflow-hidden bg-white border border-gray-500 rounded-md bg-opacity-10">
+            <div class="absolute w-full h-full bg-white bg-opacity-20 filter blur-3xl">
+            </div>
+            <h4> Powered by</h4>
+            <div class="flex justify-around mt-4 text-2xl font-bold divide-x-2">
+                <div class="w-full text-center">
+                    Chainlink
+                </div>
+                <div class="w-full text-center">
+                    Moralis
+                </div>
+                <div class="w-full">
+                    Polygon
+                </div>
             </div>
         </div>
     </div>
@@ -50,7 +61,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
             </div>
         </div>
 </LandingSection>
-<LandingSection class="bg-fire-400" title="Tournaments" inner-class="bg-fire-500">
+<LandingSection class="bg-blue-500" title="Tournaments" inner-class="bg-blue-700">
          <template #description>
             Tournaments are periodic events where the Roosters can join by paying a determined fee
             with a duration of a week were you can fight once with every other Rooster in the tournament if you win you got 3 points at the end the rooster with more points get the prize.
@@ -59,7 +70,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
         <div>
             <img src="/images/tournaments.png" alt="tournaments" class="rounded-lg">
             <div class="flex justify-center w-full">
-                <RouterLink to="/tournaments" class="inline-block px-5 py-1 mt-5 font-bold text-purple-500 transition transform bg-white border-2 rounded-md hover:scale-105 hover:bg-purple-500 hover:text-white">
+                <RouterLink to="/tournaments" class="inline-block px-5 py-1 mt-5 font-bold text-blue-500 transition transform bg-white border-2 rounded-md hover:scale-105 hover:bg-blue-500 hover:text-white">
                     Go to Tournaments
                 </RouterLink>
             </div>
@@ -98,5 +109,23 @@ const breeds = ["black", "colorao", "pinto", "white"];
         </div>
         <ClaimableList class="w-full px-5" :limit="8" />
     </div>
+</div>
+<div :style="{background: 'url(/landing-background.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
+    <div class="justify-center py-10 text-center text-white bg-black bg-opacity-80">
+        <div class="flex items-center justify-between mx-auto max-w-7xl">
+            <div class="text-left">
+                <div>
+                    <h1 class="text-2xl font-bold">Claim your free rooster </h1>
+                    <p class="font-bold"> And start fighting</p>
+                </div>
+            </div>
+            <div class="py-12 space-x-2 text-left">
+                <RouterLink to="/marketplace" class="px-3 py-2 font-bold text-white border-2 rounded-md border-primary bg-primary"> Claim a free rooster </RouterLink>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-gray-900">
+    <AtSiteFooter title="RoosterFight" year="2021" subtitle="RoosterFight - The rooster game" />
 </div>
 </template>

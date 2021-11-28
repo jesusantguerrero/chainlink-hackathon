@@ -7,6 +7,7 @@ import { useAppState } from "./useAppState";
 import { ProviderState, useWeb3Provider } from "./useWeb3Provider";
 import { AppState } from "./AppState";
 import { fetchMyItems } from "../utils/fetchMyItems";
+import { useMessage } from "../utils/useMessage";
 
 const { setUser } = useAppState();
 window.Web3 = Web3;
@@ -45,8 +46,13 @@ export const initProvider = () => {
   useWeb3Provider(init, logout);
 };
 
+const { setMessage } = useMessage();
 export const useMoralis = () => {
   const login = async () => {
+    if (!ProviderState.isConnectedToValidNetwork) {
+      setMessage("Please connect to the correct network");
+      return;
+    }
     const user = await Moralis.Web3.authenticate({
       provider: window.ethereum,
       chainId: Number(config.chainId),

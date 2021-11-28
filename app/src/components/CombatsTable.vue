@@ -44,7 +44,7 @@ const isWinner = (combat: ICombat, playerId: ethers.BigNumber): boolean => {
         </div>
     </div>
     <div v-for="(combat, index) in combats" :key="index" class="flex">
-        <router-link class="flex items-center w-6/12 space-x-2 font-bold text-purple-400" :to="`/match/${combat.token}`">
+        <router-link class="flex items-center w-6/12 space-x-2 font-bold text-gray-300" :to="`/match/${combat.token}`">
             <PlayerMiniCard :player="getPlayer(combat.attacker)" :marked="isWinner(combat, combat.attacker)" />
             <span class="px-3">
                 VS 
@@ -55,7 +55,7 @@ const isWinner = (combat: ICombat, playerId: ethers.BigNumber): boolean => {
             {{ formatDate(combat.date) }}
         </div>
         <div class="w-3/12">
-            <router-link :to="`/match/${combat.token}`" class="flex items-center font-bold hover:text-purple-400"> 
+            <router-link :to="`/match/${combat.token}`" class="flex items-center font-bold hover:text-primary-400"> 
                 View details <i class="ml-5 fa fa-chevron-right"></i>
             </router-link>
         </div>
