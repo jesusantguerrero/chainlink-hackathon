@@ -1,11 +1,23 @@
-# RoosterFight
-[![codecov](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon/branch/master/graph/badge.svg?token=Y153S4JEZL)](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon)
+<p align="center">
+<a href="https://rooster-fight.vercel.app/" target="_blank">
+<img src="https://raw.githubusercontent.com/jesusantguerrero/chainlink-hackathon/master/app/src/assets/logo.svg" width="400">
+</a></p>
 
-## Overview
+
+[![codecov](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon/branch/master/graph/badge.svg?token=Y153S4JEZL)](https://codecov.io/gh/jesusantguerrero/chainlink-hackathon) 
+
+
+## Overview of RoosterFight
 RoosterFight is a NFT game where you can claim and train a Rooster to fight and reach the top of the tournaments.
 
 ## Inspiration
 I took inspiration from zed.run a virtual horse race game and a tradition of my country cockfight to bring a virtual game where users can have a like experience of raise and train a nice looking rooster and compete with others.
+
+## Live demo
+[Live in testnet](https://rooster-fight.vercel.app/)
+
+network: [Polygon Mumbai](https://docs.polygon.technology/docs/develop/network-details/network/)
+
 
 ## What is does
 ### User Stories
