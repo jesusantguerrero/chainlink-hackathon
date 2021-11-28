@@ -32,6 +32,7 @@ const actions = [{
         :links="links" 
         :actions="actions" 
         dot-class="text-transparent" 
+        link-class="text-white hover:text-primary-500"
         @action="$emit('connect')" 
     >
         <template #brand>

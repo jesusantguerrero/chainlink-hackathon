@@ -23,9 +23,11 @@ const fetchMarketItems = async () => {
 }
 
 const claim = async (token: IPreToken) => {
-    const provider = new ethers.providers.Web3Provider(window?.ethereum, "any");
-    const signer = provider.getSigner();
-    const RoosterFight = useContract("RoosterFight", signer);
+    if (!AppState.user) {
+        useMessage().setMessage("Please login to claim");
+        return
+    }
+    const RoosterFight = useContract("RoosterFight", AppState.signer);
     const trx = await RoosterFight?.functions.mint(token.id).catch(err => {
         useMessage().setMessage("Can't claim more than one rooster")
     });

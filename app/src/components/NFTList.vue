@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { AtButton } from "atmosphere-ui";
 import RoosterCard from "./RoosterCard.vue";
 import { AppState } from "../composables/AppState";
 import PageLoader from "./animated/PageLoader.vue";
+import { onMounted } from "@vue/runtime-core";
 
+onMounted(async() => {
+  if (AppState.rooster && AppState.rooster.length === 0) {
+    await AppState.fetchMyNfts();
+  }
+});
 </script>
 
 <template>

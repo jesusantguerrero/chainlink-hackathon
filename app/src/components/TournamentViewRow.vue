@@ -60,19 +60,17 @@ onMounted(async () => {
         <td class="px-4 py-2 text-center"># {{ position }}</td>
         <td class="px-4 py-2">
         <div class="flex items-center justify-center">
-            <router-link :to="`/roosters/${player.tokenId}`">
+            <router-link :to="`/roosters/${player.tokenId}`" class="flex flex-col items-center justify-center">
                 <img :src="player.image" alt="" class="w-20 h-20 rounded-md">
                 <p class="font-bold capitalize">{{ player.name }}</p>
-            </router-link>
-            <div class="ml-2">
                 <AtButton 
-                    class="font-bold border-2 text-primary border-primary-400" 
+                    class="text-xs font-bold border-2 text-primary border-primary-400 hover:bg-primary hover:text-white" 
                     @click="$emit('fight')"
                     v-if="canRequestFight && !alreadyFought"
                 >
-                    Fight
+                    Request fight
                 </AtButton>
-            </div>
+            </router-link>
         </div>
         </td>
         <td class="px-4 py-2 text-center">{{ player.record.wins + player.record.losses }}</td>
