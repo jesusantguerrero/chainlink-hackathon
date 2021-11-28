@@ -107,12 +107,8 @@ describe("Tournament integration tests", async () => {
     const result = await tournament.startFight(requestId, 0);
     const trx2 = await result.wait(1);
     const events2 = trx2.events.map((evt: ethers.Event) => evt.event);
-    expect(events2).to.eql([
-      "FightRound",
-      "FightRound",
-      "FightWinner",
-      "FightFinished",
-    ]);
+    expect(events2).to.eql(["FightRound", "FightRound", "FightFinished"]);
+    expect(await tournament.combatLogs(0, 1, 0)).to.eql({ matchId: 0 });
     await tournament.payout(0);
 
     // shouldn't start the same fight twice

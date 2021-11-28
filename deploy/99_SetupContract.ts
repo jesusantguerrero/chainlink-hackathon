@@ -80,31 +80,41 @@ const SetupContract: DeployFunction = async (
 
   tournament.setNFTAddress(RoosterFight.address);
 
-  // Create the initial tournament
-  await tournament.functions.addPrix(
-    "Rooster fight I",
-    "First tournament of rooster fight",
-    10,
-    ethers.utils.parseEther("0.1")
-  );
-  const startDate = new Date();
-  const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
-  await tournament.functions.addEvent(0, new Date().getTime(), endDate);
+  if (chainId === "1337") {
+    console.log("in tournaments");
+    // Create the initial tournament
+    await tournament
+      .addPrix(
+        "Rooster fight I",
+        "First tournament of rooster fight",
+        10,
+        ethers.utils.parseEther("0.1"),
+        {
+          gasLimit: ethers.utils.parseEther("0.00000000002001"),
+        }
+      )
+      .catch((err) => {
+        console.log(err, "el error es aqui");
+      });
+    const startDate = new Date();
+    const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
+    console.log("in events");
+    await tournament.addEvent(0, new Date().getTime(), endDate);
 
-  if (
-    chainId === "1337" &&
-    chainLink.linkTokenAddress &&
-    (await autoFundCheck(
-      Tournament.address,
-      "localhost",
-      chainLink.linkTokenAddress,
-      "Nothing more"
-    ))
-  ) {
-    await hre.run("fund-link", {
-      contract: Tournament.address,
-      linkaddress: chainLink.linkTokenAddress,
-    });
+    if (
+      chainLink.linkTokenAddress &&
+      (await autoFundCheck(
+        Tournament.address,
+        "localhost",
+        chainLink.linkTokenAddress,
+        "Nothing more"
+      ))
+    ) {
+      await hre.run("fund-link", {
+        contract: Tournament.address,
+        linkaddress: chainLink.linkTokenAddress,
+      });
+    }
   }
 };
 
