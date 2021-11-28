@@ -37,6 +37,7 @@ export interface ITournamentWithEvent {
   seatsTaken: number;
   fee: number;
   realFee: number;
+  formattedPrize?: string;
 }
 
 export interface INftDetails {
