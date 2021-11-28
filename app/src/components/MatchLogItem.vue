@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-defineProps({
+const props = defineProps({
     vars: {
-        type: Array,
+        type: Object,
         required: true
     },
     template: {
@@ -12,18 +12,14 @@ defineProps({
     },
 })
 
- const displayMessage = computed() {
-            const regex = /\$\{(.*?)\}/ig;
-            const [actionStatus] = this.template.split(":");
-            const message = this.message || this.templates[this.template] || this.templates[`${actionStatus}:default`] || "";
-            return message.replace(regex, (match, varName) => {
-                return `<span class="${varName} template-var">${this.variables[varName] || varName }</span>`;
-            })
-        },
+ const displayMessage = computed(() =>  {
+    const regex = /\$\{(.*?)\}/ig;
+    return props.template.replace(regex, (match, varName) => {
+        return `<span class="${varName} capitalize text-primary font-bold template-var">${props.vars[varName] || varName }</span>`;
+    })
+});
 </script>
 
 <template>
-<p>
-    <span class="font-bold capitalize">{{ matchEvent.attackerToken.name }}</span> caused {{ matchEvent.logs.attackerDamage }} damage to {{ matchEvent.defenseToken.name }}
-</p>
+<p v-html="displayMessage" />    
 </template>

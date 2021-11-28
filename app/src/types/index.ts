@@ -81,6 +81,13 @@ export interface IPlayer {
   owner: string;
 }
 
+export interface ICombatLog {
+  eventId: number;
+  combatId: number;
+  attackerDamage: number;
+  defenseDamage: number;
+}
+
 export interface ICombat {
   id: number;
   token: number;
@@ -90,6 +97,7 @@ export interface ICombat {
   winner: ethers.BigNumber;
   date: number;
   active: boolean;
+  logs?: ICombatLog;
   attackerToken?: INftDetails;
   defenseToken?: INftDetails;
 }

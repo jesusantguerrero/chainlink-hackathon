@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { PropType } from 'vue';
+import { PropType, computed, ref } from 'vue';
 import { ICombat, INftDetails } from '../types';
-import { AtButton } from 'atmosphere-ui';
-import MatchPresentation from './animated/MatchPresentation.vue';
 import MatchRoosterCard from './MatchRoosterCard.vue';
+import MatchLogItem from './MatchLogItem.vue';
 
-defineProps({
+const props = defineProps({
     matchEvent: {
         type: Object as PropType<ICombat>,
         required: true
@@ -18,6 +17,16 @@ defineProps({
         required: true
     },
 })
+
+const showLogs= ref(false);
+const logVars = computed(() => {
+    return {
+        attackerName: props.matchEvent.attackerToken.name,
+        attackerDamage: props.matchEvent.logs.attackerDamage,
+        defenseDamage: props.matchEvent.logs.attackerDamage,
+        defenseName: props.matchEvent.defenseToken.name
+    }
+})
 </script>
 
 <template>
@@ -26,7 +35,7 @@ defineProps({
             <div @click="$emit('reply')" class="w-full py-10 mt-5 text-lg font-bold text-center bg-gray-700 border-4 border-gray-600 rounded-md cursor-pointer hover:text-primary hover:border-primary">
                 Reply
             </div>
-            <div class="w-full py-10 mt-5 text-lg font-bold text-center bg-gray-700 border-4 border-gray-600 rounded-md cursor-pointer hover:text-primary hover:border-primary">
+            <div @click="showLogs=!showLogs" class="w-full py-10 mt-5 text-lg font-bold text-center bg-gray-700 border-4 border-gray-600 rounded-md cursor-pointer hover:text-primary hover:border-primary">
                 See logs
             </div>
         </div>
@@ -41,14 +50,17 @@ defineProps({
         <div class="relative w-full h-64 mt-5 overflow-hidden bg-gray-700 border-4 rounded-md border-primary">
             <div class="absolute top-0 left-0 z-20 flex w-full">
                 <MatchRoosterCard :rooster="winnerToken" :is-attacker="true" class="w-8/12" />
-                <div class="w-4/12">
-                    <div class="mx-auto">
-                        <p>
-                            <span class="font-bold capitalize">{{ matchEvent.attackerToken.name }}</span> caused {{ matchEvent.logs.attackerDamage }} damage to {{ matchEvent.defenseToken.name }}
-                        </p>
-                        <p>
-                            {{ matchEvent.defenseToken.name }} caused {{ matchEvent.logs.defenseDamage }} damage to  {{ matchEvent.attackerToken.name }}
-                        </p>
+                <div class="w-5/12 h-full mx-auto my-auto" v-if="showLogs">
+                    <div class="h-full">
+                        <MatchLogItem 
+                            template="${attackerName} caused ${attackerDamage} damage to ${defenseName}"
+                            :vars="logVars"
+                        />
+                        <MatchLogItem 
+                            template="${defenseName} caused ${defenseDamage} damage to ${attackerName}"
+                            :vars="logVars"
+                        />
+                       
                     </div>
                 </div>
             </div>
