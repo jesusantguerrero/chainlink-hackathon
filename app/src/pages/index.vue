@@ -11,8 +11,8 @@ const breeds = ["black", "colorao", "pinto", "white"];
 </script>
 
 <template>
-<div :style="{background: 'url(/landing-background.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
-    <div class="flex justify-center w-full h-10 font-bold text-white bg-primary" v-if="false">
+<div :style="{background: 'url(/cockfight-bg.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
+    <div class="flex justify-center w-full h-10 font-bold text-white bg-blue-500">
         <div class="flex items-center w-full max-w-7xl">
             The chainlink hackathon
         </div>
@@ -50,7 +50,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
             </div>
         </div>
 </LandingSection>
-<LandingSection class="bg-fire-400" title="Tournaments" inner-class="bg-fire-500">
+<LandingSection class="bg-blue-500" title="Tournaments" inner-class="bg-blue-700">
          <template #description>
             Tournaments are periodic events where the Roosters can join by paying a determined fee
             with a duration of a week were you can fight once with every other Rooster in the tournament if you win you got 3 points at the end the rooster with more points get the prize.
@@ -59,7 +59,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
         <div>
             <img src="/images/tournaments.png" alt="tournaments" class="rounded-lg">
             <div class="flex justify-center w-full">
-                <RouterLink to="/tournaments" class="inline-block px-5 py-1 mt-5 font-bold text-purple-500 transition transform bg-white border-2 rounded-md hover:scale-105 hover:bg-purple-500 hover:text-white">
+                <RouterLink to="/tournaments" class="inline-block px-5 py-1 mt-5 font-bold text-blue-500 transition transform bg-white border-2 rounded-md hover:scale-105 hover:bg-blue-500 hover:text-white">
                     Go to Tournaments
                 </RouterLink>
             </div>

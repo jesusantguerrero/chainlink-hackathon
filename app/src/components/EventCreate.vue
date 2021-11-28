@@ -36,7 +36,7 @@ const createEvent = async (formData: ITournamentEvent) => {
 
 <template>
     <form className="form" @submit.prevent="createEvent(form)">
-        <h2 class="mt-5 text-xl font-bold text-purple-400">Create Event for this tournament</h2>
+        <h2 class="mt-5 text-xl font-bold text-primary-400">Create Event for this tournament</h2>
         <div className="form-group mt-5">
             <label htmlFor="name">Tournament</label>
             <select v-model="form.tournamentId" class="mt-2 form-control">
@@ -55,7 +55,7 @@ const createEvent = async (formData: ITournamentEvent) => {
         </div>
 
         <div class="text-right">
-        <AtButton class="bg-purple-500 hover:bg-purple-600">
+        <AtButton class="bg-primary-500 hover:bg-primary-600">
             Create
         </AtButton>
         </div>

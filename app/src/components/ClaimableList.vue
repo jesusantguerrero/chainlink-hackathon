@@ -71,7 +71,7 @@ const visibleItems = computed(() => {
                 </div>
             </div>
 
-            <RouterLink to="/marketplace" class="px-5 py-1 mx-auto mt-5 font-bold text-purple-300 transition transform border-2 border-purple-300 rounded-md hover:scale-105 hover:bg-purple-300 hover:text-white" v-if="limit">
+            <RouterLink to="/marketplace" class="px-5 py-1 mx-auto mt-5 font-bold transition transform border-2 rounded-md text-primary-300 border-primary-300 hover:scale-105 hover:bg-primary-300 hover:text-white" v-if="limit">
                 View More
             </RouterLink>
         </div>

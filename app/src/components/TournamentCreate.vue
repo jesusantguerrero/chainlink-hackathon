@@ -77,7 +77,7 @@ onMounted(async () => {
         </div>
 
         <div class="text-right">
-        <AtButton class="bg-purple-500 hover:bg-purple-600">
+        <AtButton class="bg-primary-500 hover:bg-primary-600">
             Create
         </AtButton>
         </div>
