@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { AtButton } from "atmosphere-ui";
 import RoosterCard from "./RoosterCard.vue";
 import { AppState } from "../composables/AppState";
 import PageLoader from "./animated/PageLoader.vue";
+import { AtButton } from "atmosphere-ui";
+import { onMounted } from "@vue/runtime-core";
 
+onMounted(async() => {
+  if (AppState.rooster && AppState.rooster.length === 0) {
+    await AppState.fetchMyNfts();
+  }
+});
 </script>
 
 <template>
@@ -22,6 +28,9 @@ import PageLoader from "./animated/PageLoader.vue";
                 class="px-2 py-2 rounded-md bg-primary hover:bg-primary-600"> 
                 Claim your free Rooster
             </RouterLink> 
+            <AtButton @click="AppState.fetchMyNfts()" type="secondary" :disabled="AppState.isLoading">
+                Refresh List
+            </AtButton>
         </div>
     </div>
 </template>
