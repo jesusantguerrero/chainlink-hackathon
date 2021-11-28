@@ -3,6 +3,7 @@ import { PropType } from 'vue';
 import { ICombat, INftDetails } from '../types';
 import { AtButton } from 'atmosphere-ui';
 import MatchPresentation from './animated/MatchPresentation.vue';
+import MatchRoosterCard from './MatchRoosterCard.vue';
 
 defineProps({
     matchEvent: {
@@ -24,17 +25,12 @@ defineProps({
         <div class="relative mt-32 bg-green-500 rounded-full w-96 h-96">
             <div class="absolute flex flex-col items-center justify-center w-full h-full" v-if="!isFetching">
                 <div class="flex items-center justify-center w-full space-x-10">
-                    <div class="w-full text-center">
-                        <img :src="matchEvent.attackerToken.image" class="attacker h-52">
-                        <p>{{ matchEvent.attackerToken.name }}</p>
-                    </div>
+                    
+                    <MatchRoosterCard :rooster="matchEvent.attackerToken" :is-attacker="true" />
                     <span class="text-5xl text-white animate-pulse">
                         vs
                     </span>
-                    <div class="w-full text-center">
-                        <img :src="matchEvent.defenseToken.image" class="h-52">
-                        <p>{{ matchEvent.defenseToken.name }}</p>
-                    </div>
+                    <MatchRoosterCard :rooster="matchEvent.defenseToken"  />
                 </div>
                 <AtButton  
                     @click="$emit('processMatch')"

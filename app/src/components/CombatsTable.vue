@@ -44,7 +44,7 @@ const isWinner = (combat: ICombat, playerId: ethers.BigNumber): boolean => {
         </div>
     </div>
     <div v-for="(combat, index) in combats" :key="index" class="flex">
-        <router-link class="flex items-center w-6/12 space-x-2 font-bold text-primary-400" :to="`/match/${combat.token}`">
+        <router-link class="flex items-center w-6/12 space-x-2 font-bold text-gray-300" :to="`/match/${combat.token}`">
             <PlayerMiniCard :player="getPlayer(combat.attacker)" :marked="isWinner(combat, combat.attacker)" />
             <span class="px-3">
                 VS 

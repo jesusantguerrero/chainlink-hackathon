@@ -67,12 +67,12 @@ const processMatch = async () => {
    const trx = await Tournament?.functions?.startFight(matchEvent.value.requestId, matchId.value)
    const receipt = await trx?.wait();
    if (receipt) {
-        const eventDelay = 3000; 
+        const eventDelay = 6000; 
         const damages = []
         receipt.events.forEach(async (event: ethers.Event, index: number) => {
             setTimeout(async () => {
                 if (event.event == 'FightFinished' && event.args) {
-                    const { damage, damageReceived, winner } = event.args;
+                    const { winner } = event.args;
                     const tokenName = getTokenName(winner, true);
                     setMessage(`after an intense fight ${tokenName} won the fight. You has received ${damages[1]} and attack caused ${damages[0]}`, eventDelay);
                     if (matchId.value) {
