@@ -79,24 +79,26 @@ const SetupContract: DeployFunction = async (
   );
 
   tournament.setNFTAddress(RoosterFight.address);
-
-  // Create the initial tournament
-  await tournament.functions.addPrix(
-    "Rooster fight I",
-    "First tournament of rooster fight",
-    10,
-    ethers.utils.parseEther("0.1")
-  );
-  const startDate = new Date();
-  const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
-  await tournament.functions.addEvent(0, new Date().getTime(), endDate);
+  try {
+    // Create the initial tournament
+    await tournament.functions.addPrix(
+      "Rooster fight I",
+      "First tournament of rooster fight",
+      10,
+      ethers.utils.parseEther("0.1")
+    );
+    const startDate = new Date();
+    const endDate = startDate.getTime() + 1000 * 60 * 60 * 24 * 7;
+    await tournament.functions.addEvent(0, new Date().getTime(), endDate);
+  } catch (_e) {
+    console.log("Have to create the tournaments manually");
+  }
 
   if (
-    chainId === "1337" &&
     chainLink.linkTokenAddress &&
     (await autoFundCheck(
       Tournament.address,
-      "localhost",
+      networkConfig[chainId].name,
       chainLink.linkTokenAddress,
       "Nothing more"
     ))
