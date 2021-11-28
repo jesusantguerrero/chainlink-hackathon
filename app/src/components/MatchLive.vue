@@ -17,6 +17,10 @@ defineProps({
         type: Boolean,
         required: true
     },
+    isReplay: {
+        type: Boolean,
+        required: false,
+    }
 })
 </script>
 
@@ -41,7 +45,7 @@ defineProps({
                     Fight  
                 </AtButton>
 
-                <div v-if="winnerToken" class="mt-5 text-center text-white">
+                <div v-if="winnerToken && !isReplay" class="mt-5 text-center text-white">
                     <p class="font-bold">
                         Winner: {{ winnerToken.name }}
                     </p> 

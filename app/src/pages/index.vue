@@ -22,7 +22,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
                 </div>
                 <div class="py-12 space-x-2 text-left">
                     <AtButton class="font-bold border-2 text-primary border-primary" v-if="!state.user" @click="$emit('connect')"> Connect </AtButton>
-                    <AtButton class="font-bold text-white border-2 border-primary bg-primary" v-if="!state.user" @click="$emit('connect')"> Claim a free rooster </AtButton>
+                    <RouterLink to="/marketplace" class="px-5 py-2 font-bold text-white border-2 rounded-md border-primary bg-primary" v-if="!state.user"> Claim a free rooster </RouterLink>
                     <MintForm v-else />
                 </div>
             </div>

@@ -7,6 +7,7 @@ import { ref } from "vue";
 import { IPreToken } from "../types";
 import { AppState } from "../composables/AppState";
 import PageLoader from "./animated/PageLoader.vue";
+import { useMessage } from "../utils/useMessage";
 
 const props = defineProps({
     limit: {
@@ -18,15 +19,16 @@ const provider = getProvider()
 const RoosterFight = useContract("RoosterFight", provider);
 
 const fetchMarketItems = async () => {
-    let roosters = await RoosterFight?.pendingToMint();
-    return roosters;
+    return await RoosterFight?.pendingToMint();
 }
 
 const claim = async (token: IPreToken) => {
     const provider = new ethers.providers.Web3Provider(window?.ethereum, "any");
     const signer = provider.getSigner();
     const RoosterFight = useContract("RoosterFight", signer);
-    const trx = await RoosterFight?.functions.mint(token.id);
+    const trx = await RoosterFight?.functions.mint(token.id).catch(err => {
+        useMessage().setMessage("Can't claim more than one rooster")
+    });
     trx?.wait();
     await AppState.fetchMyNfts();
     await fetchMarketItems();

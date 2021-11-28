@@ -9,9 +9,9 @@ interface IRoosterFight {
 }
 
 contract Tournament is TournamentBase, VRFConsumerBase {
-    event FightStarted(bytes32 requestId, uint attacker, uint defense, uint eventId, uint combatId);
-    event FightRound(uint eventId, uint attacker, uint damage);
-    event FightFinished(uint combatId, uint eventId, uint indexed winner, address indexed owner, address indexed loserOwner);
+    event FightStarted(uint indexed combatId, uint indexed eventId, uint attacker, uint defense);
+    event FightRound(uint indexed combatId, uint indexed eventId, uint attacker, uint damage);
+    event FightFinished(uint indexed combatId, uint indexed eventId, uint winner, address indexed owner, address loserOwner);
 
     struct MatchUp {
         uint token;
@@ -68,9 +68,9 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         uint combatId = combats.length;
         events[_eventId].combatsCount++;
         combats.push(MatchUp(combatId, requestId, _eventId, "", _attackerPlayerId, _defensePlayerId, true, 0, 0));
-        emit FightStarted(requestId, eventToPlayer[_eventId][_attackerPlayerId], eventToPlayer[_eventId][_defensePlayerId], _eventId, combatId); 
+        emit FightStarted(combatId,  _eventId, eventToPlayer[_eventId][_attackerPlayerId], eventToPlayer[_eventId][_defensePlayerId]); 
         eventToPlayerVsPlayer[_eventId][_attackerPlayerId][_defensePlayerId] = true;
-        requestIdToRandomNumber[requestId] = combatId;
+        requestIdToCombatId[requestId] = combatId;
         return (requestId, combatId);       
     }
 
@@ -97,8 +97,8 @@ contract Tournament is TournamentBase, VRFConsumerBase {
             expand(requestIdToRandomNumber[combat.requestId], 2)
         );
         
-        emit FightRound(combat.eventId, combat.attacker, player1Attack);
-        emit FightRound(combat.eventId, combat.defense, player2Attack);
+        emit FightRound(combat.token, combat.eventId, combat.attacker, player1Attack);
+        emit FightRound(combat.token, combat.eventId, combat.defense, player2Attack);
         
         combat.active = false;
         combat.winner = winner;
@@ -112,7 +112,7 @@ contract Tournament is TournamentBase, VRFConsumerBase {
         players[winnerPlayerId].points += 3;
         players[loserPlayerId].record.losses++;
 
-        combatLogs[combat.eventId][eventToPlayer[combat.eventId][combat.attacker]][eventToPlayer[combat.eventId][combat.defense]] = CombatLog(
+        combatLogs[combat.eventId][combat.attacker][combat.defense] = CombatLog(
             combat.eventId, 
             combat.token, 
             player1Attack, 
