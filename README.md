@@ -18,6 +18,11 @@ I took inspiration from zed.run a virtual horse race game and a tradition of my 
 
 network: [Polygon Mumbai](https://docs.polygon.technology/docs/develop/network-details/network/)
 
+If you're going to test in the testnet chances are that you need to fund the contract with `Link`
+if so 
+Tournament Contract address: [0xE58823715C71513B90Bdff7F89483f2809D18A68](https://mumbai.polygonscan.com/address/0xE58823715C71513B90Bdff7F89483f2809D18A68)
+in the [Polygon Mumbai Faucet](https://faucet.polygon.technology/)
+
 
 ## What is does
 ### User Stories
