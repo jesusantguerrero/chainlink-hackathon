@@ -8,7 +8,7 @@
 
 
 ## Overview of RoosterFight
-RoosterFight is a NFT game where you can claim and train a Rooster to fight and reach the top of the tournaments.
+RoosterFight is an NFT game where you can claim and train a Rooster to fight and reach the top of the tournaments.
 
 ## Inspiration
 I took inspiration from zed.run a virtual horse race game and a tradition of my country cockfight to bring a virtual game where users can have a like experience of raise and train a nice looking rooster and compete with others.
