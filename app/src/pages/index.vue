@@ -12,10 +12,10 @@ const breeds = ["black", "colorao", "pinto", "white"];
 
 <template>
 <div :style="{background: 'url(/cockfight-bg.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
-    <LandingHeader @connect="$emit('connect')" class="bg-black bg-opacity-80"/>
-    <div class="justify-center pt-32 pb-12 text-center text-white bg-black bg-opacity-80">
-        <div class="flex items-center mx-auto max-w-7xl">
-            <div class="text-left">
+    <LandingHeader @connect="$emit('connect')" class="hidden bg-black bg-opacity-80 md:block"/>
+    <div class="justify-center px-5 pt-32 pb-12 text-center text-white bg-black bg-opacity-80 md:px-0">
+        <div class="flex flex-col items-center mx-auto md:flex-row max-w-7xl">
+            <div class="order-2 text-left md:order-1">
                 <div>
                     <h1 class="text-5xl font-bold">Train your Roosters and fight</h1>
                     <p class="font-bold"> Build your legacy as a rooster trainer and scale up the tops</p>
@@ -26,15 +26,15 @@ const breeds = ["black", "colorao", "pinto", "white"];
                     <MintForm v-else />
                 </div>
             </div>
-            <div class="flex justify-end w-full h-full text-right">
-                <img alt="" class="w-96" src="/images/breed_colorao.png">
+            <div class="flex justify-end order-1 w-full h-full md:text-right md:order-2">
+                <img alt="" class="mx-auto w-52 md:w-96" src="/images/breed_colorao.png">
             </div>
         </div>
         <div class="relative h-24 max-w-5xl mx-auto mt-10 overflow-hidden bg-white border border-gray-500 rounded-md bg-opacity-10">
             <div class="absolute w-full h-full bg-white bg-opacity-20 filter blur-3xl">
             </div>
             <h4> Powered by</h4>
-            <div class="flex justify-around mt-4 text-2xl font-bold divide-x-2">
+            <div class="flex justify-around mt-4 font-bold divide-x-2 md:text-2xl">
                 <div class="w-full text-center">
                     Chainlink
                 </div>
@@ -102,7 +102,7 @@ const breeds = ["black", "colorao", "pinto", "white"];
         
         <img src="/images/upgrade.png" alt="upgrade" class="rounded-lg">
 </LandingSection>
-<div class="py-20 text-white bg-gray-900" id="claim">
+<div class="px-5 py-20 text-white bg-gray-900" id="claim">
     <div class="relative flex justify-center max-w-6xl px-5 py-5 mx-auto bg-gray-800 rounded-lg">
         <div class="absolute text-3xl font-bold -top-6">
             Free Roosters to Claim
@@ -111,8 +111,8 @@ const breeds = ["black", "colorao", "pinto", "white"];
     </div>
 </div>
 <div :style="{background: 'url(/landing-background.jpg)', backgroundSize: 'cover', backgroundPositionY: 'center'}">
-    <div class="justify-center py-10 text-center text-white bg-black bg-opacity-80">
-        <div class="flex items-center justify-between mx-auto max-w-7xl">
+    <div class="justify-center px-5 py-10 text-center text-white bg-black bg-opacity-80">
+        <div class="flex flex-col items-center justify-between mx-auto max-w-7xl">
             <div class="text-left">
                 <div>
                     <h1 class="text-2xl font-bold">Claim your free rooster </h1>

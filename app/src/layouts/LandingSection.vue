@@ -20,7 +20,7 @@ defineProps({
 </script>
 
 <template>
-<div class="py-20 text-white bg-gray-900">
+<div class="px-5 py-20 text-white bg-gray-900">
     <div class="relative flex flex-col items-center justify-center max-w-6xl px-5 py-5 mx-auto rounded-lg" :class="innerClass">
         <div class="absolute text-3xl font-bold -top-6">
             {{ title }}

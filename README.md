@@ -72,7 +72,6 @@ Blockchain Environment:
 
 ```shell
 node -v
-mongo --version
 ```
 #### Cloning the repo
 

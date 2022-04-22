@@ -1,6 +1,7 @@
 {
   "name": "hardhat-project",
   "scripts": {
+    "setup" : "npm install && cd ./app && npm install",
     "start-fights": "npx ts-node ./tasks/startScheduledFights.ts",
     "contract:test": "npx hardhat test",
     "contract:coverage": "npx hardhat coverage",

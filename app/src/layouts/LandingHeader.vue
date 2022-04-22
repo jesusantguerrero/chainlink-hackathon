@@ -26,7 +26,7 @@ const actions = [{
 </script>
 
 <template>
-<div class="bg-transparent">
+<div class="px-5 bg-transparent">
     <AtSiteHeader 
         title="" 
         :links="links" 
@@ -36,7 +36,7 @@ const actions = [{
         @action="$emit('connect')" 
     >
         <template #brand>
-            <img src="../assets/logo.svg" class="w-40 mt-5"/>
+            <img src="../assets/logo.svg" class="w-24 mt-5 md:w-40"/>
         </template>
         <template #actions v-if="state.user">
             <div class="text-white">
